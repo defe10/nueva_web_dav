@@ -1,0 +1,84 @@
+{% extends "sitio_publico/base.html" %} {% load static %} {% block title%}
+Cortometraje de Ficción · Plan IDEA{% endblock %} {% block content %}
+
+<!-- HERO SOLO DE ESTA PÁGINA -->
+<section class="fomento-detalle-hero">
+  <img
+    src="{% static 'sitio_publico/img/fomento.jpg' %}"
+    alt="Cortometraje de ficción"
+  />
+</section>
+
+<div class="container my-5">
+  <!-- TÍTULO PRINCIPAL -->
+  <div class="fomento-detalle-header text-center mb-5">
+    <h1>Cortometraje de Ficción</h1>
+    <p class="lead">Línea del Plan IDEA · Secretaría de Cultura de Salta</p>
+  </div>
+
+  <!-- CARD: DESCRIPCIÓN -->
+  <div class="fomento-detalle-card mb-4">
+    <h2>Descripción</h2>
+    <p>
+      Esta línea de fomento impulsa la producción de cortometrajes de ficción
+      realizados en la provincia de Salta, promoviendo nuevas voces creativas y
+      fortaleciendo el ecosistema audiovisual local.
+    </p>
+    <p>
+      Se otorgará apoyo económico no reembolsable destinado al desarrollo y
+      producción de obras con una duración máxima de 15 minutos.
+    </p>
+  </div>
+
+  <!-- CARD: OBJETIVOS -->
+  <div class="fomento-detalle-card mb-4">
+    <h2>Objetivos</h2>
+    <ul>
+      <li>Estimular la creación audiovisual salteña.</li>
+      <li>Promover la profesionalización del sector.</li>
+      <li>Fortalecer la producción de cortometrajes locales.</li>
+      <li>Incentivar la participación de nuevos realizadores.</li>
+    </ul>
+  </div>
+
+  <!-- CARD: REQUISITOS -->
+  <div class="fomento-detalle-card mb-4">
+    <h2>Requisitos</h2>
+    <ul>
+      <li>Ser persona humana o jurídica radicada en Salta.</li>
+      <li>Contar con Registro Audiovisual actualizado.</li>
+      <li>Presentar un proyecto original en formato PDF.</li>
+      <li>Duración final del cortometraje entre 5 y 15 minutos.</li>
+    </ul>
+  </div>
+
+  <!-- CARD: DOCUMENTACIÓN -->
+  <div class="fomento-detalle-card mb-4">
+    <h2>Documentación requerida</h2>
+    <ul>
+      <li>Proyecto completo (sinopsis, tratamiento, guion).</li>
+      <li>Plan de producción y plan de rodaje.</li>
+      <li>Presupuesto detallado.</li>
+      <li>DNI o datos societarios.</li>
+      <li>CV del equipo técnico.</li>
+      <li>Declaración jurada de aceptación de bases.</li>
+    </ul>
+  </div>
+
+  <!-- CARD: FECHAS -->
+  <div class="fomento-detalle-card mb-4">
+    <h2>Fechas</h2>
+    <p><strong>Apertura:</strong> 15 de marzo de 2025</p>
+    <p><strong>Cierre:</strong> 30 de abril de 2025</p>
+    <p><strong>Resultados:</strong> junio de 2025</p>
+  </div>
+
+  <!-- BOTÓN -->
+  <div class="text-center my-5">
+    <a href="{% url 'postular_idea' %}" class="btn btn-fomento">
+      Inscribirme
+    </a>
+  </div>
+</div>
+
+{% endblock %}

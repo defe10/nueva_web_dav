@@ -1,0 +1,12 @@
+{% extends "sitio_publico/base.html" %}
+
+{% block content %}
+<h1>Registro audiovisual - Persona jurídica</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+
+{% endblock %}

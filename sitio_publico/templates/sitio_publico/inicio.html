@@ -1,0 +1,232 @@
+{% extends 'sitio_publico/base.html' %} {% load static %} {% block title%}Inicio
+— Dirección de Audiovisuales{% endblock %} {% block layout %}
+
+<!-- HERO -->
+<section class="hero-section py-5">
+  <div class="container">
+    <div class="row g-4">
+      <!-- CARD IZQUIERDA -->
+      <div class="col-lg-3">
+        <div class="hero-card-left p-4 p-lg-5 h-100">
+          <div class="d-flex flex-wrap gap-3">
+            <img
+              src="{% static 'sitio_publico/img/dav.png' %}"
+              class="d-block w-100 hero-img2"
+              alt="Imagen 1"
+            />
+          </div>
+          <h3 class="fw-bold mb-3 text-white">
+            Dirección de Audiovisuales de Salta
+          </h3>
+
+          <div class="redes mb-1 mt-3">
+            <a
+              href="https://web.facebook.com/davsalta"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mx-2 redes-icon"
+            >
+              <i class="bi bi-facebook"></i>
+            </a>
+
+            <a
+              href="http://www.youtube.com/@Direcci%C3%B3ndeAudiovisualesSalta"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mx-2 redes-icon"
+            >
+              <i class="bi bi-youtube"></i>
+            </a>
+
+            <a
+              href="https://www.instagram.com/direccion.audiovisuales.salta"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mx-2 redes-icon"
+            >
+              <i class="bi bi-instagram"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD CENTRO -->
+      <div class="col-lg-3">
+        <div class="hero-card-center p-4 p-lg-5 h-100">
+          <h4 class="fw-light mb-4 text-white">
+            Conocé los programas y actividades que buscan impulsar la actividad
+            audiovisual local.
+          </h4>
+          <div>
+            <a href="#" class="btn btn-outline-light btn-lg boton-programa">
+              Registro Audiovisual
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD DERECHA (Carrusel) -->
+      <div class="col-lg-6">
+        <div class="hero-card-right h-100">
+          <div
+            id="heroCarousel"
+            class="carousel slide h-100"
+            data-bs-ride="carousel"
+          >
+            <div class="carousel-inner h-100">
+              <div class="carousel-item active h-100">
+                <img
+                  src="{% static 'sitio_publico/img/cash-rebate.jpg' %}"
+                  class="d-block w-100 hero-img"
+                  alt="Imagen 1"
+                />
+              </div>
+
+              <div class="carousel-item h-100">
+                <img
+                  src="{% static 'sitio_publico/img/cinemovil.jpg' %}"
+                  class="d-block w-100 hero-img"
+                  alt="Imagen 2"
+                />
+              </div>
+
+              <div class="carousel-item h-100">
+                <img
+                  src="{% static 'sitio_publico/img/fomento.jpg' %}"
+                  class="d-block w-100 hero-img"
+                  alt="Imagen 3"
+                />
+              </div>
+
+              <div class="carousel-item h-100">
+                <img
+                  src="{% static 'sitio_publico/img/estudio387.jpg' %}"
+                  class="d-block w-100 hero-img"
+                  alt="Imagen 4"
+                />
+              </div>
+            </div>
+
+            <!-- CONTROLES -->
+            <button
+              class="carousel-control-prev"
+              type="button"
+              data-bs-target="#heroCarousel"
+              data-bs-slide="prev"
+            >
+              <span class="carousel-control-prev-icon"></span>
+            </button>
+
+            <button
+              class="carousel-control-next"
+              type="button"
+              data-bs-target="#heroCarousel"
+              data-bs-slide="next"
+            >
+              <span class="carousel-control-next-icon"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ÁREAS DE GESTIÓN -->
+<section class="py-5 bg-light border-top border-bottom">
+  <div class="container">
+    <h3 class="fw-bold mb-4">Áreas de gestión</h3>
+
+    <div class="row g-4">
+      <!-- FOMENTO -->
+      <div class="col-sm-12 col-md-6 col-lg-3">
+        <div class="card card-area shadow-sm h-100">
+          <div class="card-img-top-area">
+            <img
+              src="{% static 'sitio_publico/img/fomento.jpg' %}"
+              alt="Fomento"
+              class="img-area"
+            />
+          </div>
+          <div class="card-body">
+            <h5 class="mb-2">FOMENTO</h5>
+            <p class="text-muted">
+              Fomento para desarrollo y producción audiovisual.
+            </p>
+            <a href="{% url 'convocatorias_home' %}" class="card-plus">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMOCIÓN -->
+      <div class="col-sm-12 col-md-6 col-lg-3">
+        <div class="card card-area shadow-sm h-100">
+          <div class="card-img-top-area">
+            <img
+              src="{% static 'sitio_publico/img/rodaje.jpg' %}"
+              alt="Promoción"
+              class="img-area"
+            />
+          </div>
+          <div class="card-body">
+            <h5 class="mb-2">PROMOCIÓN</h5>
+            <p class="text-muted">
+              Promoción de la actividad audiovisual y asistencia para rodajes.
+            </p>
+            <a href="https://saltaset.gob.ar" class="card-plus">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORMACIÓN -->
+      <div class="col-sm-12 col-md-6 col-lg-3">
+        <div class="card card-area shadow-sm h-100">
+          <div class="card-img-top-area">
+            <img
+              src="{% static 'sitio_publico/img/estudio387.jpg' %}"
+              alt="Formación"
+              class="img-area"
+            />
+          </div>
+          <div class="card-body">
+            <h5 class="mb-2">FORMACIÓN</h5>
+            <p class="text-muted">
+              Programas y talleres para capacitación profesional.
+            </p>
+            <a href="{% url 'convocatorias_home' %}" class="card-plus">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXHIBICIÓN -->
+      <div class="col-sm-12 col-md-6 col-lg-3">
+        <div class="card card-area shadow-sm h-100">
+          <div class="card-img-top-area">
+            <img
+              src="{% static 'sitio_publico/img/cinemovil.jpg' %}"
+              alt="Exhibición"
+              class="img-area"
+            />
+          </div>
+          <div class="card-body">
+            <h5 class="mb-2">EXHIBICIÓN</h5>
+            <p class="text-muted">
+              Proyección, muestras y acceso a contenidos audiovisuales.
+            </p>
+            <a href="#" class="card-plus">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

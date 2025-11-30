@@ -1,0 +1,10 @@
+{% extends "sitio_publico/base.html" %}
+
+{% block content %}
+<h1>Registro audiovisual</h1>
+<p>Seleccioná el tipo de registro que querés completar:</p>
+
+<a href="{% url 'editar_persona_humana' %}" class="btn btn-primary">Persona humana</a>
+<a href="{% url 'editar_persona_juridica' %}" class="btn btn-secondary">Persona jurídica</a>
+
+{% endblock %}

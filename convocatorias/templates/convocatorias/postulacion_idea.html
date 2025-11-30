@@ -1,0 +1,30 @@
+{% extends "sitio_publico/base.html" %}
+
+{% block content %}
+<h1>Postulación a IDEA</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <!-- BOTÓN 1 — DOCUMENTACIÓN PERSONAL -->
+    <p>
+        <a href="{% url 'subir_documentacion_personal' %}" class="btn btn-secondary">
+            Subir documentación personal
+        </a>
+    </p>
+
+    <!-- BOTÓN 2 — DOCUMENTACIÓN DEL PROYECTO -->
+    <p>
+        <a href="#" class="btn btn-secondary"
+           onclick="alert('Primero tenés que completar los datos y darle a CONTINUAR. Después vas a poder subir la documentación del proyecto.')">
+            Subir documentación del proyecto
+        </a>
+    </p>
+
+    <!-- BOTÓN FINAL -->
+    <button type="submit" class="btn btn-primary">Continuar</button>
+</form>
+
+{% endblock %}
+
