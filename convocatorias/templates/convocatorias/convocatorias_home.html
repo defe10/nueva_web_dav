@@ -20,338 +20,44 @@
 
       <!-- CARRUSEL -->
       <div class="carrusel">
-        <!-- 1 -->
+        {% for c in todas %}
         <div class="card-area">
           <div class="card-img-top-area">
+            {% if c.imagen %}
+            <img src="{{ c.imagen.url }}" class="img-area" />
+            {% else %}
             <img
-              src="{% static 'sitio_publico/img/idea.jpg' %}"
+              src="{% static 'sitio_publico/img/default.jpg' %}"
               class="img-area"
             />
+            {% endif %}
           </div>
+
           <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1"
-              >Concurso</small
-            >
-            <h5 class="mb-2">Cortometraje de ficción</h5>
+            <small class="text-muted text-uppercase d-block mb-1">
+              {{ c.get_categoria_display }}
+            </small>
+
+            <h5 class="mb-2">{{ c.titulo }}</h5>
+
             <p class="small text-muted">
-              Concurso de cortometraje de ficción de temática libre.
+              {{ c.descripcion_corta|truncatewords:20 }}
             </p>
-            <a href="{% url 'idea_concurso_ficcion' %}" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
 
-        <!-- 2 -->
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/videoclips.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1"
-              >Concurso</small
-            >
-            <h5 class="mb-2">Videoclips</h5>
-            <p class="small text-muted">
-              Concurso de videoclips de bandas o músicos/as salteñas.
-            </p>
-            <a href="{% url 'idea_concurso_videoclip' %}" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
+            <a href="{% url 'convocatoria_detalle' c.slug %}" class="card-plus">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
           </div>
         </div>
-
-        <!-- 3 -->
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/desarrollo.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1"
-              >Programa</small
-            >
-            <h5 class="mb-2">Desarrollo de largos</h5>
-            <p class="small text-muted">
-              Clínicas para desarrollo de largometrajes.
-            </p>
-            <a href="{% url 'idea_concurso_videoclip' %}" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-
-        <!-- 4 -->
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/comunidad.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1"
-              >Programa</small
-            >
-            <h5 class="mb-2">Cine en Comunidad</h5>
-            <p class="small text-muted">
-              Formación y creación audiovisual para grupos comunitarios.
-            </p>
-            <a href="{% url 'idea_programa_comunidad' %}" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-
-        <!-- 5 -->
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/lab.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1"
-              >Programa</small
-            >
-            <h5 class="mb-2">Laboratorio de Cortos</h5>
-            <p class="small text-muted">
-              Clínicas para proyectos de cortometrajes de ficción.
-            </p>
-            <a href="{% url 'idea_concurso_videoclip' %}" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-
-        <!-- 6 -->
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/animacion.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1"
-              >Programa</small
-            >
-            <h5 class="mb-2">Entrenamiento en Animación</h5>
-            <p class="small text-muted">Clínicas y masterclasses.</p>
-            <a href="{% url 'idea_concurso_videoclip' %}" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-
-        <!-- 7 -->
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/videoclips.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1"
-              >Programa</small
-            >
-            <h5 class="mb-2">Desarrollo de Videojuegos</h5>
-            <p class="small text-muted">Estrategias de desarrollo.</p>
-            <a href="{% url 'idea_concurso_videoclip' %}" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-
-        <!-- 8 -->
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/rodaje.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1"
-              >Subsidio</small
-            >
-            <h5 class="mb-2">Apoyo a Rodaje</h5>
-            <p class="small text-muted">
-              Apoyo a largometrajes, series y cortos en rodaje.
-            </p>
-            <a href="{% url 'idea_concurso_videoclip' %}" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-
-        <!-- 9 -->
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/finalizacion.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1"
-              >Subsidio</small
-            >
-            <h5 class="mb-2">Apoyo a Finalización</h5>
-            <p class="small text-muted">
-              Apoyo a largometrajes, series y cortos en postproducción.
-            </p>
-            <a href="{% url 'idea_concurso_videoclip' %}" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-
-        <!-- 10 -->
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/eventos.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1"
-              >Subsidio</small
-            >
-            <h5 class="mb-2">Participación en Eventos</h5>
-            <p class="small text-muted">Apoyo a movilidad.</p>
-            <a href="{% url 'idea_concurso_videoclip' %}" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
+        {% endfor %}
       </div>
-      <!-- FIN CARRUSEL -->
-    </div>
-  </div>
 
-  <!-- CURSOS -->
-  <h2 class="seccion-titulo">Cursos y Capacitaciones</h2>
-  <div class="carrusel-fondo">
-    <div class="carrusel-wrap">
-      <div class="flecha izq" onclick="moverCarrusel(this, -1)">‹</div>
-      <div class="flecha der" onclick="moverCarrusel(this, 1)">›</div>
-
-      <div class="carrusel">
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/formacion_presupuestos.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-uppercase text-muted">Formación</small>
-            <h5 class="fw-bold">Curso de Guion</h5>
-            <p class="text-muted small">
-              Capacitación intensiva en escritura audiovisual.
-            </p>
-            <a href="#" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/carpeta_andreaU.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-uppercase text-muted">Formación</small>
-            <h5 class="fw-bold">Producción audiovisual</h5>
-            <p class="text-muted small">
-              Curso práctico de producción audiovisual.
-            </p>
-            <a href="#" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/carpeta_andreaU.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-uppercase text-muted">Formación</small>
-            <h5 class="fw-bold">Tutoriales</h5>
-            <p class="text-muted small">
-              Guía práctica para inscripción a IDEA.
-            </p>
-            <a href="#" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- INCENTIVOS -->
-  <h2 class="seccion-titulo">Incentivos y Beneficios</h2>
-  <div class="carrusel-fondo">
-    <div class="carrusel-wrap">
-      <div class="flecha izq" onclick="moverCarrusel(this, -1)">‹</div>
-      <div class="flecha der" onclick="moverCarrusel(this, 1)">›</div>
-
-      <div class="carrusel">
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/cash.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-uppercase text-muted">Incentivo</small>
-            <h5 class="fw-bold">Cash Rebate</h5>
-            <p class="text-muted small">
-              Reintegro de gastos a producciones audiovisuales.
-            </p>
-            <a href="#" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-
-        <div class="card-area">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/exencion.jpg' %}"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <small class="text-uppercase text-muted">Beneficio</small>
-            <h5 class="fw-bold">Exención impositiva</h5>
-            <p class="text-muted small">
-              Beneficios fiscales para el sector audiovisual.
-            </p>
-            <a href="#" class="card-plus"
-              ><i class="bi bi-plus-circle-fill"></i
-            ></a>
-          </div>
-        </div>
-      </div>
+      <!-- CURSOS -->
+      <h2 class="seccion-titulo">Cursos y Capacitaciones</h2>
+      ...
+      <!-- INCENTIVOS -->
+      <h2 class="seccion-titulo">Incentivos y Beneficios</h2>
+      ...
     </div>
   </div>
 </div>

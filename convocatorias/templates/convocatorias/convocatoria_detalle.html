@@ -1,0 +1,131 @@
+{% extends "sitio_publico/base.html" %} {% load static %} {% block title %}
+{{c.titulo }}{% endblock %} {% block content %}
+<section class="py-5">
+  <div class="container">
+    <!-- Volver -->
+    <p class="small mb-3">
+      <a
+        href="{% url 'convocatorias_home' %}"
+        class="text-decoration-none text-muted"
+      >
+        ← Volver a convocatorias
+      </a>
+    </p>
+
+    <!-- TITULO + ESTADO -->
+    <div
+      class="d-flex justify-content-between align-items-start flex-wrap mb-4"
+    >
+      <div>
+        <h1 class="fw-bold h3 mb-1">{{ c.titulo }}</h1>
+
+        <p class="text-muted mb-1">{{ c.categoria }}</p>
+
+        {% if c.temática_genero %}
+        <p class="text-muted small mb-0">
+          <strong>Temática y género:</strong> {{ c.temática_genero }}
+        </p>
+        {% endif %}
+      </div>
+
+      <div class="text-end">
+        {% if c.vigente %}
+        <span class="badge bg-success">Convocatoria abierta</span>
+        <p class="small text-muted mt-1">
+          Hasta el {{ c.fecha_fin|date:"d/m/Y" }}
+        </p>
+        {% else %}
+        <span class="badge bg-secondary">Convocatoria finalizada</span>
+        <p class="small text-muted mt-1">
+          Del {{ c.fecha_inicio|date:"d/m/Y" }} al {{ c.fecha_fin|date:"d/m/Y"
+          }}
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- IMAGEN -->
+    {% if c.imagen %}
+    <div class="mb-4">
+      <img
+        src="{{ c.imagen.url }}"
+        class="img-fluid rounded"
+        alt="{{ c.titulo }}"
+      />
+    </div>
+    {% endif %}
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="row g-4">
+      <!-- DESCRIPCIÓN IZQUIERDA -->
+      <div class="col-lg-8">
+        <!-- REQUISITOS -->
+        <h4 class="fw-bold mt-3">Requisitos</h4>
+        {% if c.requisitos %}
+        <div class="mb-4">{{ c.requisitos|safe }}</div>
+        {% else %}
+        <p class="text-muted">(Sin requisitos cargados)</p>
+        {% endif %}
+
+        <!-- BENEFICIOS -->
+        <h4 class="fw-bold mt-4">Beneficios</h4>
+        {% if c.beneficios %}
+        <div class="mb-4">{{ c.beneficios|safe }}</div>
+        {% else %}
+        <p class="text-muted">(Sin beneficios cargados)</p>
+        {% endif %}
+
+        <!-- BOTONES -->
+        <div class="mt-4 d-flex flex-wrap gap-3">
+          {% if c.bases_pdf %}
+          <a
+            href="{{ c.bases_pdf.url }}"
+            target="_blank"
+            class="btn btn-outline-primary"
+          >
+            Bases y condiciones
+          </a>
+          {% endif %} {% if c.vigente %}
+          <a href="{% url 'postular_idea' %}" class="btn btn-primary">
+            Inscribirme
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- FICHA TÉCNICA DERECHA -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="fw-bold mb-3">Ficha técnica</h5>
+
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span class="text-muted">Categoría</span>
+                <span>{{ c.categoria }}</span>
+              </li>
+
+              {% if c.temática_genero %}
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span class="text-muted">Temática y género</span>
+                <span class="text-end">{{ c.temática_genero }}</span>
+              </li>
+              {% endif %}
+
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span class="text-muted">Inicio</span>
+                <span>{{ c.fecha_inicio|date:"d/m/Y" }}</span>
+              </li>
+
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span class="text-muted">Cierre</span>
+                <span>{{ c.fecha_fin|date:"d/m/Y" }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

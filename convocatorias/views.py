@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone   # <-- IMPORT NECESARIO
 
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
-from .models import PostulacionIDEA, DocumentoPersonal, DocumentoProyecto
-from .forms import PostulacionIdeaForm
+from .models import PostulacionIDEA, DocumentoPersonal, DocumentoProyecto, Convocatoria
+from .forms import PostulacionIdeaForm, ConvocatoriaForm
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 # =====================================================
@@ -11,54 +13,22 @@ from .forms import PostulacionIdeaForm
 # =====================================================
 
 def convocatorias_home(request):
-    return render(request, "convocatorias/convocatorias_home.html")
+    hoy = timezone.now().date()
+
+    vigentes = Convocatoria.objects.filter(
+        fecha_inicio__lte=hoy,
+        fecha_fin__gte=hoy
+    )
+
+    todas = Convocatoria.objects.all()  # <-- para el carrusel
+
+    return render(request, "convocatorias/convocatorias_home.html", {
+        "vigentes": vigentes,
+        "todas": todas,
+    })
 
 
-# =====================================================
-# VISTAS DE LÍNEAS DEL PLAN IDEA
-# =====================================================
-# Concursos
-def idea_concurso_ficcion(request):
-    return render(request, "convocatorias/idea_concurso_ficcion.html")
 
-def idea_concurso_videoclip(request):
-    return render(request, "convocatorias/idea_concurso_videoclip.html")
-
-
-# Programas
-def idea_programa_largometrajes(request):
-    return render(request, "convocatorias/idea_programa_largometrajes.html")
-
-def idea_programa_laboratorio(request):
-    return render(request, "convocatorias/idea_programa_laboratorio.html")
-
-def idea_programa_comunidad(request):
-    return render(request, "convocatorias/idea_programa_comunidad.html")
-
-def idea_programa_animacion(request):
-    return render(request, "convocatorias/idea_programa_animacion.html")
-
-def idea_programa_videojuegos(request):
-    return render(request, "convocatorias/idea_programa_videojuegos.html")
-
-
-# Subsidios
-def idea_subsidio_rodaje(request):
-    return render(request, "convocatorias/idea_subsidio_rodaje.html")
-
-def idea_subsidio_finalizacion(request):
-    return render(request, "convocatorias/idea_subsidio_finalizacion.html")
-
-def idea_subsidio_eventos(request):
-    return render(request, "convocatorias/idea_subsidio_eventos.html")
-
-
-# Cursos IDEA (opcional)
-def idea_curso_presupuestos(request):
-    return render(request, "convocatorias/idea_curso_presupuestos.html")
-
-def idea_curso_contar(request):
-    return render(request, "convocatorias/idea_curso_contar.html")
 
 
 # =====================================================
@@ -72,11 +42,9 @@ def postular_idea(request):
     perfil_h = PersonaHumana.objects.filter(user=request.user).first()
     perfil_j = PersonaJuridica.objects.filter(user=request.user).first()
 
-    # Si no tiene registro → enviarlo a completarlo
     if not perfil_h and not perfil_j:
         return redirect("/registro/seleccionar-tipo/?next=/convocatorias/idea/postular/")
 
-    # Si tiene registro → puede postular
     if request.method == "POST":
         form = PostulacionIdeaForm(request.POST)
         if form.is_valid():
@@ -99,7 +67,6 @@ def subir_documentacion_personal(request):
     if request.method == "POST" and request.FILES.getlist("archivos"):
         for archivo in request.FILES.getlist("archivos"):
             DocumentoPersonal.objects.create(user=request.user, archivo=archivo)
-
         return redirect("panel_usuario")
 
     return render(request, "convocatorias/subir_documentacion_personal.html")
@@ -118,8 +85,10 @@ def subir_documentacion_proyecto(request, postulacion_id):
 
     if request.method == "POST" and request.FILES.getlist("archivos"):
         for archivo in request.FILES.getlist("archivos"):
-            DocumentoProyecto.objects.create(postulacion=postulacion, archivo=archivo)
-
+            DocumentoProyecto.objects.create(
+                postulacion=postulacion,
+                archivo=archivo
+            )
         return redirect("confirmar_postulacion_idea", postulacion_id=postulacion.id)
 
     return render(request, "convocatorias/subir_documentacion_proyecto.html", {
@@ -159,3 +128,30 @@ def confirmar_postulacion_idea(request, postulacion_id):
 
 def postulacion_idea_confirmada(request):
     return render(request, "convocatorias/postulacion_idea_confirmada.html")
+
+
+# DEL FORMULARIO WEB CONVOCATORIA
+
+@staff_member_required
+def crear_convocatoria(request):
+    if request.method == "POST":
+        form = ConvocatoriaForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect("convocatorias_home")
+    else:
+        form = ConvocatoriaForm()
+
+    return render(request, "convocatorias/crear_convocatoria.html", {
+        "form": form
+    })
+
+
+# Formulario dinamico
+
+
+def convocatoria_detalle(request, slug):
+    convocatoria = get_object_or_404(Convocatoria, slug=slug)
+    return render(request, "convocatorias/detalle_convocatoria.html", {
+        "convocatoria": convocatoria
+    })

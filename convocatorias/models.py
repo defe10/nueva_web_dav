@@ -1,58 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from django.utils.text import slugify
 
 
-# ----- CHOICES -----
-
-LINEAS_FOMENTO = [
-    ('CONC_FICCION', 'Concurso de cortometrajes de ficción'),
-    ('CONC_VIDEOCLIP', 'Concurso de videoclips'),
-    ('PROG_LARGOS', 'Desarrollo de largometrajes'),
-    ('PROG_LAB_CORTOS', 'Laboratorio de cortometrajes'),
-    ('PROG_COMUNIDAD', 'Cine en comunidad'),
-    ('PROG_ANIMACION', 'Entrenamiento en animación'),
-    ('PROG_VIDEOJUEGOS', 'Desarrollo de videojuegos'),
-    ('SUB_RODAJE', 'Apoyo a rodaje'),
-    ('SUB_FINALIZACION', 'Apoyo a finalización de obras'),
-    ('SUB_EVENTOS', 'Apoyo a participación en eventos audiovisuales'),
-]
-
-TIPOS_PROYECTO = [
-    ('CORTO', 'Cortometraje'),
-    ('LARGO', 'Largometraje'),
-    ('VIDEOCLIP', 'Videoclip'),
-    ('TRANSMEDIA', 'Transmedia'),
-    ('SERIE', 'Serie'),
-    ('VIDEOJUEGO', 'Videojuego'),
-    ('ANIMACION', 'Animación'),
-    ('COMUNIDAD', 'Cine en comunidad'),
-]
-
-GENEROS = [
-    ('FICCION', 'Ficción'),
-    ('DOCUMENTAL', 'Documental'),
-    ('NO_FICCION', 'No ficción'),
-    ('EDUCATIVO', 'Educativo'),
-    ('DEPORTIVO', 'Deportivo'),
-    ('LUDICO', 'Lúdico'),
-    ('SIMULACION', 'Simulación'),
-    ('OTRO', 'Otro'),
-]
-
-
-# ----- MODELO PRINCIPAL -----
+# ==============================
+# MODELOS EXISTENTES (igual)
+# ==============================
 
 class PostulacionIDEA(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    linea_fomento = models.CharField(max_length=50, choices=LINEAS_FOMENTO)
+    linea_fomento = models.CharField(max_length=50)
     nombre_proyecto = models.CharField(max_length=255)
-    tipo_proyecto = models.CharField(max_length=50, choices=TIPOS_PROYECTO)
-    genero = models.CharField(max_length=50, choices=GENEROS)
+    tipo_proyecto = models.CharField(max_length=50)
+    genero = models.CharField(max_length=50)
     duracion_minutos = models.PositiveIntegerField()
 
     declaracion_jurada = models.BooleanField(default=False)
-
     fecha_envio = models.DateTimeField(auto_now_add=True)
 
     ESTADOS = [
@@ -62,11 +27,11 @@ class PostulacionIDEA(models.Model):
         ('APROBADA', 'Aprobada'),
         ('RECHAZADA', 'Rechazada'),
     ]
-
     estado = models.CharField(max_length=20, choices=ESTADOS, default='ENVIADA')
 
     def __str__(self):
         return f"{self.nombre_proyecto} - {self.user.username}"
+
 
 class DocumentoPersonal(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -75,6 +40,7 @@ class DocumentoPersonal(models.Model):
 
     def __str__(self):
         return f"Doc personal de {self.user.username}"
+
 
 class DocumentoProyecto(models.Model):
     postulacion = models.ForeignKey(
@@ -88,3 +54,74 @@ class DocumentoProyecto(models.Model):
     def __str__(self):
         return f"Doc proyecto #{self.postulacion.id}"
 
+
+# ==============================
+# CONVOCATORIAS
+# ==============================
+
+CATEGORIAS = [
+    ("CONCURSO", "Concurso"),
+    ("PROGRAMA", "Programa"),
+    ("SUBSIDIO", "Subsidio"),
+    ("CURSO", "Curso"),
+    ("INCENTIVO", "Incentivo"),
+    ("BENEFICIO", "Beneficio"),
+]
+
+
+class Jurado(models.Model):
+    nombre = models.CharField(max_length=200)
+    foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+
+
+class Convocatoria(models.Model):
+    titulo = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+
+    descripcion_corta = models.TextField(blank=True)
+    descripcion_larga = models.TextField(blank=True)  # ← NUEVO
+
+    categoria = models.CharField(max_length=20, choices=CATEGORIAS)
+    tematica_genero = models.CharField(max_length=200, blank=True)
+
+    requisitos = models.TextField(blank=True)
+    beneficios = models.TextField(blank=True)
+    bases_pdf = models.FileField(upload_to="convocatorias/bases/", blank=True, null=True)
+
+    imagen = models.ImageField(upload_to="convocatorias/img/", blank=True, null=True)
+
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+
+    jurado1_nombre = models.CharField(max_length=200, blank=True)
+    jurado1_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
+
+    jurado2_nombre = models.CharField(max_length=200, blank=True)
+    jurado2_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
+
+    jurado3_nombre = models.CharField(max_length=200, blank=True)
+    jurado3_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
+
+
+    orden = models.PositiveIntegerField(default=0)  # ← NUEVO (para ordenar carrusel)
+
+    url_destino = models.CharField(max_length=300, blank=True)
+
+    class Meta:
+        ordering = ["orden", "-fecha_inicio"]
+
+    @property
+    def vigente(self):
+        hoy = timezone.now().date()
+        return self.fecha_inicio <= hoy <= self.fecha_fin
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.titulo:
+            self.slug = slugify(self.titulo)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.titulo

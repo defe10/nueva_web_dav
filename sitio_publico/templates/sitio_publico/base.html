@@ -151,7 +151,24 @@
     <!-- CONTENIDO -->
     {% block layout %}
     <div class="container py-4">{% block content %}{% endblock %}</div>
-    {% endblock %}
+    {% endblock %} {% if user.is_staff %}
+    <div class="container my-4">
+      <div class="p-4 border rounded bg-light shadow-sm">
+        <h5 class="fw-bold mb-3">Panel de administración</h5>
+
+        <a href="{% url 'crear_convocatoria' %}" class="btn btn-primary btn-sm">
+          Crear nueva convocatoria
+        </a>
+
+        <a
+          href="{% url 'convocatorias_home' %}"
+          class="btn btn-outline-secondary btn-sm"
+        >
+          Ver convocatorias vigentes
+        </a>
+      </div>
+    </div>
+    {% endif %}
 
     <!-- FOOTER -->
     <footer class="footer mt-auto py-4 bg-light border-top">
