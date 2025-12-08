@@ -1,0 +1,13 @@
+Hola {{ user.username }},
+
+Gracias por registrarte en nuestra plataforma.
+
+Para activar tu cuenta, hacé clic en el siguiente enlace:
+
+https://{{ domain }}{% url 'usuario:activar' uid=uid token=token %}
+
+Si el enlace no funciona, copiá y pegá la siguiente dirección en tu navegador:
+
+https://{{ domain }}{% url 'usuario:activar' uid=uid token=token %}
+
+Si no creaste esta cuenta, simplemente ignorá este mensaje.

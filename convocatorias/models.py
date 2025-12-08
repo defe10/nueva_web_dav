@@ -63,11 +63,17 @@ CATEGORIAS = [
     ("CONCURSO", "Concurso"),
     ("PROGRAMA", "Programa"),
     ("SUBSIDIO", "Subsidio"),
-    ("CURSO", "Curso"),
+    ("CURSO", "Curso / Capacitación"),
     ("INCENTIVO", "Incentivo"),
     ("BENEFICIO", "Beneficio"),
 ]
 
+BLOQUE_PERSONAS_TITULO = [
+    ("JURADO", "Jurado"),
+    ("FORMADORES", "Formadores"),
+    ("TUTORES", "Tutores"),
+    ("NINGUNO", "Sin título"),
+]
 
 class Jurado(models.Model):
     nombre = models.CharField(max_length=200)
@@ -96,14 +102,22 @@ class Convocatoria(models.Model):
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
 
+    bloque_personas = models.CharField(
+    max_length=20,
+    choices=BLOQUE_PERSONAS_TITULO,
+    default="JURADO"
+)
     jurado1_nombre = models.CharField(max_length=200, blank=True)
     jurado1_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
+    jurado1_bio = models.TextField(blank=True)
 
     jurado2_nombre = models.CharField(max_length=200, blank=True)
     jurado2_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
+    jurado2_bio = models.TextField(blank=True)
 
     jurado3_nombre = models.CharField(max_length=200, blank=True)
     jurado3_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
+    jurado3_bio = models.TextField(blank=True)
 
 
     orden = models.PositiveIntegerField(default=0)  # ← NUEVO (para ordenar carrusel)

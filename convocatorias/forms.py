@@ -36,14 +36,17 @@ class ConvocatoriaForm(forms.ModelForm):
 
             "fecha_inicio",
             "fecha_fin",
-
+            "bloque_personas",
             "jurado1_nombre",
             "jurado1_foto",
+            "jurado1_bio",
             "jurado2_nombre",
             "jurado2_foto",
+            "jurado2_bio",
             "jurado3_nombre",
             "jurado3_foto",
-
+            "jurado3_bio",
+          
             "orden",
         ]
 
@@ -55,7 +58,12 @@ class ConvocatoriaForm(forms.ModelForm):
             "beneficios": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "fecha_inicio": forms.DateInput(attrs={"type": "date"}),
             "fecha_fin": forms.DateInput(attrs={"type": "date"}),
-        }
+            "bloque_personas": forms.Select(attrs={"class": "form-select"}),
+            "jurado1_bio": forms.Textarea(attrs={"rows": 2, "class": "form-control"}),
+            "jurado2_bio": forms.Textarea(attrs={"rows": 2, "class": "form-control"}),
+            "jurado3_bio": forms.Textarea(attrs={"rows": 2, "class": "form-control"}),
+}
+        
 
 
     def save(self, commit=True):

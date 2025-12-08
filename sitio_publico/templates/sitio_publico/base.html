@@ -45,10 +45,6 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-    />
 
     <!-- CSS personalizados -->
     <link
@@ -60,8 +56,13 @@
       rel="stylesheet"
       href="{% static 'sitio_publico/css/fomento.css' %}"
     />
+    <link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
 
-    {% block extra_css %}{% endblock %} {% block head %}{% endblock %}
+
+
+
+    {% block extra_css %}{% endblock %}
+    {% block head %}{% endblock %}
   </head>
 
   <body>
@@ -131,16 +132,15 @@
 
             {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'panel_usuario' %}">Mi cuenta</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'logout' %}">Salir</a>
+              <a class="btn btn-outline-primary" href="{% url 'usuario:logout' %}">
+                Salir
+              </a>
             </li>
             {% else %}
             <li class="nav-item ms-2">
-              <a class="btn btn-outline-primary" href="{% url 'login' %}"
-                >Mi cuenta</a
-              >
+              <a class="btn btn-outline-primary" href="{% url 'usuario:login' %}">
+                Mi cuenta
+              </a>
             </li>
             {% endif %}
           </ul>
@@ -151,7 +151,9 @@
     <!-- CONTENIDO -->
     {% block layout %}
     <div class="container py-4">{% block content %}{% endblock %}</div>
-    {% endblock %} {% if user.is_staff %}
+    {% endblock %}
+
+    {% if user.is_staff %}
     <div class="container my-4">
       <div class="p-4 border rounded bg-light shadow-sm">
         <h5 class="fw-bold mb-3">Panel de administración</h5>
@@ -188,9 +190,7 @@
           <div class="col-md-4 mb-3">
             <h6 class="text-uppercase fw-bold small">Enlaces útiles</h6>
             <ul class="list-unstyled small">
-              <li>
-                <a href="{% url 'inicio' %}" class="text-muted">Inicio</a>
-              </li>
+              <li><a href="{% url 'inicio' %}" class="text-muted">Inicio</a></li>
               <li><a href="#" class="text-muted">Institucional</a></li>
               <li><a href="#" class="text-muted">Servicios</a></li>
               <li>
@@ -228,23 +228,19 @@
         const contenedor = wrap.querySelector(".carrusel");
         if (!contenedor) return;
 
-        // Soporta nuevos estilos (card-area) y antiguos (card-fomento)
         const card =
           contenedor.querySelector(".card-area") ||
           contenedor.querySelector(".card-fomento");
 
-        if (!card) return; // No hay cards, no mueve nada
+        if (!card) return;
 
-        // Ancho de card + gap
         const styles = window.getComputedStyle(contenedor);
         const gap = parseInt(styles.gap || styles.columnGap || 0);
 
         const cardWidth = card.offsetWidth + gap;
 
-        // Nuevo destino del scroll
         let destino = contenedor.scrollLeft + direccion * cardWidth;
 
-        // Límite máximo para evitar pasar el final
         const maxScroll = contenedor.scrollWidth - contenedor.clientWidth + gap;
 
         destino = Math.max(0, Math.min(destino, maxScroll));

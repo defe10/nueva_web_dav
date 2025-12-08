@@ -58,7 +58,7 @@
             audiovisual local.
           </h4>
           <div>
-            <a href="#" class="btn btn-outline-light btn-lg boton-programa">
+            <a href="{% url 'registro:seleccionar_tipo_registro' %}" class="btn btn-outline-light btn-lg boton-programa">
               Registro Audiovisual
             </a>
           </div>
@@ -139,7 +139,7 @@
 
     <div class="row g-4">
       <!-- FOMENTO -->
-      <div class="col-sm-12 col-md-6 col-lg-3">
+      <div class="col-sm-12 col-md-6 col-lg card-col-5">
         <div class="card card-area shadow-sm h-100">
           <div class="card-img-top-area">
             <img
@@ -161,7 +161,7 @@
       </div>
 
       <!-- PROMOCIÓN -->
-      <div class="col-sm-12 col-md-6 col-lg-3">
+      <div class="col-sm-12 col-md-6 col-lg card-col-5">
         <div class="card card-area shadow-sm h-100">
           <div class="card-img-top-area">
             <img
@@ -171,9 +171,9 @@
             />
           </div>
           <div class="card-body">
-            <h5 class="mb-2">PROMOCIÓN</h5>
+            <h5 class="mb-2">SALTA SET</h5>
             <p class="text-muted">
-              Promoción de la actividad audiovisual y asistencia para rodajes.
+              Film Commission de la provincia de Salta.
             </p>
             <a href="https://saltaset.gob.ar" class="card-plus">
               <i class="bi bi-plus-circle-fill"></i>
@@ -183,7 +183,7 @@
       </div>
 
       <!-- FORMACIÓN -->
-      <div class="col-sm-12 col-md-6 col-lg-3">
+      <div class="col-sm-12 col-md-6 col-lg card-col-5">
         <div class="card card-area shadow-sm h-100">
           <div class="card-img-top-area">
             <img
@@ -205,7 +205,7 @@
       </div>
 
       <!-- EXHIBICIÓN -->
-      <div class="col-sm-12 col-md-6 col-lg-3">
+      <div class="col-sm-12 col-md-6 col-lg card-col-5">
         <div class="card card-area shadow-sm h-100">
           <div class="card-img-top-area">
             <img
@@ -215,9 +215,9 @@
             />
           </div>
           <div class="card-body">
-            <h5 class="mb-2">EXHIBICIÓN</h5>
+            <h5 class="mb-2">EXHIBICIÓN Y DIFUSIÓN</h5>
             <p class="text-muted">
-              Proyección, muestras y acceso a contenidos audiovisuales.
+              Proyección y ciclos de cine.
             </p>
             <a href="#" class="card-plus">
               <i class="bi bi-plus-circle-fill"></i>
@@ -225,6 +225,29 @@
           </div>
         </div>
       </div>
+
+      <!-- SEMANA DE CINE -->
+      <div class="col-sm-12 col-md-6 col-lg card-col-5">
+        <div class="card card-area shadow-sm h-100">
+          <div class="card-img-top-area">
+            <img
+              src="{% static 'sitio_publico/img/cinemovil.jpg' %}"
+              alt="Exhibición"
+              class="img-area"
+            />
+          </div>
+          <div class="card-body">
+            <h5 class="mb-2">SEMANA DE CINE EN SALTA</h5>
+            <p class="text-muted">
+              Festival de Cine.
+            </p>
+            <a href="#" class="card-plus">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>

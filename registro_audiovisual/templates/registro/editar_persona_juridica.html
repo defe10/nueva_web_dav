@@ -1,0 +1,216 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
+  <h1 class="mb-3">PLATAFORMA DE REGISTROS</h1>
+  <h2>Formulario – Persona Jurídica</h2>
+</div>
+
+<!-- FORMULARIO -->
+<section class="team section-bg">
+  <div class="container">
+    <div class="row justify-content-center">
+
+      <!-- COLUMNA IZQUIERDA -->
+      <div class="col-lg-4 mb-4">
+        <div class="memberRegistro mb-5 text-left">
+
+          <h5>Completa los datos de la persona jurídica</h5>
+          <br>
+
+          <p>
+            Ingresá los datos tal como figuran en la documentación oficial de la entidad.  <br><br>
+            La información correcta y actualizada es esencial para validar la inscripción y agilizar cualquier trámite administrativo.<br><br>
+            Al finalizar, hacé clic en “Enviar” para completar el registro.
+          </p>
+
+
+        </div>
+      </div>
+
+
+      <!-- COLUMNA DERECHA — FORMULARIO -->
+      <div class="col-lg-8">
+        <div class="memberRegistro mb-5 text-left">
+
+          <h3>FORMULARIO DE INSCRIPCIÓN</h3>
+          <p>Datos requeridos para la inscripción de Personas Jurídicas en el Registro.</p>
+
+          <form method="post" class="row datos_pers">
+            {% csrf_token %}
+
+            <!-- DATOS JURÍDICOS -->
+            <div class="col-lg-12 form-group">
+              <h5>Datos de la Persona Jurídica</h5>
+            </div>
+
+            <div class="col-lg-8 form-group">
+              <label>Tipo de persona jurídica</label>
+              {{ form.tipo_persona_juridica }}
+              {{ form.tipo_persona_juridica.errors }}
+            </div>
+
+            <div class="col-lg-4 form-group">
+              <label>CUIT</label>
+              {{ form.cuil_cuit }}
+              {{ form.cuil_cuit.errors }}
+            </div>
+
+            <div class="col-lg-6 form-group">
+              <label>Razón Social</label>
+              {{ form.razon_social }}
+              {{ form.razon_social.errors }}
+            </div>
+
+            <div class="col-lg-6 form-group">
+              <label>Nombre Comercial</label>
+              {{ form.nombre_comercial }}
+              {{ form.nombre_comercial.errors }}
+            </div>
+
+            <div class="col-lg-8 form-group">
+              <label>Domicilio fiscal</label>
+              {{ form.domicilio_fiscal }}
+              {{ form.domicilio_fiscal.errors }}
+            </div>
+
+            <div class="col-lg-4 form-group">
+              <label>Lugar de residencia</label>
+              {{ form.lugar_residencia }}
+              {{ form.lugar_residencia.errors }}
+            </div>
+
+            <div class="col-lg-8 form-group" id="otro-lugar-wrapper" style="display:none;">
+              <label>Especifique otro lugar</label>
+              {{ form.otro_lugar_residencia }}
+              {{ form.otro_lugar_residencia.errors }}
+            </div>
+
+            <div class="col-lg-5 form-group">
+              <label>Fecha de constitución</label>
+              {{ form.fecha_constitucion }}
+              {{ form.fecha_constitucion.errors }}
+            </div>
+
+            <div class="col-lg-2 form-group">
+              <label>Antigüedad</label>
+              {{ form.antiguedad }}
+              {{ form.antiguedad.errors }}
+            </div>
+
+            <div class="col-lg-5 form-group">
+              <label>Teléfono</label>
+              {{ form.telefono }}
+              {{ form.telefono.errors }}
+            </div>
+
+            <div class="col-lg-8 form-group">
+              <label>Correo electrónico</label>
+              {{ form.email }}
+              {{ form.email.errors }}
+            </div>
+
+            <!-- DATOS FISCALES -->
+            <div class="col-lg-12 form-group mt-4">
+              <h5>Datos Fiscales</h5>
+            </div>
+
+            <div class="col-lg-6 form-group">
+              <label>Situación ante el IVA</label>
+              {{ form.situacion_iva }}
+              {{ form.situacion_iva.errors }}
+            </div>
+
+            <div class="col-lg-6 form-group">
+              <label>Actividad declarada en DGR</label>
+              {{ form.actividad_dgr }}
+              {{ form.actividad_dgr.errors }}
+            </div>
+
+            <!-- DATOS PROFESIONALES -->
+
+            <div class="col-lg-12 form-group mt-4">
+              <h5>Datos Profesionales</h5>
+            </div>
+
+           <div class="col-lg-6 form-group">
+              <label>Área de desempeño Persona Jurídica</label>
+              {{ form.area_desempeno_JJPP_1 }}
+              {{ form.area_desempeno_JJPP_1.errors }}
+            </div>
+
+            <div class="col-lg-6 form-group">
+              <label>Área de desempeño Persona Jurídica</label>
+              {{ form.area_desempeno_JJPP_2 }}
+              {{ form.area_desempeno_JJPP_2.errors }}
+            </div>
+
+            <div class="col-lg-12 form-group">
+              <label>Medios con experiencia comprobable</label>
+              {{ form.medios_experiencia }}
+              {{ form.medios_experiencia.errors }}
+            </div>
+
+            <!-- BOTÓN -->
+            <div class="col-lg-12 mt-4 text-end">
+              <button type="submit" class="btn btn-primary">Enviar</button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const select = document.getElementById("id_lugar_residencia");
+  const otroWrapper = document.getElementById("otro-lugar-wrapper");
+
+  function toggleOtro() {
+    if (select.value === "otro") {
+      otroWrapper.style.display = "block";
+    } else {
+      otroWrapper.style.display = "none";
+    }
+  }
+
+  select.addEventListener("change", toggleOtro);
+  toggleOtro(); // ejecuta al cargar
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const fechaInput = document.querySelector("#id_fecha_constitucion");
+    const edadInput = document.querySelector("#id_antiguedad");
+
+    function calcularEdad() {
+        const fecha = new Date(fechaInput.value);
+        if (!isNaN(fecha)) {
+            const hoy = new Date();
+            let antiguedad = hoy.getFullYear() - fecha.getFullYear();
+            const m = hoy.getMonth() - fecha.getMonth();
+            if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
+                antiguedad--;
+            }
+            edadInput.value = antiguedad;
+        } else {
+            edadInput.value = "";
+        }
+    }
+
+    fechaInput.addEventListener("change", calcularEdad);
+});
+</script>
+
+{% endblock %}

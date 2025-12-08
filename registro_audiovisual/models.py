@@ -1,113 +1,317 @@
 from django.db import models
-from django.contrib.auth.models import User
-from datetime import date
 
 
-# ---------- CHOICES COMUNES ----------
-
-GENEROS = [
-    ('MUJER', 'Mujer'),
-    ('VARON', 'Varón'),
-    ('NO_DICE', 'Prefiero no decirlo'),
-    ('X', 'X'),
-    ('OTRA', 'Mi género se ve representado por otra identidad'),
-]
-
-NIVEL_EDUCATIVO = [
-    ('PRIMARIO', 'Primario completo'),
-    ('SECUNDARIO', 'Secundario completo'),
-    ('TERCIARIO', 'Terciario completo'),
-    ('UNIVERSITARIO', 'Universitario completo'),
-    ('POSGRADO', 'Posgrado completo'),
-]
-
-# Por ahora solo algunos lugares, vos completás después:
 LUGARES_RESIDENCIA = [
-    ('AGUARAY', 'Aguaray'),
-    ('AGUAS_BLANCAS', 'Aguas Blancas'),
-    ('OTRO', 'Otro'),
+    ('', '- Seleccionar -'),
+    ('SC', 'Salta Capital'),
+    ('Ag', 'Aguaray'),
+    ('AB', 'Aguas Blancas'),
+    ('An', 'Angastaco'),
+    ('Ai', 'Animaná'),
+    ('AS', 'Apolinario Saravia'),
+    ('Ca', 'Cachi'),
+    ('Cf', 'Cafayate'),
+    ('CQ', 'Campo Quijano'),
+    ('CS', 'Campo Santo'),
+    ('Ce', 'Cerrillos'),
+    ('Ch', 'Chicoana'),
+    ('CSR', 'Colonia Santa Rosa'),
+    ('CM', 'Coronel Moldes'),
+    ('EB', 'El Bordo'),
+    ('EC', 'El Carril'),
+    ('EG', 'El Galpón'),
+    ('EJ', 'El Jardín'),
+    ('EP', 'El Potrero'),
+    ('EQ', 'El Quebrachal'),
+    ('ET', 'El Tala'),
+    ('Em', 'Embarcación'),
+    ('GG', 'General Güemes'),
+    ('GP', 'General Pizzarro'),
+    ('GM', 'General Mosconi'),
+    ('GB', 'General Ballivián'),
+    ('Gu', 'Guachipas'),
+    ('HI', 'Hipólito Yrigoyen'),
+    ('Ir', 'Iruya'),
+    ('IC', 'Isla de Cañas'),
+    ('JVG', 'Joaquín V. Gonzalez'),
+    ('LC', 'La Caldera'),
+    ('LCa', 'La Candelaria'),
+    ('LM', 'La Merced'),
+    ('LP', 'La Poma'),
+    ('LV', 'La Viña'),
+    ('LL', 'Las Lajitas'),
+    ('LT', 'Los Toldos'),
+    ('Mo', 'Molinos'),
+    ('Na', 'Nazareno'),
+    ('Pa', 'Payogasta'),
+    ('PSM', 'Profesor Salvador Mazza'),
+    ('RP', 'Río Piedras'),
+    ('RBN', 'Rivadavia Banda Norte'),
+    ('RBS', 'Rivadavia Banda Sur'),
+    ('SAC', 'San Antonio de los Cobres'),
+    ('SC', 'San Carlos'),
+    ('SJM', 'San José de Metán'),
+    ('SL', 'San Lorenzo'),
+    ('Or', 'San Ramón de la Nueva Orán'),
+    ('SVE', 'Santa Victoria Este'),
+    ('SVO', 'Santa Victoria Oeste'),
+    ('Se', 'Seclantás'),
+    ('Ta', 'Tartagal'),
+    ('TG', 'Tolar Grande'),
+    ('Ur', 'Urundel'),
+    ('Va', 'Vaqueros'),
+    ("otro", "Otro"),
 ]
 
-TIPO_PERSONA_JURIDICA = [
-    ('EMPRESA', 'Empresa'),
-    ('ASOC_CIVIL', 'Asociación civil'),
-    ('FUNDACION', 'Fundación'),
-    ('COOPERATIVA', 'Cooperativa de trabajo'),
-    ('OTRA', 'Otra'),
+SITUACION_IVA = [('', '- Seleccionar -'),
+        ('N', 'Ninguna'),
+        ('EX', 'Exento'),
+        ('M', 'Monotributista'),
+        ('RI', 'Responsable Inscripto'),
+        ('O', 'Otra'),
+
 ]
 
-# Áreas de desempeño: vos los completás después
-AREAS_DESEMPENO = [
-    ('PRODUCTOR', 'Productor/a'),
-    ('JEFE_PRODUCCION', 'Jefe de producción'),
-    # ...
+ACTIVIDAD_DGR = [
+    ('', '- Seleccionar -'),
+    ('PF', '591110 - Producción de filmes y videocintas'),
+    ('PPF', '591120 - Postproducción de filmes y videocintas'),
+    ('O', 'Otra'),
+    ('N', 'Ninguna'),
+
 ]
 
+AREA_DESEMPENO_1 = [
+        ('', '- Seleccionar -'),
+        ('Productor', 'Productor/a'),
+        ('Jefe_prod', 'Jefe/a de producción'),
+        ('Asist_prod', 'Asistente de producción'),
+        ('Jefe_loc', 'Jefe/a de locaciones'), #continuar
+        ('Director', 'Director/a'),
+        ('Asist_Dir', 'Asistente de dirección'),
+        ('Dir_Cast', 'Director/a de casting'),
+        ('Dir_Foto', 'Director/a de fotografía'),
+        ('Camara', 'Camarógrafo/a'),
+        ('Key_Grip', 'Key Grip'),
+        ('Video Asist_DIT', 'Video Asist / DIT<'),
+        ('Gaffer', 'Gaffer'),
+        ('Guionista', 'Guionista'),
+        ('Reflec', 'Reflectorista'),
+        ('Dir_Arte', 'Dirección de Arte'),
+        ('Escnog', 'Escenógrafo/a'),
+        ('Vest', 'Vestuarista'),
+        ('Maqui', 'Jefe/a de Maquillaje'),
+        ('Dir_Son', 'Dirección de Sonido'),
+        ('Ayu_Son', 'Ayudante de Sonido '),
+        ('Dir_Son_Post', 'Dirección de Sonido Post / Mezclador/a'),
+        ('Post_Prod', 'Postproductor/a'),
+        ('Editor', 'Editor/a'),
+        ('Color', 'Colorista'),
+        ('Animam', 'Animador/a'),
+        ('Realizador', 'Realizador/a integral'),
+        ('Game_Design', 'Game Designer'),
+        ('Game_Artist', 'Game Artist'),
+        ('otro', 'Otro'),
+    ]
 
-# ---------- PERSONA HUMANA ----------
+AREA_DESEMPENO_2 = [
+        ('', '- Seleccionar -'),
+        ('Productor', 'Productor/a'),
+        ('Jefe_prod', 'Jefe/a de producción'),
+        ('Asist_prod', 'Asistente de producción'),
+        ('Jefe_loc', 'Jefe/a de locaciones'), #continuar
+        ('Director', 'Director/a'),
+        ('Asist_Dir', 'Asistente de dirección'),
+        ('Dir_Cast', 'Director/a de casting'),
+        ('Dir_Foto', 'Director/a de fotografía'),
+        ('Camara', 'Camarógrafo/a'),
+        ('Key_Grip', 'Key Grip'),
+        ('Video Asist_DIT', 'Video Asist / DIT<'),
+        ('Gaffer', 'Gaffer'),
+        ('Guionista', 'Guionista'),
+        ('Reflec', 'Reflectorista'),
+        ('Dir_Arte', 'Dirección de Arte'),
+        ('Escnog', 'Escenógrafo/a'),
+        ('Vest', 'Vestuarista'),
+        ('Maqui', 'Jefe/a de Maquillaje'),
+        ('Dir_Son', 'Dirección de Sonido'),
+        ('Ayu_Son', 'Ayudante de Sonido '),
+        ('Dir_Son_Post', 'Dirección de Sonido Post / Mezclador/a'),
+        ('Post_Prod', 'Postproductor/a'),
+        ('Editor', 'Editor/a'),
+        ('Color', 'Colorista'),
+        ('Animam', 'Animador/a'),
+        ('Realizador', 'Realizador/a integral'),
+        ('Game_Design', 'Game Designer'),
+        ('Game_Artist', 'Game Artist'),
+        ('otro', 'Otro'),
+    ]
+
+AREA_DESEMPENO_PPJJ_1 = [
+        ('', '- Seleccionar -'),
+        ('', '- Empresas -'),
+        ('Productora', 'Empresa de producción'),
+        ('PostProd', 'Empresa de postproducción'),
+        ('Serv_Prod', 'Empresa de servicios para la producción'),
+        ('', '- Personas Jurídicas s/fines de lucro -'),
+        ('PPJJ_Espec', 'Específica Audiovisual '),
+        ('PPJJ_Cult', 'Cultural'),
+        ('otro', 'Otro'),
+    ]
+
+AREA_DESEMPENO_PPJJ_2 = [
+        ('', '- Seleccionar -'),
+        ('', '- Empresas -'),
+        ('Productora', 'Empresa de producción'),
+        ('PostProd', 'Empresa de postproducción'),
+        ('Serv_Prod', 'Empresa de servicios para la producción'),
+        ('', '- Personas Jurídicas s/fines de lucro -'),
+        ('PPJJ_Espec', 'Específica Audiovisual '),
+        ('PPJJ_Cult', 'Cultural'),
+        ('otro', 'Otro'),
+    ]
+
+AREA_CULTURAL = [
+        ('', '- Seleccionar -'),
+        ('Actor', 'Actror / Actríz'),
+        ('musica', 'Música'),
+        ('danza', 'Danza'),
+        ('literatura', 'Literatura'),
+        ('visuales', 'Artes Visuales'),
+        ('comunicacion', 'Comunicación'),
+        ('locutor', 'Locutor/a'),
+        ('educacion', 'Educación'),
+        ('otro', 'Otro'),
+    ]
+
+MEDIOS_EXPERIENCIA = [
+        ('', '- Seleccionar -'),
+        ('tv', 'Televisión'),
+        ('cine', 'Cine'),
+        ('web', 'Plataformas web'),
+        ('institucional', 'Contenido institucional'),
+        ('publicidad', 'Publicidad'),
+        ('otro', 'Otro'),
+    ]
+
+# -------------------------------
+# PERSONA HUMANA
+# -------------------------------
 
 class PersonaHumana(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    nombre_completo = models.CharField(max_length=255)
+    nombre_completo = models.CharField(max_length=200)
     cuil_cuit = models.CharField(max_length=20)
     fecha_nacimiento = models.DateField()
-    edad = models.PositiveIntegerField(blank=True, null=True)
+    edad = models.PositiveIntegerField()
+    genero = models.CharField(max_length=50, choices=[
+        ('', '- Seleccionar -'),
+        ("M", "Masculino"),
+        ("F", "Femenino"),
+        ("NB", "No binario"),
+        ("O", "Otro"),
+    ])
+    lugar_residencia = models.CharField(
+    max_length=100,
+    choices=LUGARES_RESIDENCIA,
+    default="",
+)
+    otro_lugar_residencia = models.CharField(
+    max_length=150,
+    blank=True,
+    null=True,
+)
+    nivel_educativo = models.CharField(max_length=50, choices=[
+        ('', '- Seleccionar -'),
+        ('Pc', 'Primario completo'),
+        ('Sc', 'Secundario completo'),
+        ('Tc', 'Terciario completo'),
+        ('Uc', 'Universitario completo'),
+        ('Pos', 'Posgrado completo'),
+    ])
+    domicilio_real = models.CharField(max_length=250)
+    telefono = models.CharField(max_length=50)
+    email = models.EmailField()
 
-    lugar_residencia = models.CharField(max_length=50, choices=LUGARES_RESIDENCIA)
-    residencia_otro = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        help_text="Completar solo si seleccionaste 'Otro' en lugar de residencia."
-    )
+    # Datos fiscales
+    situacion_iva = models.CharField(
+    max_length=100,
+    choices=SITUACION_IVA,
+    default="",
+)
+    actividad_dgr = models.CharField(
+    max_length=100,
+    choices=ACTIVIDAD_DGR,
+    default="",
+)
+    domicilio_fiscal = models.CharField(max_length=250, blank=True, null=True)
 
-    domicilio_real = models.CharField(max_length=255)
-    telefono_contacto = models.CharField(max_length=50)
-    correo_electronico = models.EmailField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
-    genero = models.CharField(max_length=20, choices=GENEROS)
-    nivel_educativo = models.CharField(max_length=20, choices=NIVEL_EDUCATIVO)
 
-    area_desempeno_1 = models.CharField(max_length=50, choices=AREAS_DESEMPENO)
-    area_desempeno_2 = models.CharField(max_length=50, choices=AREAS_DESEMPENO, blank=True, null=True)
-    area_desempeno_3 = models.CharField(max_length=50, choices=AREAS_DESEMPENO, blank=True, null=True)
-
-    area_cultural_complementaria = models.CharField(max_length=255, blank=True, null=True)
-    medios_experiencia = models.CharField(max_length=255, blank=True, null=True)
-    links = models.TextField(blank=True, null=True)
+    # Datos profesionales
+    area_desempeno_1 = models.CharField(max_length=50, choices=AREA_DESEMPENO_1, verbose_name="Área de desempeño 1")
+    area_desempeno_2 = models.CharField(max_length=50, choices=AREA_DESEMPENO_2, verbose_name="Área de desempeño 2")
+    area_cultural = models.CharField(max_length=50, choices=AREA_CULTURAL, verbose_name="Área cultural complementaria")
+    medios_experiencia = models.CharField(max_length=50, choices=MEDIOS_EXPERIENCIA, verbose_name="Medios con experiencia comprobable")
 
     def __str__(self):
-        return f"Persona humana: {self.nombre_completo}"
-
-    def calcular_edad(self):
-        if self.fecha_nacimiento:
-            today = date.today()
-            return today.year - self.fecha_nacimiento.year - (
-                (today.month, today.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
-            )
-        return None
-
-    def save(self, *args, **kwargs):
-        # si no se cargó edad, o queremos recalcular siempre:
-        self.edad = self.calcular_edad()
-        super().save(*args, **kwargs)
+        return self.nombre_completo
 
 
-# ---------- PERSONA JURÍDICA ----------
+# -------------------------------
+# PERSONA JURÍDICA
+# -------------------------------
 
 class PersonaJuridica(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    tipo_persona_juridica = models.CharField(max_length=100, choices=[
+        ("asociacion", "Asociación Civil"),
+        ("fundacion", "Fundación"),
+        ("empresa", "Empresa"),
+        ("cooperativa", "Cooperativa"),
+    ])
+    cuil_cuit = models.CharField(max_length=20)
+    razon_social = models.CharField(max_length=200)
+    nombre_comercial = models.CharField(max_length=200, blank=True, null=True)
 
-    razon_social = models.CharField(max_length=255)
-    nombre_comercial = models.CharField(max_length=255, blank=True, null=True)
-    tipo_persona_juridica = models.CharField(max_length=20, choices=TIPO_PERSONA_JURIDICA)
+    domicilio_fiscal = models.CharField(max_length=250)
+    lugar_residencia = models.CharField(
+    max_length=100,
+    choices=LUGARES_RESIDENCIA,
+    default="",
+)
+    otro_lugar_residencia = models.CharField(
+    max_length=150,
+    blank=True,
+    null=True,
+)
 
-    # Por ahora un solo set de choices; después podemos hacer lógica
-    area_desempeno_1 = models.CharField(max_length=50)
-    area_desempeno_2 = models.CharField(max_length=50, blank=True, null=True)
+    # Fecha de constitución (antes usabas fecha_nacimiento)
+    fecha_constitucion = models.DateField()
+    antiguedad = models.PositiveIntegerField()
+
+    telefono = models.CharField(max_length=50)
+    email = models.EmailField()
+
+    # Datos fiscales
+    situacion_iva = models.CharField(
+    max_length=100,
+    choices=SITUACION_IVA,
+    default="",
+)
+    actividad_dgr = models.CharField(
+    max_length=100,
+    choices=ACTIVIDAD_DGR,
+    default="",
+)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+
+    # Datos profesionales
+    area_desempeno_JJPP_1 = models.CharField(max_length=50, choices=AREA_DESEMPENO_PPJJ_1, verbose_name="Área de desempeño PPJJ 1")
+    area_desempeno_JJPP_2 = models.CharField(max_length=50, choices=AREA_DESEMPENO_PPJJ_2, verbose_name="Área de desempeño PPJJ 2")
+    medios_experiencia = models.CharField(max_length=50, choices=MEDIOS_EXPERIENCIA, verbose_name="Medios con experiencia comprobable")
+
+
 
     def __str__(self):
-        return f"Persona jurídica: {self.razon_social}"
-
-
+        return self.razon_social

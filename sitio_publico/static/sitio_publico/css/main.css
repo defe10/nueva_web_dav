@@ -1,12 +1,14 @@
 /* Tipografía global */
-body, html {
+body,
+html {
     font-family: 'Montserrat', sans-serif !important;
 }
 
 
 /* Reducir padding lateral del navbar */
 .navbar .container-fluid {
-    padding-left: 1rem;   /* antes 15-20px */
+    padding-left: 1rem;
+    /* antes 15-20px */
     padding-right: 1rem;
 }
 
@@ -20,12 +22,14 @@ body, html {
 
 /* Fondo violeta institucional */
 .hero-card-left {
-    background: #2f354a; /* tu magenta personalizado */
+    background: #2f354a;
+    /* tu magenta personalizado */
     color: #fff;
 }
 
 .hero-card-center {
-    background: var(--bs-primary); /* tu magenta personalizado */
+    background: var(--bs-primary);
+    /* tu magenta personalizado */
     color: #fff;
 }
 
@@ -35,8 +39,9 @@ body, html {
 }
 
 .boton-programa {
-    white-space: nowrap;       /* evita que se corte en 2 líneas */
-    font-weight:500;
+    white-space: nowrap;
+    /* evita que se corte en 2 líneas */
+    font-weight: 500;
     font-size: medium;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
@@ -58,20 +63,24 @@ body, html {
 .hero-card-left,
 .hero-card-center,
 .hero-card-right {
-    min-height: 250px; /* ajustá si querés más alto */
+    min-height: 250px;
+    /* ajustá si querés más alto */
 }
 
 
 /* Redes sociales en el HERO */
 .redes-icon i {
-    font-size: 1.2rem;      /* tamaño del ícono */
-    color: #dbff3d;         /* blanco */
+    font-size: 1.2rem;
+    /* tamaño del ícono */
+    color: #dbff3d;
+    /* blanco */
     transition: 0.2s ease;
 }
 
 /* Efecto hover */
 .redes-icon:hover i {
-    color: #e0007a;         /* tu magenta o color institucional */
+    color: #e0007a;
+    /* tu magenta o color institucional */
 }
 
 /* Ajuste de espaciado */
@@ -83,14 +92,18 @@ body, html {
 
 /* Carrusel del hero */
 .rounded-carousel {
-    border-radius: 20px;           /* ángulos redondeados */
-    overflow: hidden;              /* importante: para que la imagen respete el borde */
+    border-radius: 20px;
+    /* ángulos redondeados */
+    overflow: hidden;
+    /* importante: para que la imagen respete el borde */
 }
 
 /* Ajustar altura del carrusel */
 #heroCarousel img {
-    height: 350px;                 /* ajustá a gusto */
-    object-fit: cover;             /* evita distorsiones */
+    height: 350px;
+    /* ajustá a gusto */
+    object-fit: cover;
+    /* evita distorsiones */
 }
 
 
@@ -108,7 +121,7 @@ body, html {
 
 /* Imagen tipo banner */
 .card-img-top-area {
-    height: 130px;
+    height: 60px;
     overflow: hidden;
 }
 
@@ -126,7 +139,7 @@ body, html {
 
 .card-area:hover {
     transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 /* Títulos */
@@ -149,4 +162,8 @@ body, html {
 
 .card-area:hover .card-plus i {
     color: #b00055;
+}
+
+.border-dotted {
+    border-top: 2px dotted #a3a3a3;
 }

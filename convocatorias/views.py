@@ -13,19 +13,25 @@ from django.contrib.admin.views.decorators import staff_member_required
 # =====================================================
 
 def convocatorias_home(request):
-    hoy = timezone.now().date()
 
-    vigentes = Convocatoria.objects.filter(
-        fecha_inicio__lte=hoy,
-        fecha_fin__gte=hoy
-    )
+    idea = Convocatoria.objects.filter(
+        categoria__in=["CONCURSO", "PROGRAMA", "SUBSIDIO"]
+    ).order_by("orden")
 
-    todas = Convocatoria.objects.all()  # <-- para el carrusel
+    cursos = Convocatoria.objects.filter(
+        categoria="CURSO"
+    ).order_by("orden")
+
+    incentivos = Convocatoria.objects.filter(
+        categoria__in=["INCENTIVO", "BENEFICIO"]
+    ).order_by("orden")
 
     return render(request, "convocatorias/convocatorias_home.html", {
-        "vigentes": vigentes,
-        "todas": todas,
+        "idea": idea,
+        "cursos": cursos,
+        "incentivos": incentivos,
     })
+
 
 
 
@@ -67,7 +73,7 @@ def subir_documentacion_personal(request):
     if request.method == "POST" and request.FILES.getlist("archivos"):
         for archivo in request.FILES.getlist("archivos"):
             DocumentoPersonal.objects.create(user=request.user, archivo=archivo)
-        return redirect("panel_usuario")
+        return redirect("seleccionar_tipo_registro")
 
     return render(request, "convocatorias/subir_documentacion_personal.html")
 

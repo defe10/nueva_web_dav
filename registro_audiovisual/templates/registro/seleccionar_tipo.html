@@ -1,0 +1,51 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
+  <h1 class="mb-3">PLATAFORMA DE REGISTROS</h1>
+  <h2>Inicio / Registros</h2>
+</div>
+
+<section id="team" class="team section-bg">
+  <div class="container">
+    <div class="row">
+
+      <!-- IZQUIERDA -->
+      <div class="col-lg-4 mb-4">
+        <div class="memberRegistro mb-5 text-left">
+          <h5>¿Qué tipo de personas se pueden inscribir?</h5><br>
+          <p>Podrán inscribirse en este Registro personas humanas y jurídicas radicadas en la provincia de Salta.</p>
+          <p>En el caso de las personas jurídicas, podrán inscribirse empresas, asociaciones civiles, fundaciones o cooperativas.</p><br>
+
+        </div>
+      </div>
+
+      <!-- DERECHA -->
+      <div class="col-lg-8 mb-4">
+        <div class="memberRegistro mb-5 text-center">
+          <h3>TIPO DE INSCRIPCIÓN</h3>
+          <p>Elija el tipo de personería que quiere inscribir</p>
+
+          <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-info me-2" name="tipo" value="humana">
+              Persona Humana
+            </button>
+            <button type="submit" class="btn btn-outline-info" name="tipo" value="juridica">
+              Persona Jurídica
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

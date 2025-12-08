@@ -1,0 +1,63 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
+  <h1 class="mb-3">PLATAFORMA DE REGISTROS</h1>
+  <h2>Inscripción enviada</h2>
+</div>
+
+<!-- MENSAJE -->
+<section class="team section-bg">
+  <div class="container">
+    <div class="row justify-content-center">
+
+      <div class="col-lg-8">
+        <div class="memberRegistro mb-5 text-center">
+
+          {% if tipo == "humana" %}
+            <h3 class="mb-4">¡Gracias {{ persona.nombre_completo }} por completar tu inscripción!</h3>
+
+          {% elif tipo == "juridica" %}
+            <h3 class="mb-4">¡Gracias {{ persona.razon_social }} por completar la inscripción!</h3>
+
+          {% else %}
+            <h3 class="mb-4">¡Gracias por completar tu inscripción!</h3>
+          {% endif %}
+
+          <p class="lead">
+            Tu información fue enviada correctamente.  
+            El equipo de la Secretaría de Cultura evaluará la documentación presentada.
+          </p>
+
+          <p>
+            En caso de ser necesario, nos pondremos en contacto a través del correo electrónico declarado.
+          </p>
+
+          <h5 class="mt-4">
+            Número de trámite:  
+            <span class="text-primary">{{ persona.id|stringformat:"05d" }}</span>
+          </h5>
+
+          <p class="mt-4">
+            <strong>Recordá que podés actualizar tus datos en cualquier momento ingresando a tu cuenta.</strong>
+          </p>
+
+          <a href="{% url 'inicio' %}" class="btn btn-primary mt-4">
+            Volver al inicio
+          </a>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -29,14 +29,6 @@ urlpatterns = [
     path('usuarios/', include('usuarios.urls')),
     path('registro/', include('registro_audiovisual.urls')),
     path('convocatorias/', include('convocatorias.urls')),
-
-
-
-
- 
-  
-  
-
 ]
 
 # Archivos subidos por usuarios (DNI, PDFs, etc.)
