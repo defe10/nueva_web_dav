@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 LUGARES_RESIDENCIA = [
@@ -184,16 +185,6 @@ AREA_CULTURAL = [
         ('otro', 'Otro'),
     ]
 
-MEDIOS_EXPERIENCIA = [
-        ('', '- Seleccionar -'),
-        ('tv', 'Televisión'),
-        ('cine', 'Cine'),
-        ('web', 'Plataformas web'),
-        ('institucional', 'Contenido institucional'),
-        ('publicidad', 'Publicidad'),
-        ('otro', 'Otro'),
-    ]
-
 # -------------------------------
 # PERSONA HUMANA
 # -------------------------------
@@ -232,6 +223,15 @@ class PersonaHumana(models.Model):
     telefono = models.CharField(max_length=50)
     email = models.EmailField()
 
+    user = models.OneToOneField(
+    User,
+    on_delete=models.CASCADE,
+    related_name="persona_humana",
+    null=True,
+    blank=True
+)
+
+
     # Datos fiscales
     situacion_iva = models.CharField(
     max_length=100,
@@ -252,7 +252,9 @@ class PersonaHumana(models.Model):
     area_desempeno_1 = models.CharField(max_length=50, choices=AREA_DESEMPENO_1, verbose_name="Área de desempeño 1")
     area_desempeno_2 = models.CharField(max_length=50, choices=AREA_DESEMPENO_2, verbose_name="Área de desempeño 2")
     area_cultural = models.CharField(max_length=50, choices=AREA_CULTURAL, verbose_name="Área cultural complementaria")
-    medios_experiencia = models.CharField(max_length=50, choices=MEDIOS_EXPERIENCIA, verbose_name="Medios con experiencia comprobable")
+    link_1 = models.CharField(max_length=250)
+    link_2 = models.CharField(max_length=250, blank=True, null=True)
+    link_3 = models.CharField(max_length=250, blank=True, null=True)
 
     def __str__(self):
         return self.nombre_completo
@@ -292,6 +294,15 @@ class PersonaJuridica(models.Model):
     telefono = models.CharField(max_length=50)
     email = models.EmailField()
 
+    user = models.OneToOneField(
+    User,
+    on_delete=models.CASCADE,
+    related_name="persona_juridica",
+    null=True,
+    blank=True
+)
+
+
     # Datos fiscales
     situacion_iva = models.CharField(
     max_length=100,
@@ -309,7 +320,9 @@ class PersonaJuridica(models.Model):
     # Datos profesionales
     area_desempeno_JJPP_1 = models.CharField(max_length=50, choices=AREA_DESEMPENO_PPJJ_1, verbose_name="Área de desempeño PPJJ 1")
     area_desempeno_JJPP_2 = models.CharField(max_length=50, choices=AREA_DESEMPENO_PPJJ_2, verbose_name="Área de desempeño PPJJ 2")
-    medios_experiencia = models.CharField(max_length=50, choices=MEDIOS_EXPERIENCIA, verbose_name="Medios con experiencia comprobable")
+    link_1 = models.CharField(max_length=250)
+    link_2 = models.CharField(max_length=250)
+    link_3 = models.CharField(max_length=250)
 
 
 

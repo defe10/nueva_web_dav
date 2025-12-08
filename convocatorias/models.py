@@ -4,17 +4,53 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 
-# ==============================
-# MODELOS EXISTENTES (igual)
-# ==============================
+# ==========================================
+# LÍNEAS DE CONVOCATORIA (NUEVO)
+# ==========================================
+
+LINEAS = [
+    ("fomento", "Fomento"),
+    ("beneficio", "Beneficio"),
+    ("formacion", "Formación"),
+    ("incentivo", "Incentivo"),
+]
+
+
+# ==========================================
+# POSTULACIÓN (por ahora solo Fomento / IDEA)
+# ==========================================
 
 class PostulacionIDEA(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    linea_fomento = models.CharField(max_length=50)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    convocatoria = models.ForeignKey("Convocatoria", on_delete=models.CASCADE)
+
     nombre_proyecto = models.CharField(max_length=255)
-    tipo_proyecto = models.CharField(max_length=50)
-    genero = models.CharField(max_length=50)
+
+    TIPO_PROYECTO = [
+        ("corto", "Cortometraje"),
+        ("largo", "Largometraje"),
+        ("videoclip", "Videoclip"),
+        ("transmedia", "Transmedia"),
+        ("serie", "Serie"),
+        ("videojuego", "Videojuego"),
+        ("animacion", "Animación"),
+        ("comunidad", "Cine en comunidad"),
+    ]
+    tipo_proyecto = models.CharField(max_length=50, choices=TIPO_PROYECTO)
+
+    GENERO = [
+        ("ficcion", "Ficción"),
+        ("documental", "Documental"),
+        ("noficcion", "No ficción"),
+        ("educativo", "Educativo"),
+        ("deportivo", "Deportivo"),
+        ("ludico", "Lúdico"),
+        ("simulacion", "Simulación"),
+        ("otro", "Otro"),
+    ]
+    genero = models.CharField(max_length=50, choices=GENERO)
+
     duracion_minutos = models.PositiveIntegerField()
 
     declaracion_jurada = models.BooleanField(default=False)
@@ -55,9 +91,10 @@ class DocumentoProyecto(models.Model):
         return f"Doc proyecto #{self.postulacion.id}"
 
 
-# ==============================
-# CONVOCATORIAS
-# ==============================
+
+# ==========================================
+# CATEGORÍAS
+# ==========================================
 
 CATEGORIAS = [
     ("CONCURSO", "Concurso"),
@@ -68,12 +105,22 @@ CATEGORIAS = [
     ("BENEFICIO", "Beneficio"),
 ]
 
+
+# ==========================================
+# BLOQUE PERSONAS
+# ==========================================
+
 BLOQUE_PERSONAS_TITULO = [
     ("JURADO", "Jurado"),
     ("FORMADORES", "Formadores"),
     ("TUTORES", "Tutores"),
     ("NINGUNO", "Sin título"),
 ]
+
+
+# ==========================================
+# JURADOS (estos quedan como están)
+# ==========================================
 
 class Jurado(models.Model):
     nombre = models.CharField(max_length=200)
@@ -83,30 +130,43 @@ class Jurado(models.Model):
         return self.nombre
 
 
+# ==========================================
+# CONVOCATORIA
+# ==========================================
+
 class Convocatoria(models.Model):
+
+    # ---- Datos generales ----
     titulo = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
 
     descripcion_corta = models.TextField(blank=True)
-    descripcion_larga = models.TextField(blank=True)  # ← NUEVO
+    descripcion_larga = models.TextField(blank=True)
 
     categoria = models.CharField(max_length=20, choices=CATEGORIAS)
     tematica_genero = models.CharField(max_length=200, blank=True)
 
+    # ---- NUEVO: LÍNEA ----
+    linea = models.CharField(max_length=20, choices=LINEAS)
+
+    # ---- Archivos y beneficios ----
     requisitos = models.TextField(blank=True)
     beneficios = models.TextField(blank=True)
     bases_pdf = models.FileField(upload_to="convocatorias/bases/", blank=True, null=True)
 
     imagen = models.ImageField(upload_to="convocatorias/img/", blank=True, null=True)
 
+    # ---- Fechas ----
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
 
+    # ---- Bloque personas / Jurado ----
     bloque_personas = models.CharField(
-    max_length=20,
-    choices=BLOQUE_PERSONAS_TITULO,
-    default="JURADO"
-)
+        max_length=20,
+        choices=BLOQUE_PERSONAS_TITULO,
+        default="JURADO"
+    )
+
     jurado1_nombre = models.CharField(max_length=200, blank=True)
     jurado1_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
     jurado1_bio = models.TextField(blank=True)
@@ -119,9 +179,10 @@ class Convocatoria(models.Model):
     jurado3_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
     jurado3_bio = models.TextField(blank=True)
 
+    # ---- Orden en el carrusel ----
+    orden = models.PositiveIntegerField(default=0)
 
-    orden = models.PositiveIntegerField(default=0)  # ← NUEVO (para ordenar carrusel)
-
+    # ---- URL alternativa ----
     url_destino = models.CharField(max_length=300, blank=True)
 
     class Meta:

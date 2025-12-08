@@ -1,33 +1,89 @@
 from django.urls import path
 from . import views
 
+app_name = "convocatorias"
+
 urlpatterns = [
 
-    # --------------------------
-    # HOME
-    # --------------------------
-    path("", views.convocatorias_home, name="convocatorias_home"),
+    # --------------------------------
+    # HOME DE CONVOCATORIAS
+    # --------------------------------
+    path(
+        "",
+        views.convocatorias_home,
+        name="convocatorias_home"
+    ),
 
-   
-    # --------------------------
-    # POSTULACIÓN IDEA
-    # --------------------------
-    path("idea/postular/", views.postular_idea, name="postular_idea"),
-    path("idea/documentacion-personal/", views.subir_documentacion_personal, name="subir_documentacion_personal"),
-    path("idea/documentacion-proyecto/<int:postulacion_id>/",
-         views.subir_documentacion_proyecto, name="subir_documentacion_proyecto"),
-    path("idea/confirmar/<int:postulacion_id>/",
-         views.confirmar_postulacion_idea, name="confirmar_postulacion_idea"),
-    path("idea/confirmada/", views.postulacion_idea_confirmada, name="postulacion_idea_confirmada"),
+    # --------------------------------
+    # INSCRIBIRSE A UNA CONVOCATORIA
+    # --------------------------------
+    path(
+        "<slug:slug>/inscribirse/",
+        views.inscribirse_convocatoria,
+        name="inscribirse_convocatoria"
+    ),
 
-    # DEL FORMULARIO WEB CONVOCATORAS
+    # --------------------------------
+    # FORMULARIO DE POSTULACIÓN (PASO 1)
+    # --------------------------------
+    path(
+        "postular/<int:convocatoria_id>/",
+        views.postular_convocatoria,
+        name="postular_convocatoria"
+    ),
 
-    path("crear/", views.crear_convocatoria, name="crear_convocatoria"),
+    # --------------------------------
+    # DOCUMENTACIÓN PERSONAL (PASO 2)
+    # --------------------------------
+    path(
+        "documentacion/personal/<int:postulacion_id>/",
+        views.subir_documentacion_personal,
+        name="subir_documentacion_personal"
+    ),
 
-    path("<slug:slug>/", views.convocatoria_detalle, name="convocatoria_detalle"),
+    # --------------------------------
+    # DOCUMENTACIÓN DEL PROYECTO (PASO 3)
+    # --------------------------------
+    path(
+        "documentacion/proyecto/<int:postulacion_id>/",
+        views.subir_documentacion_proyecto,
+        name="subir_documentacion_proyecto"
+    ),
 
+    # --------------------------------
+    # POSTULACIÓN COMPLETADA (PASO 4)
+    # --------------------------------
+    path(
+        "postulacion/enviada/<int:postulacion_id>/",
+        views.postulacion_confirmada,
+        name="postulacion_confirmada"
+    ),
 
+    # --------------------------------
+    # PANTALLA OPCIONAL (si se usa en algún flujo secundario)
+    # --------------------------------
+    path(
+        "documentacion/completada/",
+        views.documentacion_completada,
+        name="documentacion_completada"
+    ),
 
+    # --------------------------------
+    # CREAR CONVOCATORIA (ADMIN)
+    # --------------------------------
+    path(
+        "crear/",
+        views.crear_convocatoria,
+        name="crear_convocatoria"
+    ),
+
+    # --------------------------------
+    # DETALLE DE LA CONVOCATORIA
+    # SIEMPRE ÚLTIMO
+    # --------------------------------
+    path(
+        "<slug:slug>/",
+        views.convocatoria_detalle,
+        name="convocatoria_detalle"
+    ),
 ]
-
-

@@ -68,85 +68,97 @@
   <body>
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container">
-        <a
-          class="navbar-brand d-flex align-items-center"
-          href="{% url 'inicio' %}"
-        >
-          <img
-            src="{% static 'sitio_publico/img/SEC DE CULTURA - AZUL.png' %}"
-            alt="Secretaría de Cultura, Gobierno de Salta"
-            style="height: 40px"
-          />
-        </a>
+  <div class="container">
+    <a
+      class="navbar-brand d-flex align-items-center"
+      href="{% url 'inicio' %}"
+    >
+      <img
+        src="{% static 'sitio_publico/img/SEC DE CULTURA - AZUL.png' %}"
+        alt="Secretaría de Cultura, Gobierno de Salta"
+        style="height: 40px"
+      />
+    </a>
 
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarToggler"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarToggler"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <div class="collapse navbar-collapse" id="navbarToggler">
-          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" href="{% url 'inicio' %}">Inicio</a>
+    <div class="collapse navbar-collapse" id="navbarToggler">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'inicio' %}">Inicio</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#">Institucional</a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+          >Programas</a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" href="{% url 'convocatorias:convocatorias_home' %}">
+                IDEA 2026
+              </a>
+            </li>
+            <li><a class="dropdown-item" href="#">Cash Rebate</a></li>
+            <li><a class="dropdown-item" href="#">Cinemóvil</a></li>
+            <li><a class="dropdown-item" href="#">Exención impositiva</a></li>
+            <li>
+              <a class="dropdown-item" href="https://saltaset.gob.ar">
+                Salta Set
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#">Contactos</a>
+        </li>
+
+        <!-- ========================= -->
+        <!--   MI CUENTA / SALIR       -->
+        <!-- ========================= -->
+        {% if user.is_authenticated %}
+            <!-- Si está logueado: mostrar MI CUENTA y SALIR -->
+            <li class="nav-item me-2">
+              <a class="btn btn-primary" href="{% url 'usuario:panel_usuario' %}">
+                Mi cuenta
+              </a>
             </li>
 
-            <li class="nav-item">
-              <a class="nav-link" href="#">Institucional</a>
-            </li>
-
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                >Programas</a
-              >
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <a class="dropdown-item" href="{% url 'convocatorias_home' %}"
-                    >IDEA 2026</a
-                  >
-                </li>
-                <li><a class="dropdown-item" href="#">Cash Rebate</a></li>
-                <li><a class="dropdown-item" href="#">Cinemóvil</a></li>
-                <li>
-                  <a class="dropdown-item" href="#">Exención impositiva</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="https://saltaset.gob.ar"
-                    >Salta Set</a
-                  >
-                </li>
-              </ul>
-            </li>
-
-            <li class="nav-item">
-              <a class="nav-link" href="#">Contactos</a>
-            </li>
-
-            {% if user.is_authenticated %}
             <li class="nav-item">
               <a class="btn btn-outline-primary" href="{% url 'usuario:logout' %}">
                 Salir
               </a>
             </li>
-            {% else %}
+
+        {% else %}
+            <!-- Si NO está logueado: solo mostrar MI CUENTA (login) -->
             <li class="nav-item ms-2">
               <a class="btn btn-outline-primary" href="{% url 'usuario:login' %}">
                 Mi cuenta
               </a>
             </li>
-            {% endif %}
-          </ul>
-        </div>
-      </div>
-    </nav>
+        {% endif %}
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
 
     <!-- CONTENIDO -->
     {% block layout %}
@@ -158,12 +170,12 @@
       <div class="p-4 border rounded bg-light shadow-sm">
         <h5 class="fw-bold mb-3">Panel de administración</h5>
 
-        <a href="{% url 'crear_convocatoria' %}" class="btn btn-primary btn-sm">
+        <a href="{% url 'convocatorias:crear_convocatoria' %}" class="btn btn-primary btn-sm">
           Crear nueva convocatoria
         </a>
 
         <a
-          href="{% url 'convocatorias_home' %}"
+          href="{% url 'convocatorias:convocatorias_home' %}"
           class="btn btn-outline-secondary btn-sm"
         >
           Ver convocatorias vigentes
@@ -194,7 +206,7 @@
               <li><a href="#" class="text-muted">Institucional</a></li>
               <li><a href="#" class="text-muted">Servicios</a></li>
               <li>
-                <a href="{% url 'convocatorias_home' %}" class="text-muted"
+                <a href="{% url 'convocatorias:convocatorias_home' %}" class="text-muted"
                   >Convocatorias</a
                 >
               </li>

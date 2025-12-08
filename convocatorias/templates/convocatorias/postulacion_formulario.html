@@ -1,0 +1,94 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
+  <h1 class="mb-3">POSTULACIÓN A LA CONVOCATORIA</h1>
+  <h2>{{ convocatoria.titulo }}</h2>
+</div>
+
+<section class="team section-bg">
+  <div class="container">
+    <div class="row justify-content-center">
+
+      <!-- COLUMNA IZQUIERDA -->
+      <div class="col-lg-4 mb-4">
+        <div class="memberRegistro mb-5 text-left">
+          <h5>Completá la información del proyecto</h5>
+          <br>
+          <p>
+            Esta información es necesaria para validar tu postulación.<br><br>
+            En los pasos siguientes podrás subir la documentación personal
+            y los archivos correspondientes al proyecto.<br><br>
+            Al finalizar este formulario, hacé clic en “Enviar postulación”.
+          </p>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA (FORMULARIO) -->
+      <div class="col-lg-8">
+        <div class="memberRegistro mb-5 text-left">
+
+          <h3>Datos del Proyecto</h3>
+          <p>Completá todos los campos requeridos.</p>
+
+          <form method="post" class="row datos_pers">
+            {% csrf_token %}
+
+            <!-- Nombre del proyecto -->
+            <div class="col-lg-12 form-group">
+              <label>Nombre del proyecto</label>
+              {{ form.nombre_proyecto }}
+              {{ form.nombre_proyecto.errors }}
+            </div>
+
+            <!-- Tipo de proyecto -->
+            <div class="col-lg-6 form-group">
+              <label>Tipo de proyecto</label>
+              {{ form.tipo_proyecto }}
+              {{ form.tipo_proyecto.errors }}
+            </div>
+
+            <!-- Género -->
+            <div class="col-lg-6 form-group">
+              <label>Género</label>
+              {{ form.genero }}
+              {{ form.genero.errors }}
+            </div>
+
+            <!-- Duración -->
+            <div class="col-lg-6 form-group">
+              <label>Duración estimada (minutos)</label>
+              {{ form.duracion_minutos }}
+              {{ form.duracion_minutos.errors }}
+            </div>
+
+            <!-- Declaración Jurada -->
+            <div class="col-lg-6 form-group mt-4">
+              <label class="form-check-label">
+                {{ form.declaracion_jurada }} Confirmo que toda la información ingresada es verdadera.
+              </label>
+              {{ form.declaracion_jurada.errors }}
+            </div>
+
+            <!-- BOTÓN -->
+            <div class="col-lg-12 mt-4 text-end">
+              <button type="submit" class="btn btn-primary">Enviar postulación</button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

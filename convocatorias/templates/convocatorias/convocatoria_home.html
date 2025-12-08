@@ -1,0 +1,186 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero text-center">
+  <h1 class="fw-bold mb-3">Convocatorias y Programas</h1>
+  <p class="lead text-muted">
+    Descubrí todas las líneas del Plan IDEA, cursos de formación e incentivos audiovisuales disponibles en la provincia.
+  </p>
+</section>
+
+<div class="container">
+
+  <!-- =============================================== -->
+  <!-- LÍNEAS DE FOMENTO (PLAN IDEA) -->
+  <!-- =============================================== -->
+  <h2 class="seccion-titulo">Líneas de Fomento · PLAN IDEA</h2>
+
+  <div class="carrusel-fondo">
+    <div class="carrusel-wrap">
+      <div class="flecha izq" onclick="moverCarrusel(this, -1)">‹</div>
+      <div class="flecha der" onclick="moverCarrusel(this, 1)">›</div>
+
+      <div class="carrusel">
+        {% for c in fomento %}
+        <div class="card-area">
+          <div class="card-img-top-area">
+            {% if c.imagen %}
+              <img src="{{ c.imagen.url }}" class="img-area">
+            {% else %}
+              <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
+            {% endif %}
+          </div>
+
+          <div class="card-body">
+            <small class="text-muted text-uppercase d-block mb-1">
+              {{ c.get_categoria_display }}
+            </small>
+
+            <h5 class="mb-2">{{ c.titulo }}</h5>
+
+            <p class="small text-muted">{{ c.descripcion_corta|truncatewords:20 }}</p>
+
+            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="card-plus">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-muted small ps-3">No hay convocatorias disponibles.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================================== -->
+  <!-- CURSOS Y FORMACIÓN -->
+  <!-- =============================================== -->
+  <h2 class="seccion-titulo">Cursos y Formación</h2>
+
+  <div class="carrusel-fondo">
+    <div class="carrusel-wrap">
+      <div class="flecha izq" onclick="moverCarrusel(this, -1)">‹</div>
+      <div class="flecha der" onclick="moverCarrusel(this, 1)">›</div>
+
+      <div class="carrusel">
+        {% for c in formacion %}
+        <div class="card-area">
+          <div class="card-img-top-area">
+            {% if c.imagen %}
+              <img src="{{ c.imagen.url }}" class="img-area">
+            {% else %}
+              <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
+            {% endif %}
+          </div>
+
+          <div class="card-body">
+            <small class="text-muted text-uppercase d-block mb-1">
+              {{ c.get_categoria_display }}
+            </small>
+
+            <h5 class="mb-2">{{ c.titulo }}</h5>
+
+            <p class="small text-muted">{{ c.descripcion_corta|truncatewords:20 }}</p>
+
+            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="card-plus">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-muted small ps-3">No hay cursos disponibles.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================================== -->
+  <!-- BENEFICIOS -->
+  <!-- =============================================== -->
+  <h2 class="seccion-titulo">Beneficios</h2>
+
+  <div class="carrusel-fondo">
+    <div class="carrusel-wrap">
+      <div class="flecha izq" onclick="moverCarrusel(this, -1)">‹</div>
+      <div class="flecha der" onclick="moverCarrusel(this, 1)">›</div>
+
+      <div class="carrusel">
+        {% for c in beneficio %}
+        <div class="card-area">
+          <div class="card-img-top-area">
+            {% if c.imagen %}
+              <img src="{{ c.imagen.url }}" class="img-area">
+            {% else %}
+              <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
+            {% endif %}
+          </div>
+
+          <div class="card-body">
+            <small class="text-muted text-uppercase d-block mb-1">
+              {{ c.get_categoria_display }}
+            </small>
+
+            <h5 class="mb-2">{{ c.titulo }}</h5>
+
+            <p class="small text-muted">{{ c.descripcion_corta|truncatewords:20 }}</p>
+
+            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="card-plus">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-muted small ps-3">No hay beneficios disponibles.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================================== -->
+  <!-- INCENTIVOS -->
+  <!-- =============================================== -->
+  <h2 class="seccion-titulo">Incentivos</h2>
+
+  <div class="carrusel-fondo">
+    <div class="carrusel-wrap">
+      <div class="flecha izq" onclick="moverCarrusel(this, -1)">‹</div>
+      <div class="flecha der" onclick="moverCarrusel(this, 1)">›</div>
+
+      <div class="carrusel">
+        {% for c in incentivo %}
+        <div class="card-area">
+          <div class="card-img-top-area">
+            {% if c.imagen %}
+              <img src="{{ c.imagen.url }}" class="img-area">
+            {% else %}
+              <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
+            {% endif %}
+          </div>
+
+          <div class="card-body">
+            <small class="text-muted text-uppercase d-block mb-1">
+              {{ c.get_categoria_display }}
+            </small>
+
+            <h5 class="mb-2">{{ c.titulo }}</h5>
+
+            <p class="small text-muted">{{ c.descripcion_corta|truncatewords:20 }}</p>
+
+            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="card-plus">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-muted small ps-3">No hay incentivos disponibles.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

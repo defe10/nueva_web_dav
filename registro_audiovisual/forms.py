@@ -1,6 +1,7 @@
 from django import forms
 from datetime import date
 from .models import PersonaHumana, PersonaJuridica
+from .models import LUGARES_RESIDENCIA
 
 
 class PersonaHumanaForm(forms.ModelForm):
@@ -10,12 +11,8 @@ class PersonaHumanaForm(forms.ModelForm):
 
         # Lugar de residencia (select con "- Seleccionar -")
         if "lugar_residencia" in self.fields:
-            self.fields["lugar_residencia"].choices = [
-                ("", "- Seleccionar -")
-            ] + list(self.fields["lugar_residencia"].choices)[1:]
-            self.fields["lugar_residencia"].widget = forms.Select(
-                attrs={"class": "form-select"}
-            )
+            self.fields["lugar_residencia"].choices = LUGARES_RESIDENCIA
+            self.fields["lugar_residencia"].widget.attrs.update({"class": "form-select"})
 
         # Otro lugar
         if "otro_lugar_residencia" in self.fields:
@@ -58,9 +55,6 @@ class PersonaHumanaForm(forms.ModelForm):
         if "area_cultural" in self.fields:
             self.fields["area_cultural"].widget.attrs.update({"class": "form-control"})
      
-
-        if "medios_experiencia" in self.fields:
-            self.fields["medios_experiencia"].widget.attrs.update({"class": "form-control"})
      
 
     def clean(self):
@@ -107,7 +101,9 @@ class PersonaHumanaForm(forms.ModelForm):
             "area_desempeno_1",
             "area_desempeno_2",
             "area_cultural",
-            "medios_experiencia"
+            "link_1",
+            "link_2",
+            "link_3",
         ]
         widgets = {
             "nombre_completo": forms.TextInput(attrs={"class": "form-control"}),
@@ -119,6 +115,9 @@ class PersonaHumanaForm(forms.ModelForm):
             "telefono": forms.TextInput(attrs={"class": "form-control"}),
             "email": forms.EmailInput(attrs={"class": "form-control"}),
             "domicilio_fiscal": forms.TextInput(attrs={"class": "form-control"}),
+            "link_1": forms.TextInput(attrs={"class": "form-control"}),
+            "link_2": forms.TextInput(attrs={"class": "form-control"}),
+            "link_3": forms.TextInput(attrs={"class": "form-control"}),
         }
 
 def clean_email(self):
@@ -145,12 +144,9 @@ class PersonaJuridicaForm(forms.ModelForm):
 
         # Lugar de residencia
         if "lugar_residencia" in self.fields:
-            self.fields["lugar_residencia"].choices = [
-                ("", "- Seleccionar -")
-            ] + list(self.fields["lugar_residencia"].choices)[1:]
-            self.fields["lugar_residencia"].widget.attrs.update(
-                {"class": "form-select"}
-            )
+            self.fields["lugar_residencia"].choices = LUGARES_RESIDENCIA
+            self.fields["lugar_residencia"].widget.attrs.update({"class": "form-select"})
+            
 
         # Antigüedad solo lectura (si querés que se calcule sola)
         if "antiguedad" in self.fields:
@@ -172,8 +168,6 @@ class PersonaJuridicaForm(forms.ModelForm):
         if "area_desempeno_JJPP_2" in self.fields:
             self.fields["area_desempeno_JJPP_2"].widget.attrs.update({"class": "form-control"})
 
-        if "medios_experiencia" in self.fields:
-            self.fields["medios_experiencia"].widget.attrs.update({"class": "form-control"})
         
 
     def clean(self):
@@ -207,7 +201,9 @@ class PersonaJuridicaForm(forms.ModelForm):
             "actividad_dgr",
             "area_desempeno_JJPP_1",
             "area_desempeno_JJPP_2",
-            "medios_experiencia",
+            "link_1",
+            "link_2",
+            "link_3",
         ]
         widgets = {
             "fecha_constitucion": forms.DateInput(
@@ -220,6 +216,9 @@ class PersonaJuridicaForm(forms.ModelForm):
             "domicilio_fiscal": forms.TextInput(attrs={"class": "form-control"}),
             "telefono": forms.TextInput(attrs={"class": "form-control"}),
             "email": forms.EmailInput(attrs={"class": "form-control"}),
+            "link_1": forms.TextInput(attrs={"class": "form-control"}),
+            "link_2": forms.TextInput(attrs={"class": "form-control"}),
+            "link_3": forms.TextInput(attrs={"class": "form-control"}),
         }
 def clean_email(self):
     email = self.cleaned_data.get("email")

@@ -11,6 +11,9 @@ urlpatterns = [
     path("login/", views.login_usuario, name="login"),
     path("logout/", views.logout_usuario, name="logout"),
 
+    # Panel de usuario (redirige a persona humana / jurídica)
+    path("panel/", views.panel_usuario, name="panel_usuario"),
+
     # Activación de cuenta
     path("activar/<uidb64>/<token>/", views.activar_cuenta, name="activar"),
 ]

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 
 # Formularios
@@ -10,20 +10,27 @@ from .forms import LoginForm, RegistroUsuarioForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMultiAlternatives
 
-from django.contrib.auth import logout
-from django.utils.http import urlsafe_base64_decode
+# Modelos de registro audiovisual
+from registro_audiovisual.models import PersonaHumana, PersonaJuridica
+from django.contrib.auth.decorators import login_required
+
+# ============================================================
+# LOGOUT
+# ============================================================
 
 def logout_usuario(request):
     logout(request)
-    return redirect("inicio")   # ajustá según tu URL de inicio real
+    return redirect("inicio")
 
-# ===========================
-#   REGISTRO
-# ===========================
+
+# ============================================================
+# REGISTRO DE USUARIO
+# ============================================================
+
 def registro(request):
     if request.method == "POST":
         form = RegistroUsuarioForm(request.POST)
@@ -31,7 +38,7 @@ def registro(request):
         if form.is_valid():
             usuario = form.save()  # Usuario se crea inactivo
 
-            # ---- Email de activación ----
+            # Email de activación
             current_site = get_current_site(request)
             subject = "Confirmá tu cuenta"
 
@@ -61,7 +68,6 @@ https://{current_site.domain}/usuarios/activar/{uid}/{token}/
             )
             email.attach_alternative(html_message, "text/html")
             email.send()
-            # ------------------------------
 
             messages.success(request, "Tu cuenta fue creada. Revisá tu correo para activarla.")
             return redirect("usuario:login")
@@ -72,12 +78,17 @@ https://{current_site.domain}/usuarios/activar/{uid}/{token}/
     return render(request, "usuarios/registro.html", {"form": form})
 
 
-# ===========================
-#   LOGIN
-# ===========================
+# ============================================================
+# LOGIN
+# ============================================================
+
 def login_usuario(request):
 
     next_url = request.GET.get("next") or request.POST.get("next")
+
+    # Normalizar valores inválidos
+    if next_url in [None, "", "None", "null", "undefined"]:
+        next_url = None
 
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
@@ -91,15 +102,10 @@ def login_usuario(request):
 
             login(request, user)
 
-            # --- redirección segura ---
+            # Redirección segura
             if next_url:
                 if next_url.startswith("/"):
                     return redirect(next_url)
-                else:
-                    try:
-                        return redirect(next_url)
-                    except:
-                        pass
 
             return redirect("inicio")
 
@@ -110,10 +116,12 @@ def login_usuario(request):
         "form": form,
         "next": next_url,
     })
-# ===========================
-#   ACTIVAR CUENTA
-# ===========================
 
+
+
+# ============================================================
+# ACTIVAR CUENTA
+# ============================================================
 
 def activar_cuenta(request, uidb64, token):
     try:
@@ -130,3 +138,30 @@ def activar_cuenta(request, uidb64, token):
 
     messages.error(request, "El enlace de activación no es válido o ya expiró.")
     return redirect("usuario:login")
+
+
+# ============================================================
+# PANEL DEL USUARIO
+# ============================================================
+
+@login_required(login_url="/usuarios/login/")
+def panel_usuario(request):
+    user = request.user
+
+    # Recuperar registros si existen
+    persona_humana = PersonaHumana.objects.filter(user=user).first()
+    persona_juridica = PersonaJuridica.objects.filter(user=user).first()
+
+    # Si tiene registro → mostrar panel.html
+    if persona_humana or persona_juridica:
+        return render(
+            request,
+            "usuarios/panel.html",   # O "registro/panel.html", lo que uses
+            {
+                "persona_humana": persona_humana,
+                "persona_juridica": persona_juridica,
+            }
+        )
+
+    # Si no tiene nada → enviarlo a elegir tipo
+    return redirect("registro_audiovisual:seleccionar_tipo_registro")

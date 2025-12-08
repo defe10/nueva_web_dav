@@ -1,0 +1,64 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
+  <h1 class="mb-3">POSTULACIÓN COMPLETADA</h1>
+  <h2>{{ convocatoria.titulo }}</h2>
+</div>
+
+<section class="team section-bg">
+  <div class="container">
+    <div class="row justify-content-center">
+
+      <div class="col-lg-8">
+        <div class="memberRegistro mb-5 text-center">
+
+          <!-- Mensaje principal -->
+          <h3 class="mb-3">¡Tu postulación fue enviada correctamente!</h3>
+
+          <p class="text-muted mb-4">
+            Hemos recibido tu postulación para la convocatoria 
+            <strong>{{ convocatoria.titulo }}</strong>.<br>
+            Nuestro equipo revisará la información presentada y 
+            nos contactaremos en caso de ser necesario.
+          </p>
+
+          <!-- Datos opcionales -->
+          {% if postulacion %}
+          <div class="alert alert-info text-start">
+            <strong>Resumen de tu envío:</strong><br>
+            Postulación Nº: {{ postulacion.id }}<br>
+            Proyecto: {{ postulacion.nombre_proyecto }}<br>
+            Línea: {{ convocatoria.get_linea_display }}<br>
+            Fecha de envío: {{ postulacion.fecha_envio|date:"d/m/Y H:i" }}
+          </div>
+          {% endif %}
+
+          <!-- Botones -->
+          <div class="mt-4 d-flex justify-content-center gap-3">
+            <a href="{% url 'convocatorias:convocatoria_detalle' convocatoria.slug %}" 
+               class="btn btn-primary">
+              Ver convocatoria
+            </a>
+
+            <a href="{% url 'convocatorias:convocatorias_home' %}" 
+               class="btn btn-outline-primary">
+              Volver a convocatorias
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
