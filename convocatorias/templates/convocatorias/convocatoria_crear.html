@@ -37,7 +37,6 @@
               {{ form.orden }}
             </div>
 
-          
             <!-- CATEGORÍA / LÍNEA -->
             <div class="col-lg-3 form-group mb-5">
               <label>Categoría</label>
@@ -149,6 +148,15 @@
             <div class="col-lg-6 form-group mb-5">
               <label>Imagen (JPG)</label>
               {{ form.imagen }}
+            </div>
+
+            <!-- NUEVO CAMPO: URL DEL CURSO -->
+            <div class="col-lg-12 form-group mb-5">
+              <label>URL del curso asincrónico (opcional)</label>
+              {{ form.url_curso }}
+              <small class="text-muted d-block">
+                Solo para convocatorias de formación que tengan un curso online.
+              </small>
             </div>
 
             <!-- FECHAS -->

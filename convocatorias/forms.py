@@ -48,6 +48,7 @@ class ConvocatoriaForm(forms.ModelForm):
             # ARCHIVOS
             "bases_pdf",
             "imagen",
+            "url_curso",
 
             # FECHAS
             "fecha_inicio",

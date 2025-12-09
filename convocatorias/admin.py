@@ -8,6 +8,10 @@ from .models import Convocatoria, PostulacionIDEA, DocumentoPersonal, DocumentoP
 #  CONVOCATORIA
 # ============================================================
 
+# ============================================================
+#  CONVOCATORIA
+# ============================================================
+
 @admin.register(Convocatoria)
 class ConvocatoriaAdmin(admin.ModelAdmin):
     list_display = ("titulo", "categoria", "linea", "fecha_inicio", "fecha_fin", "vigente", "orden")
@@ -15,6 +19,47 @@ class ConvocatoriaAdmin(admin.ModelAdmin):
     search_fields = ("titulo", "descripcion_corta", "descripcion_larga")
     prepopulated_fields = {"slug": ("titulo",)}
     ordering = ("orden", "-fecha_inicio")
+
+    fieldsets = (
+        ("Datos generales", {
+            "fields": (
+                "titulo",
+                "slug",
+                "descripcion_corta",
+                "descripcion_larga",
+                "categoria",
+                "linea",
+                "tematica_genero",
+                "orden",
+            )
+        }),
+
+        ("Curso asincrónico (opcional)", {
+            "fields": ("url_curso",),
+        }),
+
+        ("Requisitos y beneficios", {
+            "fields": ("requisitos", "beneficios", "bases_pdf"),
+        }),
+
+        ("Imagen", {
+            "fields": ("imagen",),
+        }),
+
+        ("Fechas", {
+            "fields": ("fecha_inicio", "fecha_fin"),
+        }),
+
+        ("Jurados / Formadores / Tutores", {
+            "fields": (
+                "bloque_personas",
+                "jurado1_nombre", "Jurad⟩o1_foto", "jurado1_bio",
+                "jurado2_nombre", "jurado2_foto", "jurado2_bio",
+                "jurado3_nombre", "jurado3_foto", "jurado3_bio",
+            ),
+        }),
+    )
+
 
 
 # ============================================================
@@ -101,3 +146,13 @@ class DocumentoProyectoAdmin(admin.ModelAdmin):
         return format_html('<a href="{}" download>📄 Descargar</a>', obj.archivo.url)
 
     archivo_link.short_description = "Archivo"
+
+
+from .models import InscripcionCurso
+
+@admin.register(InscripcionCurso)
+class InscripcionCursoAdmin(admin.ModelAdmin):
+    list_display = ("user", "convocatoria", "fecha")
+    list_filter = ("convocatoria",)
+    search_fields = ("user__username", "user__email", "convocatoria__titulo")
+    ordering = ("-fecha",)

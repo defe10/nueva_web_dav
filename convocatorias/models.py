@@ -92,6 +92,19 @@ class DocumentoProyecto(models.Model):
 
 
 
+class InscripcionCurso(models.Model):
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    convocatoria = models.ForeignKey("Convocatoria", on_delete=models.CASCADE)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "convocatoria")
+        ordering = ["-fecha"]
+
+    def __str__(self):
+        return f"{self.user} → {self.convocatoria}"
+
+
 # ==========================================
 # CATEGORÍAS
 # ==========================================
@@ -143,6 +156,14 @@ class Convocatoria(models.Model):
     descripcion_corta = models.TextField(blank=True)
     descripcion_larga = models.TextField(blank=True)
 
+    # ---- NUEVO: URL del curso asincrónico ----
+    url_curso = models.URLField(
+        "URL del curso asincrónico",
+        blank=True,
+        null=True,
+        help_text="Solo completar si el curso es asincrónico."
+    )
+
     categoria = models.CharField(max_length=20, choices=CATEGORIAS)
     tematica_genero = models.CharField(max_length=200, blank=True)
 
@@ -182,7 +203,7 @@ class Convocatoria(models.Model):
     # ---- Orden en el carrusel ----
     orden = models.PositiveIntegerField(default=0)
 
-    # ---- URL alternativa ----
+    # ---- URL alternativa (no usada para cursos asincrónicos) ----
     url_destino = models.CharField(max_length=300, blank=True)
 
     class Meta:

@@ -172,21 +172,39 @@
             {% endif %}
           </ul>
 
-          <!-- BOTONES -->
-          <div class="d-grid gap-2">
-            {% if convocatoria.vigente %}
-            <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}" 
-               class="btn btn-primary btn-sm">
-              Inscribirme
-            </a>
-            {% endif %}
+      <!-- BOTONES -->
+<div class="d-grid gap-2">
 
-            {% if convocatoria.bases_pdf %}
-            <a href="{{ convocatoria.bases_pdf.url }}" class="btn btn-outline-primary btn-sm" target="_blank">
-              Bases y condiciones
-            </a>
-            {% endif %}
-          </div>
+  {% if convocatoria.vigente %}
+
+    {% if convocatoria.url_curso %}
+      <!-- BOTÓN: ACCEDER AL CURSO -->
+      <a href="{{ convocatoria.url_curso }}"
+         target="_blank"
+         class="btn btn-warning btn-sm">
+         Acceder al curso
+      </a>
+    {% else %}
+      <!-- BOTÓN: INSCRIBIRME -->
+      <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}"
+         class="btn btn-primary btn-sm">
+         Inscribirme
+      </a>
+    {% endif %}
+
+  {% endif %}
+
+  {% if convocatoria.bases_pdf %}
+  <a href="{{ convocatoria.bases_pdf.url }}" 
+     class="btn btn-outline-primary btn-sm" 
+     target="_blank">
+    Bases y condiciones
+  </a>
+  {% endif %}
+
+</div>
+
+
 
         </div>
       </div>
