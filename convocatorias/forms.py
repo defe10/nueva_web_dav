@@ -14,14 +14,14 @@ class PostulacionIDEAForm(forms.ModelForm):
             "nombre_proyecto",
             "tipo_proyecto",
             "genero",
-            "duracion_minutos",
+            # "duracion_minutos",
             "declaracion_jurada",
         ]
         widgets = {
             "nombre_proyecto": forms.TextInput(attrs={"class": "form-control"}),
             "tipo_proyecto": forms.Select(attrs={"class": "form-select"}),
             "genero": forms.Select(attrs={"class": "form-select"}),
-            "duracion_minutos": forms.NumberInput(attrs={"class": "form-control"}),
+            # "duracion_minutos": forms.NumberInput(attrs={"class": "form-control"}),
             "declaracion_jurada": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 

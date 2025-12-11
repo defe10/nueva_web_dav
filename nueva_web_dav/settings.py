@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'usuarios',
     'registro_audiovisual',
     'convocatorias',
+     "exencion",
 
     'django_ratelimit',
 ]

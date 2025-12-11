@@ -57,12 +57,13 @@ def inscribirse_convocatoria(request, slug):
         return redirect("convocatorias:postular_convocatoria",
                         convocatoria_id=convocatoria.id)
 
-    # --------------------------------------
-    # CASO 3: BENEFICIO o INCENTIVO → usan IDEA
-    # --------------------------------------
-    if linea in ["beneficio", "incentivo"]:
-        return redirect("convocatorias:postular_convocatoria",
-                        convocatoria_id=convocatoria.id)
+   # BENEFICIO → EXENCIÓN (nuevo flujo)
+    if convocatoria.linea == "beneficio":
+        return redirect("exencion:solicitar_exencion", convocatoria_id=convocatoria.id)
+
+    # INCENTIVO → sigue usando IDEA
+    if convocatoria.linea == "incentivo":
+        return redirect("convocatorias:postular_convocatoria", convocatoria_id=convocatoria.id)
 
     # Si no coincide, volvemos al detalle
     return redirect("convocatorias:convocatoria_detalle", slug=slug)

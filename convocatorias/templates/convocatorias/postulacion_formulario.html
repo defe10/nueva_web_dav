@@ -24,9 +24,9 @@
           <br>
           <p>
             Esta información es necesaria para validar tu postulación.<br><br>
-            En los pasos siguientes podrás subir la documentación personal
+            <strong>¡Muy importante!:</strong> Antes de continuar, asegurate de actualizar tus datos en el Registro Audiovisual desde “Mi cuenta”. Esa información acompañará tu convocatoria.
             y los archivos correspondientes al proyecto.<br><br>
-            Al finalizar este formulario, hacé clic en “Enviar postulación”.
+            Al finalizar este formulario, hacé clic en “Siguiente”.
           </p>
         </div>
       </div>
@@ -63,23 +63,23 @@
             </div>
 
             <!-- Duración -->
-            <div class="col-lg-6 form-group">
+            {% comment %} <div class="col-lg-6 form-group">
               <label>Duración estimada (minutos)</label>
               {{ form.duracion_minutos }}
               {{ form.duracion_minutos.errors }}
-            </div>
+            </div> {% endcomment %}
 
             <!-- Declaración Jurada -->
-            <div class="col-lg-6 form-group mt-4">
+            <div class="col-lg-12 form-group mt-4">
               <label class="form-check-label">
-                {{ form.declaracion_jurada }} Confirmo que toda la información ingresada es verdadera.
+                {{ form.declaracion_jurada }} DECLARACIÓN JURADA: Confirmo que he leido las bases y condiciones de "{{ convocatoria.titulo }}" y acepto los requisitos de participación y aprobación.
               </label>
               {{ form.declaracion_jurada.errors }}
             </div>
 
             <!-- BOTÓN -->
             <div class="col-lg-12 mt-4 text-end">
-              <button type="submit" class="btn btn-primary">Enviar postulación</button>
+              <button type="submit" class="btn btn-primary">Siguiente</button>
             </div>
 
           </form>

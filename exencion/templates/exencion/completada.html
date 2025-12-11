@@ -1,0 +1,49 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
+  <h1 class="mb-3">SOLICITUD ENVIADA</h1>
+  <h2>{{ convocatoria.titulo }}</h2>
+</div>
+
+<section class="team section-bg">
+  <div class="container">
+    <div class="row justify-content-center">
+
+      <div class="col-lg-8">
+        <div class="memberRegistro mb-5 text-center">
+
+          <h3 class="mb-3">¡Tu solicitud fue enviada correctamente!</h3>
+
+          <p class="text-muted mb-4">
+            Nuestro equipo revisará la documentación presentada.  
+            Recibirás un correo cuando tu solicitud sea aprobada o si necesitamos información adicional.
+          </p>
+
+          <div class="alert alert-info text-start">
+            <strong>Número de solicitud:</strong> {{ solicitud.id }}<br>
+            <strong>Estado:</strong> {{ solicitud.get_estado_display }}
+          </div>
+
+          <div class="mt-4">
+            <a href="{% url 'convocatorias:convocatorias_home' %}" 
+               class="btn btn-primary">
+              Volver a convocatorias
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
