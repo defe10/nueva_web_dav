@@ -5,9 +5,8 @@ from django.utils.text import slugify
 
 
 # ==========================================
-# LÍNEAS DE CONVOCATORIA (NUEVO)
+# LÍNEAS DE CONVOCATORIA
 # ==========================================
-
 LINEAS = [
     ("fomento", "Fomento"),
     ("beneficio", "Beneficio"),
@@ -17,126 +16,8 @@ LINEAS = [
 
 
 # ==========================================
-# POSTULACIÓN (por ahora solo Fomento / IDEA)
-# ==========================================
-
-class PostulacionIDEA(models.Model):
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    convocatoria = models.ForeignKey("Convocatoria", on_delete=models.CASCADE)
-
-    nombre_proyecto = models.CharField(max_length=255)
-
-    TIPO_PROYECTO = [
-
-    # ====================
-    # CINE
-    # ====================
-    ("CINE", (
-        ("cine_corto", "Cortometraje"),
-        ("cine_largo", "Largometraje"),
-        ("cine_comunidad", "Cine en comunidad"),
-    )),
-
-    # ====================
-    # SERIES
-    # ====================
-    ("SERIES", (
-        ("serie_tv", "Serie"),
-        ("serie_web", "Serie Web"),
-    )),
-
-    # ====================
-    # ANIMACIÓN
-    # ====================
-    ("ANIMACION", (
-        ("anim_corto", "Cortometraje de animación"),
-        ("anim_largo", "Largometraje de animación"),
-        ("anim_serie", "Serie de animación"),
-        ("anim_serie_web", "Serie web de animación"),
-        ("anim_videoclip", "Videoclip de animación"),
-    )),
-
-    # ====================
-    # OTROS FORMATOS
-    # ====================
-    ("OTROS", (
-        ("videoclip", "Videoclip"),
-        ("videojuego", "Videojuego"),
-        ("transmedia", "Proyecto transmedia"),
-    )),
-]
-
-    tipo_proyecto = models.CharField(max_length=50, choices=TIPO_PROYECTO)
-
-    GENERO = [
-        ("ficcion", "Ficción"),
-        ("documental", "Documental"),
-        ("noficcion", "No ficción"),
-        ("educativo", "Educativo"),
-        ("deportivo", "Deportivo"),
-        ("ludico", "Lúdico"),
-        ("simulacion", "Simulación"),
-        ("otro", "Otro"),
-    ]
-    genero = models.CharField(max_length=50, choices=GENERO)
-
-    declaracion_jurada = models.BooleanField(default=False)
-    fecha_envio = models.DateTimeField(auto_now_add=True)
-
-    ESTADOS = [
-        ('ENVIADA', 'Enviada'),
-        ('REVISION', 'En revisión'),
-        ('SUBSANAR', 'Subsanar'),
-        ('APROBADA', 'Aprobada'),
-        ('RECHAZADA', 'Rechazada'),
-    ]
-    estado = models.CharField(max_length=20, choices=ESTADOS, default='ENVIADA')
-
-    def __str__(self):
-        return f"{self.nombre_proyecto} - {self.user.username}"
-
-
-class DocumentoPersonal(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    archivo = models.FileField(upload_to="documentacion/personal/")
-    fecha_subida = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Doc personal de {self.user.username}"
-
-
-class DocumentoProyecto(models.Model):
-    postulacion = models.ForeignKey(
-        PostulacionIDEA,
-        on_delete=models.CASCADE,
-        related_name="documentos_proyecto"
-    )
-    archivo = models.FileField(upload_to="documentacion/proyecto/")
-    fecha_subida = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Doc proyecto #{self.postulacion.id}"
-
-
-
-class InscripcionCurso(models.Model):
-    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
-    convocatoria = models.ForeignKey("Convocatoria", on_delete=models.CASCADE)
-    fecha = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ("user", "convocatoria")
-        ordering = ["-fecha"]
-
-    def __str__(self):
-        return f"{self.user} → {self.convocatoria}"
-
-
-# ==========================================
 # CATEGORÍAS
 # ==========================================
-
 CATEGORIAS = [
     ("CONCURSO", "Concurso"),
     ("PROGRAMA", "Programa"),
@@ -148,9 +29,8 @@ CATEGORIAS = [
 
 
 # ==========================================
-# BLOQUE PERSONAS
+# BLOQUE PERSONAS (jurado / formadores)
 # ==========================================
-
 BLOQUE_PERSONAS_TITULO = [
     ("JURADO", "Jurado"),
     ("FORMADORES", "Formadores"),
@@ -160,9 +40,8 @@ BLOQUE_PERSONAS_TITULO = [
 
 
 # ==========================================
-# JURADOS (estos quedan como están)
+# JURADOS (opcional, se mantiene)
 # ==========================================
-
 class Jurado(models.Model):
     nombre = models.CharField(max_length=200)
     foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
@@ -174,7 +53,6 @@ class Jurado(models.Model):
 # ==========================================
 # CONVOCATORIA
 # ==========================================
-
 class Convocatoria(models.Model):
 
     # ---- Datos generales ----
@@ -184,7 +62,7 @@ class Convocatoria(models.Model):
     descripcion_corta = models.TextField(blank=True)
     descripcion_larga = models.TextField(blank=True)
 
-    # ---- NUEVO: URL del curso asincrónico ----
+    # ---- Curso asincrónico ----
     url_curso = models.URLField(
         "URL del curso asincrónico",
         blank=True,
@@ -195,21 +73,30 @@ class Convocatoria(models.Model):
     categoria = models.CharField(max_length=20, choices=CATEGORIAS)
     tematica_genero = models.CharField(max_length=200, blank=True)
 
-    # ---- NUEVO: LÍNEA ----
+    # ---- Línea ----
     linea = models.CharField(max_length=20, choices=LINEAS)
 
-    # ---- Archivos y beneficios ----
+    # ---- Contenidos ----
     requisitos = models.TextField(blank=True)
     beneficios = models.TextField(blank=True)
-    bases_pdf = models.FileField(upload_to="convocatorias/bases/", blank=True, null=True)
 
-    imagen = models.ImageField(upload_to="convocatorias/img/", blank=True, null=True)
+    bases_pdf = models.FileField(
+        upload_to="convocatorias/bases/",
+        blank=True,
+        null=True
+    )
+
+    imagen = models.ImageField(
+        upload_to="convocatorias/img/",
+        blank=True,
+        null=True
+    )
 
     # ---- Fechas ----
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
 
-    # ---- Bloque personas / Jurado ----
+    # ---- Bloque personas ----
     bloque_personas = models.CharField(
         max_length=20,
         choices=BLOQUE_PERSONAS_TITULO,
@@ -228,10 +115,10 @@ class Convocatoria(models.Model):
     jurado3_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
     jurado3_bio = models.TextField(blank=True)
 
-    # ---- Orden en el carrusel ----
+    # ---- Orden ----
     orden = models.PositiveIntegerField(default=0)
 
-    # ---- URL alternativa (no usada para cursos asincrónicos) ----
+    # ---- URL alternativa ----
     url_destino = models.CharField(max_length=300, blank=True)
 
     class Meta:
@@ -249,3 +136,114 @@ class Convocatoria(models.Model):
 
     def __str__(self):
         return self.titulo
+
+
+# ==========================================
+# POSTULACIÓN (entidad central)
+# ==========================================
+class Postulacion(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    convocatoria = models.ForeignKey(Convocatoria, on_delete=models.CASCADE)
+
+    nombre_proyecto = models.CharField(max_length=255)
+
+    TIPO_PROYECTO = [
+        ("cine_corto", "Cortometraje"),
+        ("cine_largo", "Largometraje"),
+        ("serie", "Serie"),
+        ("serie_web", "Serie Web"),
+        ("animacion", "Animación"),
+        ("videoclip", "Videoclip"),
+        ("videojuego", "Videojuego"),
+        ("transmedia", "Transmedia"),
+        ("otro", "Otro"),
+    ]
+    tipo_proyecto = models.CharField(max_length=50, choices=TIPO_PROYECTO)
+
+    GENERO = [
+        ("ficcion", "Ficción"),
+        ("documental", "Documental"),
+        ("noficcion", "No ficción"),
+        ("educativo", "Educativo"),
+        ("otro", "Otro"),
+    ]
+    genero = models.CharField(max_length=50, choices=GENERO)
+
+    declaracion_jurada = models.BooleanField(default=False)
+
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+
+    ESTADOS = [
+        ("ENVIADA", "Enviada"),
+        ("REVISION", "En revisión"),
+        ("SUBSANAR", "Subsanar"),
+        ("APROBADA", "Aprobada"),
+        ("RECHAZADA", "Rechazada"),
+    ]
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADOS,
+        default="ENVIADA"
+    )
+
+    class Meta:
+        ordering = ["-fecha_envio"]
+        verbose_name = "Postulación"
+        verbose_name_plural = "Postulaciones"
+
+    def __str__(self):
+        return f"{self.nombre_proyecto} – {self.user.username}"
+
+
+# ==========================================
+# DOCUMENTOS DE POSTULACIÓN
+# ==========================================
+class DocumentoPostulacion(models.Model):
+
+    TIPOS = [
+        ("PERSONAL", "Documentación personal"),
+        ("PROYECTO", "Documentación del proyecto"),
+    ]
+
+    postulacion = models.ForeignKey(
+        Postulacion,
+        on_delete=models.CASCADE,
+        related_name="documentos"
+    )
+
+    tipo = models.CharField(
+        max_length=20,
+        choices=TIPOS
+    )
+
+    archivo = models.FileField(
+        upload_to="postulaciones/documentos/"
+    )
+
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Documento de postulación"
+        verbose_name_plural = "Documentos de postulación"
+        ordering = ["-fecha_subida"]
+
+    def __str__(self):
+        return f"{self.get_tipo_display()} – {self.postulacion.nombre_proyecto}"
+
+
+# ==========================================
+# INSCRIPCIÓN A CURSOS
+# ==========================================
+class InscripcionCurso(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    convocatoria = models.ForeignKey(Convocatoria, on_delete=models.CASCADE)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "convocatoria")
+        ordering = ["-fecha"]
+
+    def __str__(self):
+        return f"{self.user.username} → {self.convocatoria.titulo}"

@@ -3,14 +3,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
-from .models import (
+
+from convocatorias.models import (
     Convocatoria,
-    PostulacionIDEA,
-    DocumentoPersonal,
-    DocumentoProyecto,
+    Postulacion,
+    DocumentoPostulacion,
     InscripcionCurso,
 )
-from .forms import PostulacionIDEAForm, ConvocatoriaForm
+
+from .forms import PostulacionForm, ConvocatoriaForm
 
 
 # ============================================================
@@ -125,7 +126,7 @@ def postular_convocatoria(request, convocatoria_id):
     # Formulario
     # --------------------------------------
     if request.method == "POST":
-        form = PostulacionIDEAForm(request.POST)
+        form = PostulacionForm(request.POST)
         if form.is_valid():
             postulacion = form.save(commit=False)
             postulacion.user = user
@@ -138,7 +139,7 @@ def postular_convocatoria(request, convocatoria_id):
                 postulacion_id=postulacion.id,
             )
     else:
-        form = PostulacionIDEAForm()
+        form = PostulacionForm()
 
     return render(
         request,
@@ -157,17 +158,18 @@ def postular_convocatoria(request, convocatoria_id):
 @login_required(login_url="/usuarios/login/")
 def subir_documentacion_personal(request, postulacion_id):
 
-    postulacion = get_object_or_404(PostulacionIDEA, id=postulacion_id)
+    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
 
     if postulacion.user != request.user:
         return redirect("convocatorias:convocatorias_home")
 
     if request.method == "POST" and request.FILES.getlist("archivos"):
         for archivo in request.FILES.getlist("archivos"):
-            DocumentoPersonal.objects.create(
-                user=request.user,
+            DocumentoPostulacion.objects.create(
+                postulacion=postulacion,
+                tipo="PERSONAL",
                 archivo=archivo,
-            )
+            )           
 
         return redirect(
             "convocatorias:subir_documentacion_proyecto",
@@ -189,15 +191,16 @@ def subir_documentacion_personal(request, postulacion_id):
 @login_required(login_url="/usuarios/login/")
 def subir_documentacion_proyecto(request, postulacion_id):
 
-    postulacion = get_object_or_404(PostulacionIDEA, id=postulacion_id)
+    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
 
     if postulacion.user != request.user:
         return redirect("convocatorias:convocatorias_home")
 
     if request.method == "POST" and request.FILES.getlist("archivos"):
         for archivo in request.FILES.getlist("archivos"):
-            DocumentoProyecto.objects.create(
+            DocumentoPostulacion.objects.create(
                 postulacion=postulacion,
+                tipo="PROYECTO",
                 archivo=archivo,
             )
 
@@ -221,7 +224,7 @@ def subir_documentacion_proyecto(request, postulacion_id):
 @login_required(login_url="/usuarios/login/")
 def postulacion_confirmada(request, postulacion_id):
 
-    postulacion = get_object_or_404(PostulacionIDEA, id=postulacion_id)
+    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
 
     if postulacion.user != request.user:
         return redirect("convocatorias:convocatorias_home")

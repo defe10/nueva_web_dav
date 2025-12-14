@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
 from convocatorias.models import Convocatoria
+
 from .models import Exencion, ExencionDocumento
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 

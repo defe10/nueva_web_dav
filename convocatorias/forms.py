@@ -1,15 +1,15 @@
 from django import forms
 from django.utils.text import slugify
-from .models import PostulacionIDEA, Convocatoria, Jurado
+from .models import Postulacion, Convocatoria, Jurado
 
 
 # convocatorias/forms.py
 from django import forms
-from .models import PostulacionIDEA
+from .models import Postulacion
 
-class PostulacionIDEAForm(forms.ModelForm):
+class PostulacionForm(forms.ModelForm):
     class Meta:
-        model = PostulacionIDEA
+        model = Postulacion
         fields = [
             "nombre_proyecto",
             "tipo_proyecto",
