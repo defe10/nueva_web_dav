@@ -1,24 +1,39 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
 from django.contrib.auth import views as auth_views
+
 from . import views
 from .forms import PasswordResetEmailForm
 
-app_name = "usuario"
+app_name = "usuarios"
+
 
 urlpatterns = [
+    # ----------------------------------
     # Registro / Login / Logout
+    # ----------------------------------
     path("registro/", views.registro, name="registro"),
     path("login/", views.login_usuario, name="login"),
     path("logout/", views.logout_usuario, name="logout"),
 
-    # Panel de usuario (redirige a persona humana / jurídica)
+    # ----------------------------------
+    # Panel de usuario
+    # ----------------------------------
     path("panel/", views.panel_usuario, name="panel_usuario"),
 
+    # ----------------------------------
     # Activación de cuenta
-    path("activar/<uidb64>/<token>/", views.activar_cuenta, name="activar"),
+    # ----------------------------------
+    path(
+        "activar/<uidb64>/<token>/",
+        views.activar_cuenta,
+        name="activar"
+    ),
 ]
 
+
+# ----------------------------------
 # Recuperación de contraseña
+# ----------------------------------
 urlpatterns += [
     path(
         "password_reset/",
@@ -27,7 +42,7 @@ urlpatterns += [
             email_template_name="usuarios/password_reset_email.html",
             subject_template_name="usuarios/password_reset_subject.txt",
             form_class=PasswordResetEmailForm,
-            success_url="password_reset_done/",
+            success_url=reverse_lazy("usuarios:password_reset_done"),
         ),
         name="password_reset",
     ),
@@ -42,7 +57,7 @@ urlpatterns += [
         "reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(
             template_name="usuarios/password_reset_confirm.html",
-            success_url="/usuarios/reset/done/"
+            success_url=reverse_lazy("usuarios:password_reset_complete"),
         ),
         name="password_reset_confirm",
     ),

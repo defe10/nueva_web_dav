@@ -132,14 +132,15 @@
   </div>
 </section>
 
+
 <!-- ÁREAS DE GESTIÓN -->
-<section class="py-5 bg-light border-top border-bottom">
+<section class="py-5 bg-light  ">
   <div class="container">
     <h3 class="fw-bold mb-4">Áreas de gestión</h3>
 
-    <div class="row g-4">
+    <div class="row g-3 justify-content-center">
       <!-- FOMENTO -->
-      <div class="col-sm-12 col-md-6 col-lg card-col-5">
+      <div class="col-auto card-col-5">
         <div class="card card-area shadow-sm h-100">
           <div class="card-img-top-area">
             <img
@@ -149,9 +150,9 @@
             />
           </div>
           <div class="card-body">
-            <h5 class="mb-2">FOMENTO</h5>
+            <h5 class="mb-2">Fomento</h5>
             <p class="text-muted">
-              Fomento para desarrollo y producción audiovisual.
+              Concursos, programas, subsidios y Cash Rebate.
             </p>
             <a href="{% url 'convocatorias:convocatorias_home' %}" class="card-plus">
               <i class="bi bi-plus-circle-fill"></i>
@@ -161,7 +162,7 @@
       </div>
 
       <!-- PROMOCIÓN -->
-      <div class="col-sm-12 col-md-6 col-lg card-col-5">
+      <div class="col-auto card-col-5">
         <div class="card card-area shadow-sm h-100">
           <div class="card-img-top-area">
             <img
@@ -171,7 +172,7 @@
             />
           </div>
           <div class="card-body">
-            <h5 class="mb-2">SALTA SET</h5>
+            <h5 class="mb-2">Salta Set</h5>
             <p class="text-muted">
               Film Commission de la provincia de Salta.
             </p>
@@ -183,7 +184,7 @@
       </div>
 
       <!-- FORMACIÓN -->
-      <div class="col-sm-12 col-md-6 col-lg card-col-5">
+      <div class="col-auto card-col-5">
         <div class="card card-area shadow-sm h-100">
           <div class="card-img-top-area">
             <img
@@ -193,7 +194,7 @@
             />
           </div>
           <div class="card-body">
-            <h5 class="mb-2">FORMACIÓN</h5>
+            <h5 class="mb-2">Formación</h5>
             <p class="text-muted">
               Programas y talleres para capacitación profesional.
             </p>
@@ -205,7 +206,7 @@
       </div>
 
       <!-- EXHIBICIÓN -->
-      <div class="col-sm-12 col-md-6 col-lg card-col-5">
+      <div class="col-auto card-col-5">
         <div class="card card-area shadow-sm h-100">
           <div class="card-img-top-area">
             <img
@@ -215,31 +216,9 @@
             />
           </div>
           <div class="card-body">
-            <h5 class="mb-2">EXHIBICIÓN Y DIFUSIÓN</h5>
+            <h5 class="mb-2">Exhibición</h5>
             <p class="text-muted">
-              Proyección y ciclos de cine.
-            </p>
-            <a href="#" class="card-plus">
-              <i class="bi bi-plus-circle-fill"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- SEMANA DE CINE -->
-      <div class="col-sm-12 col-md-6 col-lg card-col-5">
-        <div class="card card-area shadow-sm h-100">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/cinemovil.jpg' %}"
-              alt="Exhibición"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <h5 class="mb-2">SEMANA DE CINE EN SALTA</h5>
-            <p class="text-muted">
-              Festival de Cine.
+              Cine Móvil, La semana de cine y proyecciones de cine.
             </p>
             <a href="#" class="card-plus">
               <i class="bi bi-plus-circle-fill"></i>
@@ -252,8 +231,67 @@
   </div>
 </section>
 
-{% if vigentes %}
 <section class="py-5">
+  <div class="container">
+    {% comment %} <h3 class="fw-bold mb-4">Servicios</h3> {% endcomment %}
+
+    <div class="row g-3 justify-content-center">
+
+      <!-- CARD 1 -->
+      <div class="col-auto card-col-5">
+        <div class="card card_servs text-white mb-3">
+          <div class="card-body">
+            <h5 class="card-titlen mb-4">Registro Audiovisual</h5>
+            <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}" class="btn btn-outline-light btn-lg boton-programa mb-3">
+              Registrame
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2 -->
+      <div class="col-auto card-col-5">
+        <div class="card card_servs text-white mb-3">
+          <div class="card-body">
+            <h5 class="card-title mb-4">Exención impositiva</h5>
+            <a href="{% url 'exencion:iniciar' %}" class="btn btn-outline-light btn-lg boton-programa mb-3">
+              Solicitar aquí
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 3 -->
+      <div class="col-auto card-col-5">
+        <div class="card card_servs text-white mb-3">
+          <div class="card-body">
+            <h5 class="card-title mb-4">Solicitud Cine Móvil</h5>
+            <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}" class="btn btn-outline-light btn-lg boton-programa mb-3">
+              Solicitar aquí
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 4 -->
+      <div class="col-auto card-col-5">
+        <div class="card card_servs text-white  mb-3">
+          <div class="card-body">
+            <h5 class="card-title mb-4">Solicitud de avales</h5>
+            <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}" class="btn btn-outline-light btn-lg boton-programa mb-3">
+              Solicitar aquí
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{% if vigentes %}
+<section class="py-4">
   <div class="container">
     <h3 class="fw-bold mb-4">Convocatorias abiertas</h3>
 

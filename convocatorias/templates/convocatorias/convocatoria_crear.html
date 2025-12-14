@@ -3,177 +3,176 @@
 
 {% block title %}Crear convocatoria{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
-{% endblock %}
-
 {% block content %}
 
-<!-- HERO -->
-<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-  <h1 class="mb-3">CREAR CONVOCATORIA</h1>
-  <h2>Administración del sistema</h2>
-</div>
+<!-- HERO ADMIN -->
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Crear convocatoria</h1>
+  <p class="text-muted">
+    Administración del sistema
+  </p>
+</section>
 
-<section class="team section-bg">
-  <div class="container">
-    <div class="row justify-content-center">
+<div class="container py-5">
 
-      <div class="col-lg-10">
-        <div class="memberRegistro mb-5 text-left">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
 
-          <h3 class="mb-4">Nueva Convocatoria</h3>
+      <div class="card shadow-sm mb-5">
+        <div class="card-body p-4">
+
+          <h3 class="mb-3">Nueva convocatoria</h3>
           <p class="text-muted mb-4">
             Completá todos los campos para crear una nueva convocatoria.
             Los datos cargados se mostrarán automáticamente en la web pública.
           </p>
 
-          <form method="post" enctype="multipart/form-data" class="row datos_pers">
+          <form method="post" enctype="multipart/form-data" class="row g-3">
             {% csrf_token %}
 
-            <!-- ORDEN -->
-            <div class="col-lg-3 form-group mb-5">
-              <label>Orden en el carrusel</label>
+            <!-- ORDEN / CATEGORÍA / LÍNEA -->
+            <div class="col-md-3">
+              <label class="form-label">Orden en el carrusel</label>
               {{ form.orden }}
             </div>
 
-            <!-- CATEGORÍA / LÍNEA -->
-            <div class="col-lg-3 form-group mb-5">
-              <label>Categoría</label>
+            <div class="col-md-3">
+              <label class="form-label">Categoría</label>
               {{ form.categoria }}
             </div>
 
-            <div class="col-lg-3 form-group mb-5">
-              <label>Línea</label>
+            <div class="col-md-3">
+              <label class="form-label">Línea</label>
               {{ form.linea }}
             </div>
 
             <!-- TÍTULO -->
-            <div class="col-lg-12 form-group">
-              <label>Título</label>
+            <div class="col-12">
+              <label class="form-label">Título</label>
               {{ form.titulo }}
             </div>
 
-            <!-- DESCRIPCIÓN CORTA -->
-            <div class="col-lg-12 form-group">
-              <label>Descripción corta</label>
+            <!-- DESCRIPCIONES -->
+            <div class="col-12">
+              <label class="form-label">Descripción corta</label>
               {{ form.descripcion_corta }}
             </div>
 
-            <!-- DESCRIPCIÓN COMPLETA -->
-            <div class="col-lg-12 form-group">
-              <label>Descripción completa</label>
+            <div class="col-12">
+              <label class="form-label">Descripción completa</label>
               {{ form.descripcion_larga }}
             </div>
 
             <!-- TEMÁTICA -->
-            <div class="col-lg-12 form-group">
-              <label>Temática / Género</label>
+            <div class="col-12">
+              <label class="form-label">Temática / Género</label>
               {{ form.tematica_genero }}
             </div>
 
-            <!-- REQUISITOS -->
-            <div class="col-lg-12 form-group">
-              <label>Requisitos</label>
+            <!-- REQUISITOS / BENEFICIOS -->
+            <div class="col-12">
+              <label class="form-label">Requisitos</label>
               {{ form.requisitos }}
             </div>
 
-            <!-- BENEFICIOS -->
-            <div class="col-lg-12 form-group">
-              <label>Beneficios</label>
+            <div class="col-12">
+              <label class="form-label">Beneficios</label>
               {{ form.beneficios }}
             </div>
 
             <!-- BLOQUE PERSONAS -->
-            <div class="col-lg-12 mt-5">
-              <h4>Jurados / Formadores / Tutores</h4>
+            <div class="col-12 mt-4">
+              <h4 class="fw-bold">Jurados / Formadores / Tutores</h4>
             </div>
 
-            <div class="col-lg-12 form-group mb-5">
-              <label>Título del bloque</label>
+            <div class="col-12">
+              <label class="form-label">Título del bloque</label>
               {{ form.bloque_personas }}
               <small class="text-muted d-block">
-                Elegí cómo se mostrará este bloque (Jurado, Formación, etc.).
+                Elegí cómo se mostrará este bloque.
               </small>
             </div>
 
             <!-- JURADO 1 -->
-            <div class="col-lg-3 form-group">
-              <label>Nombre 1</label>
+            <div class="col-md-4">
+              <label class="form-label">Nombre 1</label>
               {{ form.jurado1_nombre }}
             </div>
-            <div class="col-lg-3 form-group">
-              <label>Foto 1</label>
+            <div class="col-md-4">
+              <label class="form-label">Foto 1</label>
               {{ form.jurado1_foto }}
             </div>
-            <div class="col-lg-12 form-group mb-5">
-              <label>Bio 1</label>
+            <div class="col-12">
+              <label class="form-label">Bio 1</label>
               {{ form.jurado1_bio }}
             </div>
 
             <!-- JURADO 2 -->
-            <div class="col-lg-4 form-group">
-              <label>Nombre 2</label>
+            <div class="col-md-4">
+              <label class="form-label">Nombre 2</label>
               {{ form.jurado2_nombre }}
             </div>
-            <div class="col-lg-4 form-group">
-              <label>Foto 2</label>
+            <div class="col-md-4">
+              <label class="form-label">Foto 2</label>
               {{ form.jurado2_foto }}
             </div>
-            <div class="col-lg-12 form-group mb-5">
-              <label>Bio 2</label>
+            <div class="col-12">
+              <label class="form-label">Bio 2</label>
               {{ form.jurado2_bio }}
             </div>
 
             <!-- JURADO 3 -->
-            <div class="col-lg-4 form-group">
-              <label>Nombre 3</label>
+            <div class="col-md-4">
+              <label class="form-label">Nombre 3</label>
               {{ form.jurado3_nombre }}
             </div>
-            <div class="col-lg-4 form-group">
-              <label>Foto 3</label>
+            <div class="col-md-4">
+              <label class="form-label">Foto 3</label>
               {{ form.jurado3_foto }}
             </div>
-            <div class="col-lg-12 form-group mb-5">
-              <label>Bio 3</label>
+            <div class="col-12">
+              <label class="form-label">Bio 3</label>
               {{ form.jurado3_bio }}
             </div>
 
             <!-- ARCHIVOS -->
-            <div class="col-lg-6 form-group mb-5">
-              <label>Bases y Condiciones (PDF)</label>
+            <div class="col-md-6">
+              <label class="form-label">Bases y condiciones (PDF)</label>
               {{ form.bases_pdf }}
             </div>
 
-            <div class="col-lg-6 form-group mb-5">
-              <label>Imagen (JPG)</label>
+            <div class="col-md-6">
+              <label class="form-label">Imagen (JPG)</label>
               {{ form.imagen }}
             </div>
 
-            <!-- NUEVO CAMPO: URL DEL CURSO -->
-            <div class="col-lg-12 form-group mb-5">
-              <label>URL del curso asincrónico (opcional)</label>
+            <!-- URL CURSO -->
+            <div class="col-12">
+              <label class="form-label">URL del curso asincrónico</label>
               {{ form.url_curso }}
               <small class="text-muted d-block">
-                Solo para convocatorias de formación que tengan un curso online.
+                Solo para convocatorias de formación con curso online.
               </small>
             </div>
 
             <!-- FECHAS -->
-            <div class="col-lg-6 form-group">
-              <label>Fecha de inicio</label>
+            <div class="col-md-6">
+              <label class="form-label">Fecha de inicio</label>
               {{ form.fecha_inicio }}
             </div>
 
-            <div class="col-lg-6 form-group mb-5">
-              <label>Fecha de cierre</label>
+            <div class="col-md-6">
+              <label class="form-label">Fecha de cierre</label>
               {{ form.fecha_fin }}
             </div>
 
             <!-- BOTONES -->
-            <div class="col-lg-12 mt-4 text-end">
-              <button type="submit" class="btn btn-primary">Crear convocatoria</button>
-              <a href="{% url 'convocatorias:convocatorias_home' %}" class="btn btn-outline-secondary ms-2">
+            <div class="col-12 text-end mt-4">
+              <button type="submit" class="btn btn-primary">
+                Crear convocatoria
+              </button>
+              <a href="{% url 'convocatorias:convocatorias_home' %}"
+                 class="btn btn-outline-secondary ms-2">
                 Volver
               </a>
             </div>
@@ -185,6 +184,7 @@
 
     </div>
   </div>
-</section>
+
+</div>
 
 {% endblock %}

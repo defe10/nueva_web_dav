@@ -239,7 +239,7 @@ class PersonaHumana(models.Model):
     default="",
 )
     actividad_dgr = models.CharField(
-    max_length=100,
+    max_length=50,
     choices=ACTIVIDAD_DGR,
     default="",
 )
@@ -310,7 +310,7 @@ class PersonaJuridica(models.Model):
     default="",
 )
     actividad_dgr = models.CharField(
-    max_length=100,
+    max_length=50,
     choices=ACTIVIDAD_DGR,
     default="",
 )

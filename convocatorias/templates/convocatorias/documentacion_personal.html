@@ -1,56 +1,71 @@
 {% extends "sitio_publico/base.html" %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
-{% endblock %}
-
 {% block content %}
 
-<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-  <h1 class="mb-3">DOCUMENTACIÓN PERSONAL</h1>
-  <h2>{{ postulacion.nombre_proyecto }}</h2>
-</div>
+<!-- HERO -->
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Documentación personal</h1>
+  <p class="text-muted">
+    {{ postulacion.nombre_proyecto }}
+  </p>
+</section>
 
-<section class="team section-bg">
-  <div class="container">
-    <div class="row justify-content-center">
+<div class="container py-5">
 
-      <div class="col-lg-4 mb-4">
-        <div class="memberRegistro mb-5 text-left">
-          <h5>Subí tu documentación personal</h5>
-          <p>
+  <div class="row justify-content-center">
+
+    <!-- INFO -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">Subí tu documentación personal</h5>
+          <p class="mb-0 small">
             Documentación obligatoria del responsable del proyecto:<br><br>
             • DNI o pasaporte<br>
             • Constancia de CUIT<br>
             • Constancia de DGR / ARBA<br><br>
-            Los archivos deben ser PDF, JPG o PNG.
+            <strong>Formatos admitidos:</strong> PDF, JPG o PNG.
           </p>
         </div>
       </div>
+    </div>
 
-      <div class="col-lg-8">
-        <div class="memberRegistro mb-5 text-left">
+    <!-- FORMULARIO -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
 
-          <form method="post" enctype="multipart/form-data" class="row datos_pers">
+          <form method="post"
+                enctype="multipart/form-data"
+                class="row g-3">
             {% csrf_token %}
 
-            <div class="col-lg-12 form-group">
-              <label>Seleccionar archivos</label>
-              <input type="file" name="archivos" multiple class="form-control" required>
+            <div class="col-12">
+              <label class="form-label">
+                Seleccionar archivos
+              </label>
+              <input type="file"
+                     name="archivos"
+                     multiple
+                     class="form-control"
+                     required>
             </div>
 
-            <div class="col-lg-12 mt-4 text-end">
-              <button type="submit" class="btn btn-primary">Continuar</button>
+            <div class="col-12 text-end mt-4">
+              <button type="submit" class="btn btn-primary">
+                Continuar
+              </button>
             </div>
 
           </form>
 
         </div>
       </div>
-
     </div>
+
   </div>
-</section>
+
+</div>
 
 {% endblock %}

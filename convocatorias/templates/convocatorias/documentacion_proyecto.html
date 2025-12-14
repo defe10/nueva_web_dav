@@ -1,63 +1,76 @@
 {% extends "sitio_publico/base.html" %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
-{% endblock %}
-
 {% block content %}
 
 <!-- HERO -->
-<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-  <h1 class="mb-3">DOCUMENTACIÓN DEL PROYECTO</h1>
-  <h2>{{ postulacion.nombre_proyecto }}</h2>
-</div>
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Documentación del proyecto</h1>
+  <p class="text-muted">
+    {{ postulacion.nombre_proyecto }}
+  </p>
+</section>
 
-<section class="team section-bg">
-  <div class="container">
-    <div class="row justify-content-center">
+<div class="container py-5">
 
-      <!-- COLUMNA IZQUIERDA -->
-      <div class="col-lg-4 mb-4">
-        <div class="memberRegistro mb-5 text-left">
-          <h5>Subí la documentación del proyecto</h5>
-          <br>
-          <p>
-            Podés subir **uno o varios archivos** según los requisitos de la convocatoria:<br>
-            dossier, guion, presupuesto, plan de rodaje, etc. <br><br>
-            Los archivos deben ser PDF, JPG o PNG.<br><br>
-            Cuando termines, hacé clic en <strong>"Finalizar postulación"</strong>.
+  <div class="row justify-content-center">
+
+    <!-- INFO -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">Subí la documentación del proyecto</h5>
+          <p class="mb-0 small">
+            Podés subir uno o varios archivos según los requisitos de la convocatoria:<br>
+            dossier, guion, presupuesto, plan de rodaje, etc.<br><br>
+            <strong>Formatos admitidos:</strong> PDF, JPG o PNG.<br><br>
+            Cuando termines, hacé clic en <strong>“Finalizar postulación”</strong>.
           </p>
         </div>
       </div>
+    </div>
 
-      <!-- FORMULARIO -->
-      <div class="col-lg-8">
-        <div class="memberRegistro mb-5 text-left">
+    <!-- FORMULARIO -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
 
-          <h3>Archivos del proyecto</h3>
-          <p>Subí los documentos requeridos para completar tu postulación.</p>
+          <h3 class="mb-2">Archivos del proyecto</h3>
+          <p class="text-muted mb-3">
+            Subí los documentos requeridos para completar tu postulación.
+          </p>
 
-          <form method="post" enctype="multipart/form-data" class="row datos_pers">
+          <form method="post"
+                enctype="multipart/form-data"
+                class="row g-3">
             {% csrf_token %}
 
-            <div class="col-lg-12 form-group">
-              <label>Seleccionar archivos</label>
-              <input type="file" name="archivos" multiple class="form-control" required>
+            <div class="col-12">
+              <label class="form-label">
+                Seleccionar archivos
+              </label>
+              <input type="file"
+                     name="archivos"
+                     multiple
+                     class="form-control"
+                     required>
             </div>
 
             <!-- BOTÓN -->
-            <div class="col-lg-12 mt-4 text-end">
-              <button type="submit" class="btn btn-primary">Finalizar postulación</button>
+            <div class="col-12 text-end mt-4">
+              <button type="submit" class="btn btn-primary">
+                Finalizar postulación
+              </button>
             </div>
 
           </form>
 
         </div>
       </div>
-
     </div>
+
   </div>
-</section>
+
+</div>
 
 {% endblock %}

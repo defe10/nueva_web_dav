@@ -134,13 +134,13 @@
         {% if user.is_authenticated %}
             <!-- Si está logueado: mostrar MI CUENTA y SALIR -->
             <li class="nav-item me-2">
-              <a class="btn btn-primary" href="{% url 'usuario:panel_usuario' %}">
+              <a class="btn btn-primary" href="{% url 'usuarios:panel_usuario' %}">
                 Mi cuenta
               </a>
             </li>
 
             <li class="nav-item">
-              <a class="btn btn-outline-primary" href="{% url 'usuario:logout' %}">
+              <a class="btn btn-outline-primary" href="{% url 'usuarios:logout' %}">
                 Salir
               </a>
             </li>
@@ -148,7 +148,7 @@
         {% else %}
             <!-- Si NO está logueado: solo mostrar MI CUENTA (login) -->
             <li class="nav-item ms-2">
-              <a class="btn btn-outline-primary" href="{% url 'usuario:login' %}">
+              <a class="btn btn-outline-primary" href="{% url 'usuarios:login' %}">
                 Mi cuenta
               </a>
             </li>

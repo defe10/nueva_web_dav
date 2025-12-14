@@ -1,94 +1,98 @@
 {% extends "sitio_publico/base.html" %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
-{% endblock %}
-
 {% block content %}
 
 <!-- HERO -->
-<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-  <h1 class="mb-3">POSTULACIÓN A LA CONVOCATORIA</h1>
-  <h2>{{ convocatoria.titulo }}</h2>
-</div>
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Postulación a la convocatoria</h1>
+  <p class="text-muted">
+    {{ convocatoria.titulo }}
+  </p>
+</section>
 
-<section class="team section-bg">
-  <div class="container">
-    <div class="row justify-content-center">
+<div class="container py-5">
 
-      <!-- COLUMNA IZQUIERDA -->
-      <div class="col-lg-4 mb-4">
-        <div class="memberRegistro mb-5 text-left">
-          <h5>Completá la información del proyecto</h5>
-          <br>
-          <p>
+  <div class="row justify-content-center">
+
+    <!-- INFO -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">Completá la información del proyecto</h5>
+          <p class="mb-0 small">
             Esta información es necesaria para validar tu postulación.<br><br>
-            <strong>¡Muy importante!:</strong> Antes de continuar, asegurate de actualizar tus datos en el Registro Audiovisual desde “Mi cuenta”. Esa información acompañará tu convocatoria.
-            y los archivos correspondientes al proyecto.<br><br>
-            Al finalizar este formulario, hacé clic en “Siguiente”.
+            <strong>Muy importante:</strong> antes de continuar, asegurate de
+            actualizar tus datos en el Registro Audiovisual desde
+            <em>“Mi cuenta”</em>. Esa información acompañará tu convocatoria.<br><br>
+            Al finalizar este formulario, hacé clic en <strong>“Siguiente”</strong>.
           </p>
         </div>
       </div>
+    </div>
 
-      <!-- COLUMNA DERECHA (FORMULARIO) -->
-      <div class="col-lg-8">
-        <div class="memberRegistro mb-5 text-left">
+    <!-- FORMULARIO -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
 
-          <h3>Datos del Proyecto</h3>
-          <p>Completá todos los campos requeridos.</p>
+          <h3 class="mb-2">Datos del proyecto</h3>
+          <p class="text-muted mb-3">
+            Completá todos los campos requeridos.
+          </p>
 
-          <form method="post" class="row datos_pers">
+          <form method="post" class="row g-3">
             {% csrf_token %}
 
             <!-- Nombre del proyecto -->
-            <div class="col-lg-12 form-group">
-              <label>Nombre del proyecto</label>
+            <div class="col-12">
+              <label class="form-label">Nombre del proyecto</label>
               {{ form.nombre_proyecto }}
               {{ form.nombre_proyecto.errors }}
             </div>
 
             <!-- Tipo de proyecto -->
-            <div class="col-lg-6 form-group">
-              <label>Tipo de proyecto</label>
+            <div class="col-md-6">
+              <label class="form-label">Tipo de proyecto</label>
               {{ form.tipo_proyecto }}
               {{ form.tipo_proyecto.errors }}
             </div>
 
             <!-- Género -->
-            <div class="col-lg-6 form-group">
-              <label>Género</label>
+            <div class="col-md-6">
+              <label class="form-label">Género</label>
               {{ form.genero }}
               {{ form.genero.errors }}
             </div>
 
-            <!-- Duración -->
-            {% comment %} <div class="col-lg-6 form-group">
-              <label>Duración estimada (minutos)</label>
-              {{ form.duracion_minutos }}
-              {{ form.duracion_minutos.errors }}
-            </div> {% endcomment %}
-
-            <!-- Declaración Jurada -->
-            <div class="col-lg-12 form-group mt-4">
-              <label class="form-check-label">
-                {{ form.declaracion_jurada }} DECLARACIÓN JURADA: Confirmo que he leido las bases y condiciones de "{{ convocatoria.titulo }}" y acepto los requisitos de participación y aprobación.
-              </label>
+            <!-- Declaración jurada -->
+            <div class="col-12 mt-3">
+              <div class="form-check">
+                {{ form.declaracion_jurada }}
+                <label class="form-check-label ms-2">
+                  DECLARACIÓN JURADA: Confirmo que he leído las bases y condiciones
+                  de <strong>{{ convocatoria.titulo }}</strong> y acepto los
+                  requisitos de participación y aprobación.
+                </label>
+              </div>
               {{ form.declaracion_jurada.errors }}
             </div>
 
             <!-- BOTÓN -->
-            <div class="col-lg-12 mt-4 text-end">
-              <button type="submit" class="btn btn-primary">Siguiente</button>
+            <div class="col-12 text-end mt-4">
+              <button type="submit" class="btn btn-primary">
+                Siguiente
+              </button>
             </div>
 
           </form>
 
         </div>
       </div>
-
     </div>
+
   </div>
-</section>
+
+</div>
 
 {% endblock %}

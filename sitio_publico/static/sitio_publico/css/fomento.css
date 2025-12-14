@@ -1,18 +1,19 @@
-/* Tipografía global */
-body,
-html {
-    font-family: 'Montserrat', sans-serif !important;
-}
+/* ============================================================
+   HERO DE FOMENTO / CONVOCATORIAS
+   ============================================================ */
 
-/* HERO */
-.hero {
+.fomento-hero {
     background: #f5f5f5;
     border-radius: 12px;
-    padding: 60px 30px;
+    padding: 60px 35px;
     margin-bottom: 50px;
 }
 
-/* Título sección estilo institucional */
+
+/* ============================================================
+   TÍTULOS DE SECCIÓN
+   ============================================================ */
+
 .seccion-titulo {
     font-size: 1rem;
     font-weight: 700;
@@ -23,7 +24,11 @@ html {
     border-bottom: 2px solid #e2e2e2;
 }
 
-/* Fondo gris para secciones de carrusel */
+
+/* ============================================================
+   CARRUSELES DE CONVOCATORIAS
+   ============================================================ */
+
 .carrusel-fondo {
     background: #fafafa;
     border-radius: 12px;
@@ -31,15 +36,12 @@ html {
     margin-bottom: 40px;
 }
 
-/* Contenedor global de carrusel + flechas */
 .carrusel-wrap {
     position: relative;
 }
 
-/* Carrusel horizontal */
 .carrusel {
     display: flex;
-    flex-wrap: nowrap;
     gap: 20px;
     overflow-x: auto;
     padding: 10px 0;
@@ -53,83 +55,15 @@ html {
 }
 
 .carrusel .card-area {
-    flex: 0 0 300px;
-}
-
-
-/* --------------------------------------------------------- */
-/* ESTILO UNIFICADO DE CARDS (card-area) - NUEVO ESTÁNDAR    */
-/* --------------------------------------------------------- */
-
-.card-area {
     flex: 0 0 auto;
-    width: 250px;
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid #eaeaea;
-    transition: 0.25s ease;
-    background: #DFDFD6;
     scroll-snap-align: start;
 }
 
-/* Imagen tipo banner */
-.card-img-top-area {
-    height: 130px;
-    overflow: hidden;
-}
 
-.img-area {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform .4s ease;
-}
+/* ============================================================
+   FLECHAS DE CARRUSEL
+   ============================================================ */
 
-.card-body {
-    padding: 20px 20px 10px 20px;
-}
-
-/* Hover */
-.card-area:hover .img-area {
-    transform: scale(1.08);
-}
-
-.card-area:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-}
-
-.card-area h5 {
-    font-weight: 700;
-    color: #2f354a;
-}
-
-.card-area p {
-    font-size: .9rem;
-}
-
-/* Botón + */
-.card-plus i {
-    font-size: 1.6rem;
-    color: #2f354a;
-    transition: 0.25s;
-}
-
-.card-area:hover .card-plus i {
-    color: #b00055;
-}
-
-.card-bg-idea {
-    background-color: #F4F1EB;
-    /* color suave beige */
-}
-
-
-/* --------------------------------------------------------- */
-/* FIN ESTILO DE CARD-AREA                                   */
-/* --------------------------------------------------------- */
-
-/* Flechas del carrusel */
 .flecha {
     position: absolute;
     top: 50%;
@@ -152,7 +86,7 @@ html {
 }
 
 .flecha:hover {
-    background: white;
+    background: #fff;
 }
 
 .flecha.izq {
@@ -163,85 +97,10 @@ html {
     right: -20px;
 }
 
-@media (min-width: 992px) {
-    .card-col-5 {
-        flex: 0 0 20%;
-        max-width: 20%;
-    }
-}
 
-/* ========================================= */
-/* DETALLE LÍNEAS PLAN IDEA                  */
-/* ========================================= */
-
-.fomento-detalle-hero {
-    width: 100%;
-    height: 320px;
-    overflow: hidden;
-    border-radius: 12px;
-    margin-bottom: 40px;
-}
-
-.fomento-detalle-hero img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.fomento-detalle-header h1 {
-    font-size: 2.4rem;
-    font-weight: 700;
-    color: #222;
-}
-
-.fomento-detalle-header p {
-    color: #666;
-}
-
-.fomento-detalle-card {
-    background: #fff;
-    padding: 32px 32px;
-    border-radius: 12px;
-    box-shadow: 0 3px 18px rgba(0, 0, 0, 0.08);
-}
-
-.fomento-detalle-card h2 {
-    font-size: 1.7rem;
-    font-weight: 600;
-    margin-bottom: 18px;
-}
-
-.fomento-detalle-card p,
-.fomento-detalle-card li {
-    color: #444;
-    font-size: 1.05rem;
-    line-height: 1.6;
-}
-
-.fomento-detalle-card ul {
-    padding-left: 20px;
-}
-
-/* Botón de fomento */
-.btn-fomento {
-    background-color: #b8005c;
-    color: #fff;
-    font-size: 1.1rem;
-    padding: 12px 36px;
-    border-radius: 50px;
-    font-weight: 600;
-    border: none;
-    transition: 0.2s ease-in-out;
-}
-
-.btn-fomento:hover {
-    background-color: #8b0045;
-    color: #fff;
-}
-
-/* =============================== */
-/*       FICHA DE CONVOCATORIA     */
-/* =============================== */
+/* ============================================================
+   DETALLE DE CONVOCATORIA
+   ============================================================ */
 
 .ficha-convocatoria .convocatoria-left {
     padding-right: 0;
@@ -257,28 +116,19 @@ html {
     }
 }
 
-/* Tarjeta de información rápida */
-.card-bg-idea {
-    background: #f8f8f2;
-}
-
-/* Línea punteada */
 .border-dotted {
-    border-top: 1.5px dotted #7d7c7c;
+    border-top: 2px dotted #a3a3a3;
 }
 
-/* Estado */
-.badge-success {
-    background-color: #2ecc71 !important;
+.descripcion-convocatoria p {
+    margin-bottom: 1rem;
+    font-size: 1rem;
 }
 
-.badge-danger {
-    background-color: #e74c3c !important;
-}
 
-/* =============================== */
-/*              JURADOS            */
-/* =============================== */
+/* ============================================================
+   JURADOS / FORMADORES
+   ============================================================ */
 
 .jurado-card {
     border-radius: 10px;
@@ -297,21 +147,7 @@ html {
     }
 }
 
-.jurado-nombre {
-    font-weight: 600;
-    margin-top: 10px;
-}
-
 .jurado-bio {
     font-size: 0.85rem;
     color: #6c757d;
-}
-
-/* =============================== */
-/* DESCRIPCIÓN PRINCIPAL */
-/* =============================== */
-
-.descripcion-convocatoria p {
-    margin-bottom: 1rem;
-    font-size: 1rem;
 }

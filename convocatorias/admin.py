@@ -133,14 +133,14 @@ class DocumentoPersonalAdmin(admin.ModelAdmin):
 
 @admin.register(DocumentoProyecto)
 class DocumentoProyectoAdmin(admin.ModelAdmin):
-    list_display = ("postulacion", "usuario", "archivo_link", "fecha_subida")
+    list_display = ("postulacion", "usuarios", "archivo_link", "fecha_subida")
     search_fields = ("postulacion__nombre_proyecto", "postulacion__user__username")
     ordering = ("-fecha_subida",)
 
-    def usuario(self, obj):
+    def usuarios(self, obj):
         return obj.postulacion.user.username
 
-    usuario.short_description = "Usuario"
+    usuarios.short_description = "Usuarios"
 
     def archivo_link(self, obj):
         return format_html('<a href="{}" download>📄 Descargar</a>', obj.archivo.url)

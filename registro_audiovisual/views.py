@@ -32,7 +32,7 @@ def seleccionar_tipo_registro(request):
 def editar_persona_humana(request):
     user = request.user
 
-    # Si ya existe, se edita. Si no existe, se crea uno nuevo.
+    # Si existe, se edita; si no, se crea
     persona_existente = PersonaHumana.objects.filter(user=user).first()
 
     if request.method == "POST":
@@ -40,7 +40,7 @@ def editar_persona_humana(request):
 
         if form.is_valid():
             persona = form.save(commit=False)
-            persona.user = user            # <<< VÍNCULO CLAVE
+            persona.user = user
             persona.save()
 
             return redirect(
@@ -73,7 +73,7 @@ def editar_persona_juridica(request):
 
         if form.is_valid():
             persona = form.save(commit=False)
-            persona.user = user            # <<< VÍNCULO CLAVE
+            persona.user = user
             persona.save()
 
             return redirect(
@@ -108,26 +108,11 @@ def inscripcion_exitosa(request):
     elif tipo == "juridica":
         persona = PersonaJuridica.objects.filter(id=id_persona).first()
 
-    context = {
-        "tipo": tipo,
-        "persona": persona,
-    }
-
-    return render(request, "registro/inscripcion_exitosa.html", context)
-
-
-@login_required(login_url="/usuarios/login/")
-def inscribirse_convocatoria(request, slug):
-    from registro_audiovisual.models import PersonaHumana, PersonaJuridica
-
-    user = request.user
-
-    # Verificar registro audiovisual
-    tiene_humana = PersonaHumana.objects.filter(user=user).exists()
-    tiene_juridica = PersonaJuridica.objects.filter(user=user).exists()
-
-    if not tiene_humana and not tiene_juridica:
-        return redirect("registro_audiovisual:seleccionar_tipo_registro")
-
-    # Si sí tiene registro → va al panel del usuario
-    return redirect("usuario:panel_usuario")
+    return render(
+        request,
+        "registro/inscripcion_exitosa.html",
+        {
+            "tipo": tipo,
+            "persona": persona,
+        }
+    )

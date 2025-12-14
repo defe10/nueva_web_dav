@@ -5,13 +5,17 @@ Django settings for nueva_web_dav project.
 from pathlib import Path
 import os
 
+# ============================================
+# BASE
+# ============================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-1f@jofy4keh$&m1mbxf4r5r+ya025iwo+laq@***j95uy^l%r7'
+SECRET_KEY = 'django-insecure-dev-secret-key'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]   # evitas problemas en desarrollo
+ALLOWED_HOSTS = ["*"]  # desarrollo
 
 
 # ============================================
@@ -19,7 +23,7 @@ ALLOWED_HOSTS = ["*"]   # evitas problemas en desarrollo
 # ============================================
 
 INSTALLED_APPS = [
-    # Django base
+    # Django core
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,11 +36,13 @@ INSTALLED_APPS = [
     'usuarios',
     'registro_audiovisual',
     'convocatorias',
-     "exencion",
-
-    'django_ratelimit',
+    'exencion',
 ]
 
+
+# ============================================
+# MIDDLEWARE
+# ============================================
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -49,14 +55,29 @@ MIDDLEWARE = [
 ]
 
 
+# ============================================
+# URLS
+# ============================================
+
 ROOT_URLCONF = 'nueva_web_dav.urls'
 
+
+# ============================================
+# TEMPLATES
+# ============================================
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+
+        # Templates globales
+        # (base.html, partials, layouts comunes)
+        'DIRS': [
+            BASE_DIR / 'templates',
+        ],
+
         'APP_DIRS': True,
+
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -68,6 +89,10 @@ TEMPLATES = [
     },
 ]
 
+
+# ============================================
+# WSGI
+# ============================================
 
 WSGI_APPLICATION = 'nueva_web_dav.wsgi.application'
 
@@ -89,10 +114,18 @@ DATABASES = {
 # ============================================
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 
@@ -101,8 +134,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # ============================================
 
 LANGUAGE_CODE = 'es-ar'
+
 TIME_ZONE = 'America/Argentina/Buenos_Aires'
+
 USE_I18N = True
+
 USE_TZ = True
 
 
@@ -111,14 +147,17 @@ USE_TZ = True
 # ============================================
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 MEDIA_URL = '/media/'
+
 MEDIA_ROOT = BASE_DIR / 'media'
-
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # ============================================
@@ -126,12 +165,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ============================================
 
 LOGIN_URL = '/usuarios/login/'
+
 LOGIN_REDIRECT_URL = '/registro/seleccionar-tipo/'
 
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-    }
-}
+# ============================================
+# DEFAULT PK
+# ============================================
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

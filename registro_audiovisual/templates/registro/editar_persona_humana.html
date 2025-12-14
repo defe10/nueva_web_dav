@@ -9,235 +9,232 @@
 
 <!-- HERO -->
 <div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-  <h1 class="mb-3">REGISTRO AUDIOVISUAL</h1>
+  <h1 class="mb-3">Registro Audiovisual</h1>
   <h2>Persona Humana</h2>
 </div>
 
-<section class="team section-bg">
-  <div class="container">
-    <div class="row justify-content-center">
+<div class="container py-5">
+  <div class="row justify-content-center">
 
-      <!-- COLUMNA IZQUIERDA -->
-      <div class="col-lg-4 mb-4">
-        <div class="memberRegistro mb-5 text-left">
-
-          <h5>Completa tus datos personales y fiscales</h5>
-          <br>
-
-          <p>
-            Asegurate de ingresar tus datos exactamente como figuran en tu DNI.<br><br>
-            Mantener esta información actualizada es fundamental para validar tu inscripción  
-            y agilizar cualquier trámite administrativo.<br><br>
-            Al finalizar, hacé clic en “Enviar” para completar el registro.
-          </p>
-
-
-        </div>
+    <!-- INFO -->
+    <div class="col-lg-4 mb-4">
+      <div class="memberRegistro">
+        <h5 class="mb-3">Completá tus datos personales y fiscales</h5>
+        <p class="small">
+          Asegurate de ingresar tus datos exactamente como figuran en tu DNI.
+          Mantener esta información actualizada es fundamental para validar
+          tu inscripción y agilizar cualquier trámite administrativo.
+        </p>
+        <p class="small">
+          Al finalizar, hacé clic en <strong>“Enviar”</strong> para completar
+          el registro. Podrás actualizar tus datos cuando quieras desde
+          <em>Mi cuenta</em>.
+        </p>
       </div>
-
-
-      <!-- COLUMNA DERECHA (FORMULARIO) -->
-      <div class="col-lg-8">
-        <div class="memberRegistro mb-5 text-left">
-
-          <h3>FORMULARIO DE INSCRIPCIÓN</h3>
-          <p>Formulario de datos para Personas Humanas para la inscripción al registro y declaración jurada.</p>
-
-          <form method="post" class="row datos_pers">
-            {% csrf_token %}
-
-            <!-- DATOS PERSONALES -->
-            <div class="col-lg-12 form-group">
-              <h5>Datos Personales</h5>
-            </div>
-
-            <div class="col-lg-8 form-group">
-              <label>Nombre completo</label>
-              {{ form.nombre_completo }}
-              {{ form.nombre_completo.errors }}
-            </div>
-
-            <div class="col-lg-4 form-group">
-              <label>CUIL/CUIT</label>
-              {{ form.cuil_cuit }}
-              {{ form.cuil_cuit.errors }}
-            </div>
-
-            <div class="col-lg-4 form-group">
-              <label>Fecha de nacimiento</label>
-              {{ form.fecha_nacimiento }}
-              {{ form.fecha_nacimiento.errors }}
-            </div>
-
-            <div class="col-lg-4 form-group">
-              <label>Edad</label>
-              {{ form.edad }}
-              {{ form.edad.errors }}
-            </div>
-
-            <div class="col-lg-4 form-group">
-              <label>Género</label>
-              {{ form.genero }}
-              {{ form.genero.errors }}
-            </div>
-
-            <div class="col-lg-4 form-group">
-              <label>Lugar de residencia</label>
-              {{ form.lugar_residencia }}
-              {{ form.lugar_residencia.errors }}
-            </div>
-
-            <div class="col-lg-8 form-group" id="otro-lugar-wrapper" style="display:none;">
-              <label>Especifique otro lugar</label>
-              {{ form.otro_lugar_residencia }}
-              {{ form.otro_lugar_residencia.errors }}
-            </div>
-
-            <div class="col-lg-8 form-group">
-              <label>Nivel educativo alcanzado</label>
-              {{ form.nivel_educativo }}
-              {{ form.nivel_educativo.errors }}
-            </div>
-
-            <div class="col-lg-12 form-group">
-              <label>Domicilio real</label>
-              {{ form.domicilio_real }}
-              {{ form.domicilio_real.errors }}
-            </div>
-
-            <div class="col-lg-4 form-group">
-              <label>Teléfono</label>
-              {{ form.telefono }}
-              {{ form.telefono.errors }}
-            </div>
-
-            <div class="col-lg-8 form-group">
-              <label>Correo electrónico</label>
-              {{ form.email }}
-              {{ form.email.errors }}
-            </div>
-
-
-            <!-- DATOS FISCALES -->
-            <div class="col-lg-12 form-group mt-4">
-              <h5>Datos Fiscales</h5>
-            </div>
-
-            <div class="col-lg-6 form-group">
-              <label>Situación ante el IVA</label>
-              {{ form.situacion_iva }}
-              {{ form.situacion_iva.errors }}
-            </div>
-
-            <div class="col-lg-6 form-group">
-              <label>Actividad declarada en DGR</label>
-              {{ form.actividad_dgr }}
-              {{ form.actividad_dgr.errors }}
-            </div>
-
-            <div class="col-lg-12 form-group">
-              <label>Domicilio fiscal</label>
-              {{ form.domicilio_fiscal }}
-              {{ form.domicilio_fiscal.errors }}
-            </div>
-
-            <!-- DATOS PROFESIONALES -->
-            <div class="col-lg-12 form-group mt-4">
-              <h5>Datos Profesionales</h5>
-            </div>
-
-            <div class="col-lg-6 form-group">
-              <label>Área de desempeño principal</label>
-              {{ form.area_desempeno_1 }}
-              {{ form.area_desempeno_1.errors }}
-            </div>
-
-            <div class="col-lg-6 form-group">
-              <label>Área de desempeño secundaria</label>
-              {{ form.area_desempeno_2 }}
-              {{ form.area_desempeno_2.errors }}
-            </div>
-
-            <div class="col-lg-12 form-group">
-              <label>Área cultural complementaria</label>
-              {{ form.area_cultural }}
-              {{ form.area_cultural.errors }}
-            </div>
-
-
-            <div class="col-lg-12 form-group">
-              <label>Link de trabajos</label>
-              {{ form.link_1 }}
-              {{ form.link_1.errors }}
-            </div>
-
-            <div class="col-lg-12 form-group">
-              <label>Link de trabajos</label>
-              {{ form.link_2 }}
-              {{ form.link_2.errors }}
-            </div>
-
-            <div class="col-lg-12 form-group">
-              <label>Link de trabajos</label>
-              {{ form.link_2 }}
-              {{ form.link_2.errors }}
-            </div>
-
-
-            <!-- BOTÓN -->
-            <div class="col-lg-12 mt-4 text-end">
-              <button type="submit" class="btn btn-primary">Enviar</button>
-            </div>
-
-          </form>
-
-        </div>
-      </div>
-
     </div>
+
+    <!-- FORMULARIO -->
+    <div class="col-lg-8">
+      <div class="memberRegistro">
+
+        <h3 class="mb-2">Formulario de inscripción</h3>
+        <p class="text-muted mb-4">
+          Datos para personas humanas – inscripción y declaración jurada.
+        </p>
+
+        <form method="post" class="row g-3">
+          {% csrf_token %}
+
+          <!-- DATOS PERSONALES -->
+          <div class="col-12">
+            <h5>Datos personales</h5>
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Nombre completo</label>
+            {{ form.nombre_completo }}
+            {{ form.nombre_completo.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">CUIL / CUIT</label>
+            {{ form.cuil_cuit }}
+            {{ form.cuil_cuit.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Fecha de nacimiento</label>
+            {{ form.fecha_nacimiento }}
+            {{ form.fecha_nacimiento.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Edad</label>
+            {{ form.edad }}
+            {{ form.edad.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Género</label>
+            {{ form.genero }}
+            {{ form.genero.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Lugar de residencia</label>
+            {{ form.lugar_residencia }}
+            {{ form.lugar_residencia.errors }}
+          </div>
+
+          <div class="col-md-8" id="otro-lugar-wrapper" style="display:none;">
+            <label class="form-label">Especificar otro lugar</label>
+            {{ form.otro_lugar_residencia }}
+            {{ form.otro_lugar_residencia.errors }}
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Nivel educativo alcanzado</label>
+            {{ form.nivel_educativo }}
+            {{ form.nivel_educativo.errors }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Domicilio real</label>
+            {{ form.domicilio_real }}
+            {{ form.domicilio_real.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Teléfono</label>
+            {{ form.telefono }}
+            {{ form.telefono.errors }}
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Correo electrónico</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+          </div>
+
+          <!-- DATOS FISCALES -->
+          <div class="col-12 mt-4">
+            <h5>Datos fiscales</h5>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Situación ante el IVA</label>
+            {{ form.situacion_iva }}
+            {{ form.situacion_iva.errors }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Actividad declarada en DGR</label>
+            {{ form.actividad_dgr }}
+            {{ form.actividad_dgr.errors }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Domicilio fiscal</label>
+            {{ form.domicilio_fiscal }}
+            {{ form.domicilio_fiscal.errors }}
+          </div>
+
+          <!-- DATOS PROFESIONALES -->
+          <div class="col-12 mt-4">
+            <h5>Datos profesionales</h5>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Área de desempeño principal</label>
+            {{ form.area_desempeno_1 }}
+            {{ form.area_desempeno_1.errors }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Área de desempeño secundaria</label>
+            {{ form.area_desempeno_2 }}
+            {{ form.area_desempeno_2.errors }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Área cultural complementaria</label>
+            {{ form.area_cultural }}
+            {{ form.area_cultural.errors }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Link de trabajos</label>
+            {{ form.link_1 }}
+            {{ form.link_1.errors }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Link de trabajos</label>
+            {{ form.link_2 }}
+            {{ form.link_2.errors }}
+          </div>
+
+          {% if form.link_3 %}
+          <div class="col-12">
+            <label class="form-label">Link de trabajos</label>
+            {{ form.link_3 }}
+            {{ form.link_3.errors }}
+          </div>
+          {% endif %}
+
+          <!-- BOTÓN -->
+          <div class="col-12 text-end mt-4">
+            <button type="submit" class="btn btn-primary">
+              Enviar
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
   </div>
-</section>
+</div>
+
+<!-- JS: OTRO LUGAR -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById("id_lugar_residencia");
   const otroWrapper = document.getElementById("otro-lugar-wrapper");
 
   function toggleOtro() {
-    if (select.value === "otro") {
-      otroWrapper.style.display = "block";
-    } else {
-      otroWrapper.style.display = "none";
-    }
+    otroWrapper.style.display = (select.value === "otro") ? "block" : "none";
   }
 
   select.addEventListener("change", toggleOtro);
-  toggleOtro(); // ejecuta al cargar
+  toggleOtro();
 });
 </script>
 
+<!-- JS: EDAD -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const fechaInput = document.querySelector("#id_fecha_nacimiento");
-    const edadInput = document.querySelector("#id_edad");
+  const fechaInput = document.querySelector("#id_fecha_nacimiento");
+  const edadInput = document.querySelector("#id_edad");
 
-    function calcularEdad() {
-        const fecha = new Date(fechaInput.value);
-        if (!isNaN(fecha)) {
-            const hoy = new Date();
-            let edad = hoy.getFullYear() - fecha.getFullYear();
-            const m = hoy.getMonth() - fecha.getMonth();
-            if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
-                edad--;
-            }
-            edadInput.value = edad;
-        } else {
-            edadInput.value = "";
-        }
+  function calcularEdad() {
+    const fecha = new Date(fechaInput.value);
+    if (!isNaN(fecha)) {
+      const hoy = new Date();
+      let edad = hoy.getFullYear() - fecha.getFullYear();
+      const m = hoy.getMonth() - fecha.getMonth();
+      if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
+        edad--;
+      }
+      edadInput.value = edad;
+    } else {
+      edadInput.value = "";
     }
+  }
 
-    fechaInput.addEventListener("change", calcularEdad);
+  fechaInput.addEventListener("change", calcularEdad);
 });
 </script>
-
 
 {% endblock %}

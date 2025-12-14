@@ -1,127 +1,131 @@
-/* Tipografía global */
-body,
-html {
+/* ============================================================
+   TIPOGRAFÍA GLOBAL
+   ============================================================ */
+
+html,
+body {
     font-family: 'Montserrat', sans-serif !important;
 }
 
 
-/* Reducir padding lateral del navbar */
+/* ============================================================
+   NAVBAR / LAYOUT GENERAL
+   ============================================================ */
+
 .navbar .container-fluid {
     padding-left: 1rem;
-    /* antes 15-20px */
     padding-right: 1rem;
 }
 
-/* HERO 2-CARD LAYOUT */
+
+/* ============================================================
+   HERO HOME
+   ============================================================ */
+
 .hero-card-left,
 .hero-card-center,
 .hero-card-right {
     border-radius: 20px;
     overflow: hidden;
+    min-height: 250px;
 }
 
-/* Fondo violeta institucional */
 .hero-card-left {
     background: #2f354a;
-    /* tu magenta personalizado */
     color: #fff;
 }
 
 .hero-card-center {
     background: var(--bs-primary);
-    /* tu magenta personalizado */
     color: #fff;
 }
 
-.hero-img2 {
-    max-width: 180px;
-    margin-bottom: 10px;
-}
-
-.boton-programa {
-    white-space: nowrap;
-    /* evita que se corte en 2 líneas */
-    font-weight: 500;
-    font-size: medium;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-}
-
-
-/* Carrusel dentro de la card derecha */
 .hero-card-right {
     background: #000;
 }
 
-/* Las imágenes llenan el alto */
 .hero-img {
     height: 100%;
     object-fit: cover;
 }
 
-/* Altura mínima para ambas cards: misma dimensión */
-.hero-card-left,
-.hero-card-center,
-.hero-card-right {
-    min-height: 250px;
-    /* ajustá si querés más alto */
+.hero-img2 {
+    max-width: 180px;
+    margin-bottom: 10px;
+    object-fit: cover;
+}
+
+.boton-programa {
+    white-space: nowrap;
+    font-weight: 500;
+    font-size: medium;
+    padding: 0 0.5rem;
 }
 
 
-/* Redes sociales en el HERO */
-.redes-icon i {
-    font-size: 1.2rem;
-    /* tamaño del ícono */
-    color: #dbff3d;
-    /* blanco */
-    transition: 0.2s ease;
-}
+/* ============================================================
+   REDES SOCIALES
+   ============================================================ */
 
-/* Efecto hover */
-.redes-icon:hover i {
-    color: #e0007a;
-    /* tu magenta o color institucional */
-}
-
-/* Ajuste de espaciado */
 .redes {
     display: flex;
     align-items: center;
 }
 
+.redes-icon i {
+    font-size: 1.2rem;
+    color: #dbff3d;
+    transition: 0.2s ease;
+}
 
-/* Carrusel del hero */
+.redes-icon:hover i {
+    color: #e0007a;
+}
+
+
+/* ============================================================
+   CARRUSEL HERO HOME
+   ============================================================ */
+
 .rounded-carousel {
     border-radius: 20px;
-    /* ángulos redondeados */
     overflow: hidden;
-    /* importante: para que la imagen respete el borde */
 }
 
-/* Ajustar altura del carrusel */
 #heroCarousel img {
     height: 350px;
-    /* ajustá a gusto */
     object-fit: cover;
-    /* evita distorsiones */
 }
 
 
-
-
-/* ---- CARDS: Áreas de gestión / Servicios e incentivos ---- */
+/* ============================================================
+   CARD-AREA — COMPONENTE GLOBAL
+   ============================================================ */
 
 .card-area {
+    width: 250px;
     border-radius: 20px;
     overflow: hidden;
     border: 1px solid #eaeaea;
-    transition: 0.25s ease;
     background: #DFDFD6;
+    transition: 0.25s ease;
 }
 
-/* Imagen tipo banner */
+.card-body {
+    padding: 15px !important;
+}
+
+.card_servs {
+    width: 250px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #eaeaea;
+    background: #8c27ce !important;
+    transition: 0.25s ease;
+}
+
 .card-img-top-area {
-    height: 60px;
+    height: 130px;
     overflow: hidden;
 }
 
@@ -129,12 +133,17 @@ html {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform .4s ease;
+    transition: transform 0.4s ease;
+
 }
 
-/* Hover */
-.card-area:hover .img-area {
-    transform: scale(1.08);
+.card-area h5 {
+    font-weight: 700;
+    color: #2f354a;
+}
+
+.card-area p {
+    font-size: 0.9rem;
 }
 
 .card-area:hover {
@@ -142,18 +151,10 @@ html {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
-/* Títulos */
-.card-area h5 {
-    font-weight: 700;
-    color: #2f354a;
+.card-area:hover .img-area {
+    transform: scale(1.08);
 }
 
-/* Descripción */
-.card-area p {
-    font-size: .9rem;
-}
-
-/* Botón + */
 .card-plus i {
     font-size: 1.6rem;
     color: #2f354a;
@@ -164,6 +165,15 @@ html {
     color: #b00055;
 }
 
-.border-dotted {
-    border-top: 2px dotted #a3a3a3;
+
+/* ============================================================
+   BADGES (override Bootstrap)
+   ============================================================ */
+
+.badge-success {
+    background-color: #2ecc71 !important;
+}
+
+.badge-danger {
+    background-color: #e74c3c !important;
 }

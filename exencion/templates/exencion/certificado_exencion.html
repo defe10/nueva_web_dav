@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Constancia {{ exencion.numero_constancia }}</title>
+</head>
+<body>
+
+  <div class="header">
+    <img src="{{ logo_path }}" class="logo-titulo">
+    <div class="codigo">
+      <strong>FRC-75</strong><br>
+      Constancia de Inscripción
+    </div>
+  </div>
+
+  <div class="titulo">
+    <h2>Constancia de inscripción en el Registro Audiovisual</h2>
+  </div>
+
+  <p class="texto-principal">
+    Por la presente se deja constancia de que la persona humana o jurídica que se detalla a continuación
+    se encuentra inscripta para acceder al beneficio de exención impositiva conforme a la normativa vigente.
+  </p>
+
+  <div class="cuadro-datos">
+
+    <div class="fila">
+      <div class="fila-label">Constancia N°:</div>
+      <div class="fila-valor">{{ exencion.numero_constancia }}</div>
+    </div>
+
+    <div class="fila">
+      <div class="fila-label">Nombre / Razón social:</div>
+      <div class="fila-valor">{{ exencion.nombre_razon_social }}</div>
+    </div>
+
+    <div class="fila">
+      <div class="fila-label">CUIT:</div>
+      <div class="fila-valor">{{ exencion.cuit }}</div>
+    </div>
+
+    <div class="fila">
+      <div class="fila-label">Correo electrónico:</div>
+      <div class="fila-valor">{{ exencion.email }}</div>
+    </div>
+
+    <div class="fila">
+      <div class="fila-label">Domicilio fiscal:</div>
+      <div class="fila-valor">{{ exencion.domicilio_fiscal }}</div>
+    </div>
+
+    <div class="fila">
+      <div class="fila-label">Actividad declarada:</div>
+        <div class="fila-valor">
+          {% if exencion.persona_humana %}
+          {{ exencion.persona_humana.get_actividad_dgr_display }}
+          {% elif exencion.persona_juridica %}
+          {{ exencion.persona_juridica.get_actividad_dgr_display }}
+          {% else %}
+          —
+          {% endif %}
+      </div>
+    </div>
+
+    <div class="fila">
+      <div class="fila-label">Fecha de emisión:</div>
+      <div class="fila-valor">{{ exencion.fecha_emision|date:"d/m/Y" }}</div>
+    </div>
+
+    <div class="fila">
+      <div class="fila-label">Válida hasta:</div>
+      <div class="fila-valor">{{ exencion.fecha_vencimiento|date:"d/m/Y" }}</div>
+    </div>
+
+  </div>
+
+  <p class="fechas">
+    Salta, {{ exencion.fecha_emision|date:"d" }} de
+    {{ exencion.fecha_emision|date:"F" }} de
+    {{ exencion.fecha_emision|date:"Y" }}.
+  </p>
+
+  <div class="firma">
+    <img src="{{ firma_path }}" class="firma-img"    alt="Firma">
+    <div class="firma-nombre">Secretaría de Cultura</div>
+    <div class="firma-cargo">Gobierno de la Provincia de Salta</div>
+  </div>
+
+</body>
+</html>

@@ -16,6 +16,7 @@ urlpatterns = [
 
     # --------------------------------
     # INSCRIBIRSE A UNA CONVOCATORIA
+    # (decide flujo según la línea)
     # --------------------------------
     path(
         "<slug:slug>/inscribirse/",
@@ -51,21 +52,12 @@ urlpatterns = [
     ),
 
     # --------------------------------
-    # POSTULACIÓN COMPLETADA (PASO 4)
+    # POSTULACIÓN COMPLETADA (PASO FINAL)
     # --------------------------------
     path(
         "postulacion/enviada/<int:postulacion_id>/",
         views.postulacion_confirmada,
         name="postulacion_confirmada"
-    ),
-
-    # --------------------------------
-    # PANTALLA OPCIONAL (si se usa en algún flujo secundario)
-    # --------------------------------
-    path(
-        "documentacion/completada/",
-        views.documentacion_completada,
-        name="documentacion_completada"
     ),
 
     # --------------------------------

@@ -28,15 +28,45 @@ class PostulacionIDEA(models.Model):
     nombre_proyecto = models.CharField(max_length=255)
 
     TIPO_PROYECTO = [
-        ("corto", "Cortometraje"),
-        ("largo", "Largometraje"),
+
+    # ====================
+    # CINE
+    # ====================
+    ("CINE", (
+        ("cine_corto", "Cortometraje"),
+        ("cine_largo", "Largometraje"),
+        ("cine_comunidad", "Cine en comunidad"),
+    )),
+
+    # ====================
+    # SERIES
+    # ====================
+    ("SERIES", (
+        ("serie_tv", "Serie"),
+        ("serie_web", "Serie Web"),
+    )),
+
+    # ====================
+    # ANIMACIÓN
+    # ====================
+    ("ANIMACION", (
+        ("anim_corto", "Cortometraje de animación"),
+        ("anim_largo", "Largometraje de animación"),
+        ("anim_serie", "Serie de animación"),
+        ("anim_serie_web", "Serie web de animación"),
+        ("anim_videoclip", "Videoclip de animación"),
+    )),
+
+    # ====================
+    # OTROS FORMATOS
+    # ====================
+    ("OTROS", (
         ("videoclip", "Videoclip"),
-        ("transmedia", "Transmedia"),
-        ("serie", "Serie"),
         ("videojuego", "Videojuego"),
-        ("animacion", "Animación"),
-        ("comunidad", "Cine en comunidad"),
-    ]
+        ("transmedia", "Proyecto transmedia"),
+    )),
+]
+
     tipo_proyecto = models.CharField(max_length=50, choices=TIPO_PROYECTO)
 
     GENERO = [
@@ -50,8 +80,6 @@ class PostulacionIDEA(models.Model):
         ("otro", "Otro"),
     ]
     genero = models.CharField(max_length=50, choices=GENERO)
-
-    duracion_minutos = models.PositiveIntegerField()
 
     declaracion_jurada = models.BooleanField(default=False)
     fecha_envio = models.DateTimeField(auto_now_add=True)

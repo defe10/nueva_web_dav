@@ -9,219 +9,218 @@
 
 <!-- HERO -->
 <div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-  <h1 class="mb-3">PLATAFORMA DE REGISTROS</h1>
-  <h2>Formulario – Persona Jurídica</h2>
+  <h1 class="mb-3">Registro Audiovisual</h1>
+  <h2>Persona Jurídica</h2>
 </div>
 
-<!-- FORMULARIO -->
-<section class="team section-bg">
-  <div class="container">
-    <div class="row justify-content-center">
+<div class="container py-5">
+  <div class="row justify-content-center">
 
-      <!-- COLUMNA IZQUIERDA -->
-      <div class="col-lg-4 mb-4">
-        <div class="memberRegistro mb-5 text-left">
-
-          <h5>Completa los datos de la persona jurídica</h5>
-          <br>
-
-          <p>
-            Ingresá los datos tal como figuran en la documentación oficial de la entidad.  <br><br>
-            La información correcta y actualizada es esencial para validar la inscripción y agilizar cualquier trámite administrativo.<br><br>
-            Al finalizar, hacé clic en “Enviar” para completar el registro.
-          </p>
-
-
-        </div>
+    <!-- INFO -->
+    <div class="col-lg-4 mb-4">
+      <div class="memberRegistro">
+        <h5 class="mb-3">Datos de la persona jurídica</h5>
+        <p class="small">
+          Ingresá los datos tal como figuran en la documentación oficial de la entidad.
+          La información correcta y actualizada es esencial para validar la inscripción
+          y agilizar cualquier trámite administrativo.
+        </p>
+        <p class="small">
+          Al finalizar, hacé clic en <strong>“Enviar”</strong> para completar el registro.
+          Podrás actualizar tus datos cuando quieras desde <em>Mi cuenta</em>.
+        </p>
       </div>
-
-
-      <!-- COLUMNA DERECHA — FORMULARIO -->
-      <div class="col-lg-8">
-        <div class="memberRegistro mb-5 text-left">
-
-          <h3>FORMULARIO DE INSCRIPCIÓN</h3>
-          <p>Datos requeridos para la inscripción de Personas Jurídicas en el Registro.</p>
-
-          <form method="post" class="row datos_pers">
-            {% csrf_token %}
-
-            <!-- DATOS JURÍDICOS -->
-            <div class="col-lg-12 form-group">
-              <h5>Datos de la Persona Jurídica</h5>
-            </div>
-
-            <div class="col-lg-8 form-group">
-              <label>Tipo de persona jurídica</label>
-              {{ form.tipo_persona_juridica }}
-              {{ form.tipo_persona_juridica.errors }}
-            </div>
-
-            <div class="col-lg-4 form-group">
-              <label>CUIT</label>
-              {{ form.cuil_cuit }}
-              {{ form.cuil_cuit.errors }}
-            </div>
-
-            <div class="col-lg-6 form-group">
-              <label>Razón Social</label>
-              {{ form.razon_social }}
-              {{ form.razon_social.errors }}
-            </div>
-
-            <div class="col-lg-6 form-group">
-              <label>Nombre Comercial</label>
-              {{ form.nombre_comercial }}
-              {{ form.nombre_comercial.errors }}
-            </div>
-
-            <div class="col-lg-8 form-group">
-              <label>Domicilio fiscal</label>
-              {{ form.domicilio_fiscal }}
-              {{ form.domicilio_fiscal.errors }}
-            </div>
-
-            <div class="col-lg-4 form-group">
-              <label>Lugar de residencia</label>
-              {{ form.lugar_residencia }}
-              {{ form.lugar_residencia.errors }}
-            </div>
-
-            <div class="col-lg-8 form-group" id="otro-lugar-wrapper" style="display:none;">
-              <label>Especifique otro lugar</label>
-              {{ form.otro_lugar_residencia }}
-              {{ form.otro_lugar_residencia.errors }}
-            </div>
-
-            <div class="col-lg-5 form-group">
-              <label>Fecha de constitución</label>
-              {{ form.fecha_constitucion }}
-              {{ form.fecha_constitucion.errors }}
-            </div>
-
-            <div class="col-lg-2 form-group">
-              <label>Antigüedad</label>
-              {{ form.antiguedad }}
-              {{ form.antiguedad.errors }}
-            </div>
-
-            <div class="col-lg-5 form-group">
-              <label>Teléfono</label>
-              {{ form.telefono }}
-              {{ form.telefono.errors }}
-            </div>
-
-            <div class="col-lg-8 form-group">
-              <label>Correo electrónico</label>
-              {{ form.email }}
-              {{ form.email.errors }}
-            </div>
-
-            <!-- DATOS FISCALES -->
-            <div class="col-lg-12 form-group mt-4">
-              <h5>Datos Fiscales</h5>
-            </div>
-
-            <div class="col-lg-6 form-group">
-              <label>Situación ante el IVA</label>
-              {{ form.situacion_iva }}
-              {{ form.situacion_iva.errors }}
-            </div>
-
-            <div class="col-lg-6 form-group">
-              <label>Actividad declarada en DGR</label>
-              {{ form.actividad_dgr }}
-              {{ form.actividad_dgr.errors }}
-            </div>
-
-            <!-- DATOS PROFESIONALES -->
-
-            <div class="col-lg-12 form-group mt-4">
-              <h5>Datos Profesionales</h5>
-            </div>
-
-           <div class="col-lg-6 form-group">
-              <label>Área de desempeño Persona Jurídica</label>
-              {{ form.area_desempeno_JJPP_1 }}
-              {{ form.area_desempeno_JJPP_1.errors }}
-            </div>
-
-            <div class="col-lg-6 form-group">
-              <label>Área de desempeño Persona Jurídica</label>
-              {{ form.area_desempeno_JJPP_2 }}
-              {{ form.area_desempeno_JJPP_2.errors }}
-            </div>
-
-            <div class="col-lg-12 form-group">
-              <label>Link de trabajos</label>
-              {{ form.link_1 }}
-              {{ form.link_1.errors }}
-            </div>
-
-            <div class="col-lg-12 form-group">
-              <label>Link de trabajos</label>
-              {{ form.link_2 }}
-              {{ form.link_2.errors }}
-            </div>
-
-            <div class="col-lg-12 form-group">
-              <label>Link de trabajos</label>
-              {{ form.link_2 }}
-              {{ form.link_2.errors }}
-            </div>
-
-            <!-- BOTÓN -->
-            <div class="col-lg-12 mt-4 text-end">
-              <button type="submit" class="btn btn-primary">Enviar</button>
-            </div>
-
-          </form>
-
-        </div>
-      </div>
-
     </div>
+
+    <!-- FORMULARIO -->
+    <div class="col-lg-8">
+      <div class="memberRegistro">
+
+        <h3 class="mb-2">Formulario de inscripción</h3>
+        <p class="text-muted mb-4">
+          Datos requeridos para la inscripción de Personas Jurídicas.
+        </p>
+
+        <form method="post" class="row g-3">
+          {% csrf_token %}
+
+          <!-- DATOS JURÍDICOS -->
+          <div class="col-12">
+            <h5>Datos de la persona jurídica</h5>
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Tipo de persona jurídica</label>
+            {{ form.tipo_persona_juridica }}
+            {{ form.tipo_persona_juridica.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">CUIT</label>
+            {{ form.cuil_cuit }}
+            {{ form.cuil_cuit.errors }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Razón social</label>
+            {{ form.razon_social }}
+            {{ form.razon_social.errors }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Nombre comercial</label>
+            {{ form.nombre_comercial }}
+            {{ form.nombre_comercial.errors }}
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Domicilio fiscal</label>
+            {{ form.domicilio_fiscal }}
+            {{ form.domicilio_fiscal.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Lugar de residencia</label>
+            {{ form.lugar_residencia }}
+            {{ form.lugar_residencia.errors }}
+          </div>
+
+          <div class="col-md-8" id="otro-lugar-wrapper" style="display:none;">
+            <label class="form-label">Especificar otro lugar</label>
+            {{ form.otro_lugar_residencia }}
+            {{ form.otro_lugar_residencia.errors }}
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label">Fecha de constitución</label>
+            {{ form.fecha_constitucion }}
+            {{ form.fecha_constitucion.errors }}
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label">Antigüedad</label>
+            {{ form.antiguedad }}
+            {{ form.antiguedad.errors }}
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label">Teléfono</label>
+            {{ form.telefono }}
+            {{ form.telefono.errors }}
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Correo electrónico</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+          </div>
+
+          <!-- DATOS FISCALES -->
+          <div class="col-12 mt-4">
+            <h5>Datos fiscales</h5>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Situación ante el IVA</label>
+            {{ form.situacion_iva }}
+            {{ form.situacion_iva.errors }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Actividad declarada en DGR</label>
+            {{ form.actividad_dgr }}
+            {{ form.actividad_dgr.errors }}
+          </div>
+
+          <!-- DATOS PROFESIONALES -->
+          <div class="col-12 mt-4">
+            <h5>Datos profesionales</h5>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Área de desempeño principal</label>
+            {{ form.area_desempeno_JJPP_1 }}
+            {{ form.area_desempeno_JJPP_1.errors }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Área de desempeño secundaria</label>
+            {{ form.area_desempeno_JJPP_2 }}
+            {{ form.area_desempeno_JJPP_2.errors }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Link de trabajos</label>
+            {{ form.link_1 }}
+            {{ form.link_1.errors }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Link de trabajos</label>
+            {{ form.link_2 }}
+            {{ form.link_2.errors }}
+          </div>
+
+          {% if form.link_3 %}
+          <div class="col-12">
+            <label class="form-label">Link de trabajos</label>
+            {{ form.link_3 }}
+            {{ form.link_3.errors }}
+          </div>
+          {% endif %}
+
+          <!-- BOTÓN -->
+          <div class="col-12 text-end mt-4">
+            <button type="submit" class="btn btn-primary">
+              Enviar
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
   </div>
-</section>
+</div>
+
+<!-- JS: OTRO LUGAR -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById("id_lugar_residencia");
   const otroWrapper = document.getElementById("otro-lugar-wrapper");
 
   function toggleOtro() {
-    if (select.value === "otro") {
-      otroWrapper.style.display = "block";
-    } else {
-      otroWrapper.style.display = "none";
-    }
+    otroWrapper.style.display = (select.value === "otro") ? "block" : "none";
   }
 
   select.addEventListener("change", toggleOtro);
-  toggleOtro(); // ejecuta al cargar
+  toggleOtro();
 });
 </script>
 
+<!-- JS: ANTIGÜEDAD -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const fechaInput = document.querySelector("#id_fecha_constitucion");
-    const edadInput = document.querySelector("#id_antiguedad");
+  const fechaInput = document.querySelector("#id_fecha_constitucion");
+  const antiguedadInput = document.querySelector("#id_antiguedad");
 
-    function calcularEdad() {
-        const fecha = new Date(fechaInput.value);
-        if (!isNaN(fecha)) {
-            const hoy = new Date();
-            let antiguedad = hoy.getFullYear() - fecha.getFullYear();
-            const m = hoy.getMonth() - fecha.getMonth();
-            if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
-                antiguedad--;
-            }
-            edadInput.value = antiguedad;
-        } else {
-            edadInput.value = "";
-        }
+  function calcularAntiguedad() {
+    const fecha = new Date(fechaInput.value);
+    if (!isNaN(fecha)) {
+      const hoy = new Date();
+      let antiguedad = hoy.getFullYear() - fecha.getFullYear();
+      const m = hoy.getMonth() - fecha.getMonth();
+      if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
+        antiguedad--;
+      }
+      antiguedadInput.value = antiguedad;
+    } else {
+      antiguedadInput.value = "";
     }
+  }
 
-    fechaInput.addEventListener("change", calcularEdad);
+  fechaInput.addEventListener("change", calcularAntiguedad);
 });
 </script>
 

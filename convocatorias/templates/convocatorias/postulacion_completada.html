@@ -1,39 +1,38 @@
 {% extends "sitio_publico/base.html" %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
-{% endblock %}
-
 {% block content %}
 
 <!-- HERO -->
-<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-  <h1 class="mb-3">POSTULACIÓN COMPLETADA</h1>
-  <h2>{{ convocatoria.titulo }}</h2>
-</div>
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Postulación completada</h1>
+  <p class="text-muted">
+    {{ convocatoria.titulo }}
+  </p>
+</section>
 
-<section class="team section-bg">
-  <div class="container">
-    <div class="row justify-content-center">
+<div class="container py-5">
 
-      <div class="col-lg-8">
-        <div class="memberRegistro mb-5 text-center">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="card shadow-sm text-center">
+        <div class="card-body p-4">
 
           <!-- Mensaje principal -->
           <h3 class="mb-3">¡Tu postulación fue enviada correctamente!</h3>
 
           <p class="text-muted mb-4">
-            Hemos recibido tu postulación para la convocatoria 
+            Hemos recibido tu postulación para la convocatoria
             <strong>{{ convocatoria.titulo }}</strong>.<br>
-            Nuestro equipo revisará la información presentada y 
-            nos contactaremos en caso de ser necesario.
+            Nuestro equipo revisará la información presentada y
+            se contactará con vos en caso de ser necesario.
           </p>
 
-          <!-- Datos opcionales -->
+          <!-- Resumen -->
           {% if postulacion %}
-          <div class="alert alert-info text-start">
-            <strong>Resumen de tu envío:</strong><br>
+          <div class="alert alert-info text-start small">
+            <strong>Resumen de tu envío</strong><br>
             Postulación Nº: {{ postulacion.id }}<br>
             Proyecto: {{ postulacion.nombre_proyecto }}<br>
             Línea: {{ convocatoria.get_linea_display }}<br>
@@ -43,12 +42,12 @@
 
           <!-- Botones -->
           <div class="mt-4 d-flex justify-content-center gap-3">
-            <a href="{% url 'convocatorias:convocatoria_detalle' convocatoria.slug %}" 
+            <a href="{% url 'convocatorias:convocatoria_detalle' convocatoria.slug %}"
                class="btn btn-primary">
               Ver convocatoria
             </a>
 
-            <a href="{% url 'convocatorias:convocatorias_home' %}" 
+            <a href="{% url 'convocatorias:convocatorias_home' %}"
                class="btn btn-outline-primary">
               Volver a convocatorias
             </a>
@@ -59,6 +58,7 @@
 
     </div>
   </div>
-</section>
+
+</div>
 
 {% endblock %}

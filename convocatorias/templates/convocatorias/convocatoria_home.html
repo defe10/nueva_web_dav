@@ -4,7 +4,7 @@
 {% block content %}
 
 <!-- HERO -->
-<section class="hero text-center">
+<section class="fomento-hero text-center">
   <h1 class="fw-bold mb-3">Convocatorias y Programas</h1>
   <p class="lead text-muted">
     Descubrí todas las líneas del Plan IDEA, cursos de formación e incentivos audiovisuales disponibles en la provincia.
@@ -25,7 +25,7 @@
 
       <div class="carrusel">
         {% for c in fomento %}
-        <div class="card-area">
+        <div class="card-area h-100">
           <div class="card-img-top-area">
             {% if c.imagen %}
               <img src="{{ c.imagen.url }}" class="img-area">
@@ -41,90 +41,99 @@
 
             <h5 class="mb-2">{{ c.titulo }}</h5>
 
-            <p class="small text-muted">{{ c.descripcion_corta|truncatewords:20 }}</p>
+            <p class="small text-muted">
+              {{ c.descripcion_corta|truncatewords:20 }}
+            </p>
 
-            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="card-plus">
+            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+               class="card-plus">
               <i class="bi bi-plus-circle-fill"></i>
             </a>
           </div>
         </div>
         {% empty %}
-        <p class="text-muted small ps-3">No hay convocatorias disponibles.</p>
+          <p class="text-muted small ps-3">
+            No hay convocatorias disponibles.
+          </p>
         {% endfor %}
       </div>
     </div>
   </div>
 
   <!-- =============================================== -->
-  <!-- 2) INCENTIVOS Y BENEFICIOS (UN SOLO CARRUSEL) -->
+  <!-- 2) INCENTIVOS Y BENEFICIOS -->
   <!-- =============================================== -->
   <h2 class="seccion-titulo">Incentivos y Beneficios</h2>
 
-  <div class="carrusel-fondo">
-    <div class="carrusel-wrap">
-      {% comment %} <div class="flecha izq" onclick="moverCarrusel(this, -1)">‹</div>
-      <div class="flecha der" onclick="moverCarrusel(this, 1)">›</div> {% endcomment %}
+  <div class="row g-4 mb-5">
 
-      <div class="carrusel">
-
-        {% for c in beneficio %}
-        <div class="card-area">
-          <div class="card-img-top-area">
-            {% if c.imagen %}
-              <img src="{{ c.imagen.url }}" class="img-area">
-            {% else %}
-              <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
-            {% endif %}
-          </div>
-
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1">
-              {{ c.get_categoria_display }}
-            </small>
-
-            <h5 class="mb-2">{{ c.titulo }}</h5>
-
-            <p class="small text-muted">{{ c.descripcion_corta|truncatewords:20 }}</p>
-
-            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="card-plus">
-              <i class="bi bi-plus-circle-fill"></i>
-            </a>
-          </div>
+    {% for c in beneficio %}
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      <div class="card-area h-100">
+        <div class="card-img-top-area">
+          {% if c.imagen %}
+            <img src="{{ c.imagen.url }}" class="img-area">
+          {% else %}
+            <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
+          {% endif %}
         </div>
-        {% endfor %}
 
-        {% for c in incentivo %}
-        <div class="card-area">
-          <div class="card-img-top-area">
-            {% if c.imagen %}
-              <img src="{{ c.imagen.url }}" class="img-area">
-            {% else %}
-              <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
-            {% endif %}
-          </div>
+        <div class="card-body">
+          <small class="text-muted text-uppercase d-block mb-1">
+            {{ c.get_categoria_display }}
+          </small>
 
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1">
-              {{ c.get_categoria_display }}
-            </small>
+          <h5 class="mb-2">{{ c.titulo }}</h5>
 
-            <h5 class="mb-2">{{ c.titulo }}</h5>
+          <p class="small text-muted">
+            {{ c.descripcion_corta|truncatewords:20 }}
+          </p>
 
-            <p class="small text-muted">{{ c.descripcion_corta|truncatewords:20 }}</p>
-
-            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="card-plus">
-              <i class="bi bi-plus-circle-fill"></i>
-            </a>
-          </div>
+          <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+             class="card-plus">
+            <i class="bi bi-plus-circle-fill"></i>
+          </a>
         </div>
-        {% endfor %}
-
-        {% if not beneficio and not incentivo %}
-          <p class="text-muted small ps-3">No hay incentivos ni beneficios disponibles.</p>
-        {% endif %}
-
       </div>
     </div>
+    {% endfor %}
+
+    {% for c in incentivo %}
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      <div class="card-area h-100">
+        <div class="card-img-top-area">
+          {% if c.imagen %}
+            <img src="{{ c.imagen.url }}" class="img-area">
+          {% else %}
+            <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
+          {% endif %}
+        </div>
+
+        <div class="card-body">
+          <small class="text-muted text-uppercase d-block mb-1">
+            {{ c.get_categoria_display }}
+          </small>
+
+          <h5 class="mb-2">{{ c.titulo }}</h5>
+
+          <p class="small text-muted">
+            {{ c.descripcion_corta|truncatewords:20 }}
+          </p>
+
+          <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+             class="card-plus">
+            <i class="bi bi-plus-circle-fill"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    {% if not beneficio and not incentivo %}
+      <p class="text-muted small ps-3">
+        No hay incentivos ni beneficios disponibles.
+      </p>
+    {% endif %}
   </div>
 
   <!-- =============================================== -->
@@ -134,12 +143,9 @@
 
   <div class="carrusel-fondo">
     <div class="carrusel-wrap">
-      {% comment %} <div class="flecha izq" onclick="moverCarrusel(this, -1)">‹</div>
-      <div class="flecha der" onclick="moverCarrusel(this, 1)">›</div> {% endcomment %}
-
       <div class="carrusel">
         {% for c in formacion %}
-        <div class="card-area">
+        <div class="card card-area shadow-sm h-100">
           <div class="card-img-top-area">
             {% if c.imagen %}
               <img src="{{ c.imagen.url }}" class="img-area">
@@ -155,15 +161,20 @@
 
             <h5 class="mb-2">{{ c.titulo }}</h5>
 
-            <p class="small text-muted">{{ c.descripcion_corta|truncatewords:20 }}</p>
+            <p class="small text-muted">
+              {{ c.descripcion_corta|truncatewords:20 }}
+            </p>
 
-            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="card-plus">
+            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+               class="card-plus">
               <i class="bi bi-plus-circle-fill"></i>
             </a>
           </div>
         </div>
         {% empty %}
-        <p class="text-muted small ps-3">No hay cursos disponibles.</p>
+          <p class="text-muted small ps-3">
+            No hay cursos disponibles.
+          </p>
         {% endfor %}
       </div>
     </div>

@@ -11,7 +11,7 @@
 
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-warning">{{ message }}</div>
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
             {% endfor %}
         {% endif %}
 
@@ -28,26 +28,36 @@
 
             <!-- Correo -->
             <div class="mb-3">
-                <label for="{{ form.username.id_for_label }}" class="form-label">Correo electrónico</label>
+                <label for="{{ form.username.id_for_label }}" class="form-label">
+                    Correo electrónico
+                </label>
                 {{ form.username|add_class:"form-control" }}
             </div>
 
             <!-- Contraseña -->
             <div class="mb-3">
-                <label for="{{ form.password.id_for_label }}" class="form-label">Contraseña</label>
+                <label for="{{ form.password.id_for_label }}" class="form-label">
+                    Contraseña
+                </label>
                 {{ form.password|add_class:"form-control" }}
             </div>
 
             <!-- Botón ingresar -->
-            <button class="btn btn-primary w-100" type="submit">Ingresar</button>
+            <button class="btn btn-primary w-100" type="submit">
+                Ingresar
+            </button>
         </form>
 
         <div class="text-center mt-3">
-            <a href="{% url 'usuario:registro' %}">¿No tenés cuenta? Registrate</a>
+            <a href="{% url 'usuarios:registro' %}">
+                ¿No tenés cuenta? Registrate
+            </a>
         </div>
 
         <div class="text-center mt-2">
-            <a href="{% url 'usuario:password_reset' %}">¿Olvidaste tu contraseña?</a>
+            <a href="{% url 'usuarios:password_reset' %}">
+                ¿Olvidaste tu contraseña?
+            </a>
         </div>
 
     </div>

@@ -7,16 +7,18 @@
     <h1 class="fw-bold mb-4 text-center">Mi Panel</h1>
 
     <div class="row justify-content-center">
-
         <div class="col-lg-8">
 
-            <!-- CARD PRINCIPAL -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body p-4">
 
-                    <h4 class="fw-bold mb-3">Bienvenido, {{ user.username }}</h4>
+                    <h4 class="fw-bold mb-3">
+                        Bienvenido, {{ user.username }}
+                    </h4>
+
                     <p class="text-muted">
-                        Desde aquí podés administrar tu registro audiovisual e inscribirte a convocatorias.
+                        Desde aquí podés consultar el estado de tu registro audiovisual
+                        y acceder a las convocatorias disponibles.
                     </p>
 
                     <hr>
@@ -40,12 +42,9 @@
                             </p>
                         {% endif %}
                     {% else %}
-                        <p class="mb-3">
+                        <p class="mb-2">
                             <strong>Estado del registro audiovisual:</strong>
                             <span class="badge bg-warning text-dark ms-2">Pendiente</span>
-                        </p>
-                        <p class="text-muted small">
-                            Aún no completaste tu registro audiovisual.
                         </p>
                     {% endif %}
 
@@ -54,36 +53,49 @@
                     <!-- ACCIONES -->
                     <div class="d-grid gap-3 mt-4">
 
-                        <!-- EDITAR DATOS -->
                         {% if persona_humana %}
-                        <a href="{% url 'registro_audiovisual:editar_persona_humana' %}"
-                           class="btn btn-primary">
-                            Editar mis datos (Persona Humana)
-                        </a>
+                            <a href="{% url 'registro_audiovisual:editar_persona_humana' %}"
+                               class="btn btn-primary">
+                                Editar mis datos (Persona Humana)
+                            </a>
                         {% endif %}
 
                         {% if persona_juridica %}
-                        <a href="{% url 'registro_audiovisual:editar_persona_juridica' %}"
-                           class="btn btn-primary">
-                            Editar mis datos (Persona Jurídica)
-                        </a>
+                            <a href="{% url 'registro_audiovisual:editar_persona_juridica' %}"
+                               class="btn btn-primary">
+                                Editar mis datos (Persona Jurídica)
+                            </a>
                         {% endif %}
 
                         {% if not persona_humana and not persona_juridica %}
-                        <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}"
-                           class="btn btn-warning">
-                            Completar Registro Audiovisual
-                        </a>
+                            <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}"
+                               class="btn btn-warning">
+                                Completar Registro Audiovisual
+                            </a>
                         {% endif %}
 
-                        <!-- CONVOCATORIAS -->
-                        <a href="{% url 'convocatorias:convocatorias_home' %}" class="btn btn-outline-primary">
+                        <a href="{% url 'convocatorias:convocatorias_home' %}"
+                           class="btn btn-outline-primary">
                             Ver Convocatorias Disponibles
                         </a>
 
-                        <!-- LOGOUT -->
-                        <a href="{% url 'usuario:logout' %}" class="btn btn-outline-danger">
-                            Cerrar Sesión
+                        {% if exencion %}
+                            {% if exencion.certificado_pdf %}
+                                <a href="{{ exencion.certificado_pdf.url }}"
+                                   class="btn btn-success"
+                                   download>
+                                    Descargar constancia de exención impositiva
+                                </a>
+                            {% else %}
+                                <button class="btn btn-outline-secondary" disabled>
+                                    Exención impositiva en revisión
+                                </button>
+                            {% endif %}
+                        {% endif %}
+
+                        <a href="{% url 'usuarios:logout' %}"
+                           class="btn btn-outline-danger">
+                            Cerrar sesión
                         </a>
 
                     </div>
@@ -92,7 +104,6 @@
             </div>
 
         </div>
-
     </div>
 </div>
 {% endblock %}
