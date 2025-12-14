@@ -44,6 +44,13 @@
           <form method="post" class="row g-3">
             {% csrf_token %}
 
+            <!-- Presentante -->
+            <div class="col-12 mb-2">
+              <p class="mb-1 small text-muted">
+              <strong>Presentante:</strong> {{ persona_nombre }}
+              </p>
+            </div>
+
             <!-- Nombre del proyecto -->
             <div class="col-12">
               <label class="form-label">Nombre del proyecto</label>

@@ -1,5 +1,3 @@
-# convocatorias/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -33,7 +31,6 @@ def convocatorias_home(request):
 
 # ============================================================
 # INSCRIBIRSE A UNA CONVOCATORIA
-# Decide el flujo según la línea
 # ============================================================
 @login_required
 def inscribirse_convocatoria(request, slug):
@@ -85,8 +82,9 @@ def inscribirse_convocatoria(request, slug):
         slug=convocatoria.slug
     )
 
+
 # ============================================================
-# POSTULACIÓN – PASO 1 (FORMULARIO)
+# POSTULACIÓN – PASO 1 (FORMULARIO IDEA)
 # ============================================================
 @login_required(login_url="/usuarios/login/")
 def postular_convocatoria(request, convocatoria_id):
@@ -98,23 +96,34 @@ def postular_convocatoria(request, convocatoria_id):
     # --------------------------------------
     # Validar registro audiovisual
     # --------------------------------------
-    tiene_humana = PersonaHumana.objects.filter(user=user).exists()
-    tiene_juridica = PersonaJuridica.objects.filter(user=user).exists()
+    persona_humana = PersonaHumana.objects.filter(user=user).first()
+    persona_juridica = PersonaJuridica.objects.filter(user=user).first()
 
-    if not (tiene_humana or tiene_juridica):
+    if not (persona_humana or persona_juridica):
         return redirect(
             f"/registro/seleccionar-tipo/?next=/convocatorias/{convocatoria.slug}/inscribirse/"
         )
 
     # --------------------------------------
+    # Determinar nombre del presentante
+    # --------------------------------------
+    if persona_humana:
+        persona_nombre = persona_humana.nombre_completo
+    else:
+        persona_nombre = persona_juridica.razon_social
+
+    # --------------------------------------
     # Solo estas líneas usan IDEA
     # --------------------------------------
-    if linea not in ["fomento", "beneficio", "incentivo"]:
+    if linea not in ["fomento", "beneficio"]:
         return redirect(
             "convocatorias:convocatoria_detalle",
             slug=convocatoria.slug,
         )
 
+    # --------------------------------------
+    # Formulario
+    # --------------------------------------
     if request.method == "POST":
         form = PostulacionIDEAForm(request.POST)
         if form.is_valid():
@@ -137,6 +146,7 @@ def postular_convocatoria(request, convocatoria_id):
         {
             "convocatoria": convocatoria,
             "form": form,
+            "persona_nombre": persona_nombre,  # ← CLAVE
         },
     )
 

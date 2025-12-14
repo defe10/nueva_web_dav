@@ -7,6 +7,7 @@ from .models import Exencion, ExencionDocumento
 from .utils import generar_pdf_exencion
 
 
+
 # ============================================================
 # DOCUMENTOS DE LA EXENCIÓN (INLINE)
 # ============================================================
