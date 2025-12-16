@@ -13,7 +13,23 @@
   <h2>Persona Humana</h2>
 </div>
 
-<div class="container py-5">
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 text-center">
+
+      <div class="d-flex justify-content-between mb-4 small text-muted">
+        <div>1. Tipo de persona</div>
+        <div class="fw-bold text-info">2. Completar datos y enviar</div>
+        <div>3. Completado</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<div class="container py-3">
   <div class="row justify-content-center">
 
     <!-- INFO -->
@@ -53,12 +69,19 @@
           <div class="col-md-8">
             <label class="form-label">Nombre completo</label>
             {{ form.nombre_completo }}
+            <small class="text-muted">
+            Debe coincidir con el DNI.
+            </small>
             {{ form.nombre_completo.errors }}
           </div>
+
 
           <div class="col-md-4">
             <label class="form-label">CUIL / CUIT</label>
             {{ form.cuil_cuit }}
+            <small class="text-muted">
+            Sin espacios ni guiones.
+            </small>
             {{ form.cuil_cuit.errors }}
           </div>
 
@@ -80,33 +103,45 @@
             {{ form.genero.errors }}
           </div>
 
+          <div class="col-12">
+            <label class="form-label">Domicilio real</label>
+            {{ form.domicilio_real }}
+            <small class="text-muted">
+            Debe coincidir con el DNI.
+            </small>
+            {{ form.domicilio_real.errors }}
+          </div>
+
           <div class="col-md-4">
             <label class="form-label">Lugar de residencia</label>
             {{ form.lugar_residencia }}
             {{ form.lugar_residencia.errors }}
           </div>
 
-          <div class="col-md-8" id="otro-lugar-wrapper" style="display:none;">
+          <div class="col-md-4" id="otro-lugar-wrapper" style="display:none;">
             <label class="form-label">Especificar otro lugar</label>
             {{ form.otro_lugar_residencia }}
             {{ form.otro_lugar_residencia.errors }}
           </div>
 
-          <div class="col-md-8">
+          <div class="col-md-4">
+            <label class="form-label">Código postal</label>
+            {{ form.codigo_postal_real }}
+            {{ form.codigo_postal_real.errors }}
+          </div>
+
+          <div class="col-md-4">
             <label class="form-label">Nivel educativo alcanzado</label>
             {{ form.nivel_educativo }}
             {{ form.nivel_educativo.errors }}
           </div>
 
-          <div class="col-12">
-            <label class="form-label">Domicilio real</label>
-            {{ form.domicilio_real }}
-            {{ form.domicilio_real.errors }}
-          </div>
-
           <div class="col-md-4">
             <label class="form-label">Teléfono</label>
             {{ form.telefono }}
+            <small class="text-muted">
+            Ingresá el número con código de área, sin 0 y sin 15.
+            </small>
             {{ form.telefono.errors }}
           </div>
 
@@ -133,10 +168,22 @@
             {{ form.actividad_dgr.errors }}
           </div>
 
-          <div class="col-12">
+          <div class="col-4">
             <label class="form-label">Domicilio fiscal</label>
             {{ form.domicilio_fiscal }}
             {{ form.domicilio_fiscal.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Ciudad</label>
+            {{ form.localidad_fiscal }}
+            {{ form.localidad_fiscal.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Código postal</label>
+            {{ form.codigo_postal_fiscal }}
+            {{ form.codigo_postal_fiscal.errors }}
           </div>
 
           <!-- DATOS PROFESIONALES -->
@@ -199,18 +246,33 @@
 
 <!-- JS: OTRO LUGAR -->
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   const select = document.getElementById("id_lugar_residencia");
   const otroWrapper = document.getElementById("otro-lugar-wrapper");
 
+  if (!select || !otroWrapper) return;
+
   function toggleOtro() {
-    otroWrapper.style.display = (select.value === "otro") ? "block" : "none";
+    if (!select.value) {
+      otroWrapper.style.display = "none";
+      return;
+    }
+
+    const selectedText =
+      select.options[select.selectedIndex].text.toLowerCase();
+
+    if (selectedText.includes("otro")) {
+      otroWrapper.style.display = "block";
+    } else {
+      otroWrapper.style.display = "none";
+    }
   }
 
   select.addEventListener("change", toggleOtro);
   toggleOtro();
 });
 </script>
+
 
 <!-- JS: EDAD -->
 <script>

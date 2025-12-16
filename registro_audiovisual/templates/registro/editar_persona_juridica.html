@@ -13,7 +13,20 @@
   <h2>Persona Jurídica</h2>
 </div>
 
-<div class="container py-5">
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 text-center">
+
+      <div class="d-flex justify-content-between mb-4 small text-muted">
+        <div>1. Tipo de persona</div>
+        <div class="fw-bold text-info">2. Completar datos y enviar</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="container py-3">
   <div class="row justify-content-center">
 
     <!-- INFO -->
@@ -58,12 +71,16 @@
           <div class="col-md-4">
             <label class="form-label">CUIT</label>
             {{ form.cuil_cuit }}
+            <small class="text-muted">
+            Sin espacios ni guiones.
+            </small>
             {{ form.cuil_cuit.errors }}
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Razón social</label>
-            {{ form.razon_social }}
+            {{ form.razon_social }}<small class="text-muted">
+            </small>
             {{ form.razon_social.errors }}
           </div>
 
@@ -73,16 +90,22 @@
             {{ form.nombre_comercial.errors }}
           </div>
 
-          <div class="col-md-8">
+          <div class="col-md-4">
             <label class="form-label">Domicilio fiscal</label>
             {{ form.domicilio_fiscal }}
             {{ form.domicilio_fiscal.errors }}
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">Lugar de residencia</label>
-            {{ form.lugar_residencia }}
-            {{ form.lugar_residencia.errors }}
+            <label class="form-label">Código postal</label>
+            {{ form.codigo_postal_fiscal }}
+            {{ form.codigo_postal_fiscal.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Ciudad</label>
+            {{ form.localidad_fiscal }}
+            {{ form.localidad_fiscal.errors }}
           </div>
 
           <div class="col-md-8" id="otro-lugar-wrapper" style="display:none;">
@@ -184,14 +207,27 @@
   </div>
 </div>
 
-<!-- JS: OTRO LUGAR -->
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  const select = document.getElementById("id_lugar_residencia");
+document.addEventListener("DOMContentLoaded", function () {
+  const select = document.querySelector("select[name$='lugar_residencia']");
   const otroWrapper = document.getElementById("otro-lugar-wrapper");
 
+  if (!select || !otroWrapper) return;
+
   function toggleOtro() {
-    otroWrapper.style.display = (select.value === "otro") ? "block" : "none";
+    if (!select.value) {
+      otroWrapper.style.display = "none";
+      return;
+    }
+
+    const selectedText =
+      select.options[select.selectedIndex].text.toLowerCase();
+
+    if (selectedText.includes("otro")) {
+      otroWrapper.style.display = "block";
+    } else {
+      otroWrapper.style.display = "none";
+    }
   }
 
   select.addEventListener("change", toggleOtro);

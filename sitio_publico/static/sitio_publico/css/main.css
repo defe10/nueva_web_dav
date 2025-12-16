@@ -4,7 +4,7 @@
 
 html,
 body {
-    font-family: 'Montserrat', sans-serif !important;
+    font-family: 'Montserrat', sans-serif;
 }
 
 
@@ -63,6 +63,8 @@ body {
 }
 
 
+
+
 /* ============================================================
    REDES SOCIALES
    ============================================================ */
@@ -79,8 +81,9 @@ body {
 }
 
 .redes-icon:hover i {
-    color: #e0007a;
+    color: var(--bs-primary);
 }
+
 
 
 /* ============================================================
@@ -102,6 +105,13 @@ body {
    CARD-AREA — COMPONENTE GLOBAL
    ============================================================ */
 
+
+.card1 {
+    border-radius: 20px;
+    background-color: #d3dcfc;
+}
+
+
 .card-area {
     width: 250px;
     border-radius: 20px;
@@ -111,22 +121,13 @@ body {
     transition: 0.25s ease;
 }
 
-.card-body {
-    padding: 15px !important;
-}
-
-.card_servs {
-    width: 250px;
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid #eaeaea;
-    background: #8c27ce !important;
-    transition: 0.25s ease;
-}
-
 .card-img-top-area {
     height: 130px;
     overflow: hidden;
+}
+
+.card-body {
+    padding: 20px;
 }
 
 .img-area {
@@ -134,7 +135,6 @@ body {
     height: 100%;
     object-fit: cover;
     transition: transform 0.4s ease;
-
 }
 
 .card-area h5 {
@@ -167,13 +167,107 @@ body {
 
 
 /* ============================================================
-   BADGES (override Bootstrap)
+   CONVOCATORIAS – CARDS
    ============================================================ */
 
-.badge-success {
-    background-color: #2ecc71 !important;
+.convocatoria-card {
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.badge-danger {
-    background-color: #e74c3c !important;
+.convocatoria-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12);
+}
+
+
+
+
+.filtros-convocatorias .filtro {
+    text-decoration: none;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid #000;
+    color: #000;
+    transition: all 0.2s ease;
+}
+
+.filtros-convocatorias .filtro:hover {
+    background: #000;
+    color: #fff;
+}
+
+.filtros-convocatorias .filtro.active {
+    background: #000;
+    color: #fff;
+}
+
+
+
+/* ============================================================
+   CONVOCATORIAS – CARD ESTILO MUBI
+   ============================================================ */
+
+.convocatoria-card-mubi {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #fff;
+}
+
+.convocatoria-card-mubi img,
+.convocatoria-placeholder {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+    background: #444;
+}
+
+.convocatoria-card-mubi .overlay {
+    position: absolute;
+    inset: 0;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background: linear-gradient(to top,
+            rgba(0, 0, 0, 0.75),
+            rgba(0, 0, 0, 0.2),
+            transparent);
+}
+
+.convocatoria-card-mubi .categoria {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.85;
+    /* text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6); */
+}
+
+.convocatoria-card-mubi .titulo {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0.25rem 0;
+    line-height: 1.2;
+    /* text-shadow: 0 3px 8px rgba(0, 0, 0, 0.85); */
+}
+
+.convocatoria-card-mubi .fecha {
+    font-size: 0.75rem;
+    opacity: 0.85;
+    /* text-shadow: 0 2px 6px rgba(0, 0, 0, 0.75); */
+    margin-bottom: 0.1rem;
+}
+
+.convocatoria-card-mubi img {
+    transition: transform 0.4s ease;
+}
+
+
+.convocatoria-card-mubi:hover img {
+    transform: scale(1.05);
 }

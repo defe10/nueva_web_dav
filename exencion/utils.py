@@ -5,6 +5,7 @@ from weasyprint import HTML, CSS
 import os
 
 
+
 def generar_pdf_exencion(exencion):
 
     base_static = os.path.join(settings.BASE_DIR, "static")
@@ -34,3 +35,12 @@ def generar_pdf_exencion(exencion):
     )
 
     return pdf
+
+def datos_fiscales_completos(persona):
+    return all([
+        persona.situacion_iva,
+        persona.actividad_dgr,
+        persona.domicilio_fiscal,
+        persona.codigo_postal_fiscal,
+        persona.localidad_fiscal,
+    ])

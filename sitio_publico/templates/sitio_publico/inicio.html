@@ -132,154 +132,149 @@
   </div>
 </section>
 
-
-<!-- ÁREAS DE GESTIÓN -->
-<section class="py-5 bg-light  ">
+<section class="py-5 bg-light">
   <div class="container">
-    <h3 class="fw-bold mb-4">Áreas de gestión</h3>
 
-    <div class="row g-3 justify-content-center">
-      <!-- FOMENTO -->
-      <div class="col-auto card-col-5">
-        <div class="card card-area shadow-sm h-100">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/fomento.jpg' %}"
-              alt="Fomento"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <h5 class="mb-2">Fomento</h5>
-            <p class="text-muted">
-              Concursos, programas, subsidios y Cash Rebate.
-            </p>
-            <a href="{% url 'convocatorias:convocatorias_home' %}" class="card-plus">
-              <i class="bi bi-plus-circle-fill"></i>
-            </a>
-          </div>
-        </div>
-      </div>
+    <!-- TÍTULO -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="fw-bold mb-0">Convocatorias abiertas</h3>
+      <a href="{% url 'convocatorias:convocatorias_home' %}" class="btn btn-link fw-bold">
+        Ver todas →
+      </a>
+    </div>
 
-      <!-- PROMOCIÓN -->
-      <div class="col-auto card-col-5">
-        <div class="card card-area shadow-sm h-100">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/rodaje.jpg' %}"
-              alt="Promoción"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <h5 class="mb-2">Salta Set</h5>
-            <p class="text-muted">
-              Film Commission de la provincia de Salta.
-            </p>
-            <a href="https://saltaset.gob.ar" class="card-plus">
-              <i class="bi bi-plus-circle-fill"></i>
-            </a>
-          </div>
-        </div>
-      </div>
+    <!-- FILTROS -->
+    <div class="mb-4 d-flex flex-wrap gap-2 filtros-convocatorias">
 
-      <!-- FORMACIÓN -->
-      <div class="col-auto card-col-5">
-        <div class="card card-area shadow-sm h-100">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/estudio387.jpg' %}"
-              alt="Formación"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <h5 class="mb-2">Formación</h5>
-            <p class="text-muted">
-              Programas y talleres para capacitación profesional.
-            </p>
-            <a href="{% url 'convocatorias:convocatorias_home' %}" class="card-plus">
-              <i class="bi bi-plus-circle-fill"></i>
-            </a>
-          </div>
-        </div>
-      </div>
+      <a href="?"
+        class="filtro {% if not request.GET.categoria %}active{% endif %}">
+        Todas
+      </a>
 
-      <!-- EXHIBICIÓN -->
-      <div class="col-auto card-col-5">
-        <div class="card card-area shadow-sm h-100">
-          <div class="card-img-top-area">
-            <img
-              src="{% static 'sitio_publico/img/cinemovil.jpg' %}"
-              alt="Exhibición"
-              class="img-area"
-            />
-          </div>
-          <div class="card-body">
-            <h5 class="mb-2">Exhibición</h5>
-            <p class="text-muted">
-              Cine Móvil, La semana de cine y proyecciones de cine.
-            </p>
-            <a href="#" class="card-plus">
-              <i class="bi bi-plus-circle-fill"></i>
-            </a>
-          </div>
+      <a href="?categoria=CONCURSO"
+        class="filtro {% if request.GET.categoria == 'CONCURSO' %}active{% endif %}">
+        Concursos
+      </a>
+
+      <a href="?categoria=PROGRAMA"
+        class="filtro {% if request.GET.categoria == 'PROGRAMA' %}active{% endif %}">
+        Programas
+      </a>
+
+      <a href="?categoria=SUBSIDIO"
+        class="filtro {% if request.GET.categoria == 'SUBSIDIO' %}active{% endif %}">
+        Subsidios
+      </a>
+
+      <a href="?categoria=CURSO"
+        class="filtro {% if request.GET.categoria == 'CURSO' %}active{% endif %}">
+        Cursos
+      </a>
+
+      <a href="?categoria=INCENTIVO"
+        class="filtro {% if request.GET.categoria == 'INCENTIVO' %}active{% endif %}">
+        Incentivos
+      </a>
+
+      <a href="?categoria=BENEFICIO"
+        class="filtro {% if request.GET.categoria == 'BENEFICIO' %}active{% endif %}">
+        Beneficios
+      </a>
+    </div>
+
+
+    <!-- CONTENIDO -->
+    {% if vigentes %}
+    <div class="row g-3">
+
+    {% for c in vigentes %}
+    <div class="col-md-6 col-lg-3">
+
+      <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+         class="convocatoria-card-mubi">
+
+        {% if c.imagen %}
+          <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+        {% else %}
+          <div class="convocatoria-placeholder"></div>
+        {% endif %}
+
+        <div class="overlay">
+          <span class="categoria">
+            {{ c.get_categoria_display }}
+          </span>
+
+          <h5 class="titulo">
+            {{ c.titulo }}
+          </h5>
+
+          <p class="fecha">
+            Abierta hasta {{ c.fecha_fin|date:"d/m/Y" }}
+          </p>
         </div>
-      </div>
+
+      </a>
 
     </div>
+    {% endfor %}
+
   </div>
+
+{% else %}
+  <!-- MENSAJE CUANDO NO HAY RESULTADOS -->
+  <div class="alert alert-light border text-muted">
+    No hay convocatorias abiertas en esta categoría en este momento.
+  </div>
+{% endif %}
+</div>
 </section>
+
 
 <section class="py-5">
   <div class="container">
-    {% comment %} <h3 class="fw-bold mb-4">Servicios</h3> {% endcomment %}
+    <h3 class="fw-bold mb-4">Gestiones y trámites</h3>
 
     <div class="row g-3 justify-content-center">
 
-      <!-- CARD 1 -->
-      <div class="col-auto card-col-5">
-        <div class="card card_servs text-white mb-3">
+      <div class="col-sm-6 col-lg-3">
+        <div class="card h-100 text-center shadow-sm">
           <div class="card-body">
-            <h5 class="card-titlen mb-4">Registro Audiovisual</h5>
-            <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}" class="btn btn-outline-light btn-lg boton-programa mb-3">
-              Registrame
+            <h6 class="fw-bold mb-3">Registro Audiovisual</h6>
+            <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}" class="btn btn-outline-primary btn-sm">
+              Iniciar registro
             </a>
           </div>
         </div>
       </div>
 
-      <!-- CARD 2 -->
-      <div class="col-auto card-col-5">
-        <div class="card card_servs text-white mb-3">
+      <div class="col-sm-6 col-lg-3">
+        <div class="card h-100 text-center shadow-sm">
           <div class="card-body">
-            <h5 class="card-title mb-4">Exención impositiva</h5>
-            <a href="{% url 'exencion:iniciar' %}" class="btn btn-outline-light btn-lg boton-programa mb-3">
-              Solicitar aquí
+            <h6 class="fw-bold mb-3">Exención impositiva</h6>
+            <a href="{% url 'exencion:iniciar' %}" class="btn btn-outline-primary btn-sm">
+              Solicitar
             </a>
           </div>
         </div>
       </div>
 
-      <!-- CARD 3 -->
-      <div class="col-auto card-col-5">
-        <div class="card card_servs text-white mb-3">
+      <div class="col-sm-6 col-lg-3">
+        <div class="card h-100 text-center shadow-sm">
           <div class="card-body">
-            <h5 class="card-title mb-4">Solicitud Cine Móvil</h5>
-            <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}" class="btn btn-outline-light btn-lg boton-programa mb-3">
-              Solicitar aquí
+            <h6 class="fw-bold mb-3">Cine Móvil</h6>
+            <a href="#" class="btn btn-outline-primary btn-sm">
+              Solicitar
             </a>
           </div>
         </div>
       </div>
 
-      <!-- CARD 4 -->
-      <div class="col-auto card-col-5">
-        <div class="card card_servs text-white  mb-3">
+      <div class="col-sm-6 col-lg-3">
+        <div class="card h-100 text-center shadow-sm">
           <div class="card-body">
-            <h5 class="card-title mb-4">Solicitud de avales</h5>
-            <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}" class="btn btn-outline-light btn-lg boton-programa mb-3">
-              Solicitar aquí
+            <h6 class="fw-bold mb-3">Avales institucionales</h6>
+            <a href="#" class="btn btn-outline-primary btn-sm">
+              Solicitar
             </a>
           </div>
         </div>
@@ -289,36 +284,4 @@
   </div>
 </section>
 
-
-{% if vigentes %}
-<section class="py-4">
-  <div class="container">
-    <h3 class="fw-bold mb-4">Convocatorias abiertas</h3>
-
-    <div class="row">
-      {% for c in vigentes %}
-      <div class="col-md-4">
-        <div class="card mb-3 shadow-sm">
-          <div class="card-body">
-            <h5 class="fw-bold">{{ c.titulo }}</h5>
-
-            <p class="text-muted small">{{ c.get_categoria_display }}</p>
-
-            <p class="text-muted small mb-2">
-              Vigente hasta el {{ c.fecha_fin|date:"d/m/Y" }}
-            </p>
-
-            <a
-              href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
-              class="btn btn-primary btn-sm"
-            >
-              Ver más +
-            </a>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-{% endif %} {% endblock %}
+{% endblock %} 

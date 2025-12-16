@@ -32,7 +32,6 @@ def seleccionar_tipo_registro(request):
 def editar_persona_humana(request):
     user = request.user
 
-    # Si existe, se edita; si no, se crea
     persona_existente = PersonaHumana.objects.filter(user=user).first()
 
     if request.method == "POST":
@@ -41,6 +40,7 @@ def editar_persona_humana(request):
         if form.is_valid():
             persona = form.save(commit=False)
             persona.user = user
+            persona.email = user.email  # 🔑 aseguramos email
             persona.save()
 
             return redirect(
@@ -49,13 +49,19 @@ def editar_persona_humana(request):
             )
 
     else:
-        form = PersonaHumanaForm(instance=persona_existente)
+        form = PersonaHumanaForm(
+            instance=persona_existente,
+            initial={
+                "email": user.email  # 🔑 prellenado
+            }
+        )
 
     return render(
         request,
         "registro/editar_persona_humana.html",
         {"form": form}
     )
+
 
 
 # ============================================================
@@ -74,6 +80,7 @@ def editar_persona_juridica(request):
         if form.is_valid():
             persona = form.save(commit=False)
             persona.user = user
+            persona.email = user.email  # 🔑 aseguramos email
             persona.save()
 
             return redirect(
@@ -82,7 +89,12 @@ def editar_persona_juridica(request):
             )
 
     else:
-        form = PersonaJuridicaForm(instance=persona_existente)
+        form = PersonaJuridicaForm(
+            instance=persona_existente,
+            initial={
+                "email": user.email  # 🔑 prellenado
+            }
+        )
 
     return render(
         request,

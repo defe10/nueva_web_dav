@@ -6,23 +6,36 @@
 </head>
 <body>
 
+  <!-- =========================
+       ENCABEZADO
+  ========================== -->
   <div class="header">
-    <img src="{{ logo_path }}" class="logo-titulo">
+    <img src="{{ logo_path }}" class="logo-titulo" alt="Secretaría de Cultura">
     <div class="codigo">
       <strong>FRC-75</strong><br>
-      Constancia de Inscripción
+      Constancia de Exención Impositiva
     </div>
   </div>
 
+  <!-- =========================
+       TÍTULO
+  ========================== -->
   <div class="titulo">
     <h2>Constancia de inscripción en el Registro Audiovisual</h2>
   </div>
 
+  <!-- =========================
+       TEXTO INTRODUCTORIO
+  ========================== -->
   <p class="texto-principal">
     Por la presente se deja constancia de que la persona humana o jurídica que se detalla a continuación
-    se encuentra inscripta para acceder al beneficio de exención impositiva conforme a la normativa vigente.
+    se encuentra debidamente inscripta en el Registro Audiovisual de la Provincia de Salta y cumple con
+    los requisitos establecidos para acceder al beneficio de exención impositiva, conforme a la normativa vigente.
   </p>
 
+  <!-- =========================
+       DATOS DE LA EXENCIÓN
+  ========================== -->
   <div class="cuadro-datos">
 
     <div class="fila">
@@ -45,44 +58,66 @@
       <div class="fila-valor">{{ exencion.email }}</div>
     </div>
 
+    <!-- =========================
+         DOMICILIO FISCAL
+    ========================== -->
     <div class="fila">
       <div class="fila-label">Domicilio fiscal:</div>
-      <div class="fila-valor">{{ exencion.domicilio_fiscal }}</div>
+      <div class="fila-valor">
+        {{ exencion.domicilio_fiscal }}
+        {% if exencion.localidad_fiscal %}
+          – {{ exencion.get_localidad_fiscal_display }}
+        {% endif %}
+        {% if exencion.codigo_postal_fiscal %}
+          (CP {{ exencion.codigo_postal_fiscal }})
+        {% endif %}
+      </div>
     </div>
 
+    <!-- =========================
+         ACTIVIDAD
+    ========================== -->
     <div class="fila">
       <div class="fila-label">Actividad declarada:</div>
-        <div class="fila-valor">
-          {% if exencion.persona_humana %}
-          {{ exencion.persona_humana.get_actividad_dgr_display }}
-          {% elif exencion.persona_juridica %}
-          {{ exencion.persona_juridica.get_actividad_dgr_display }}
-          {% else %}
-          —
-          {% endif %}
+      <div class="fila-valor">
+        {{ exencion.actividad_dgr }}
+      </div>
+    </div>
+
+    <!-- =========================
+         FECHAS
+    ========================== -->
+    <div class="fila">
+      <div class="fila-label">Fecha de emisión:</div>
+      <div class="fila-valor">
+        {{ exencion.fecha_emision|date:"d/m/Y" }}
       </div>
     </div>
 
     <div class="fila">
-      <div class="fila-label">Fecha de emisión:</div>
-      <div class="fila-valor">{{ exencion.fecha_emision|date:"d/m/Y" }}</div>
-    </div>
-
-    <div class="fila">
       <div class="fila-label">Válida hasta:</div>
-      <div class="fila-valor">{{ exencion.fecha_vencimiento|date:"d/m/Y" }}</div>
+      <div class="fila-valor">
+        {{ exencion.fecha_vencimiento|date:"d/m/Y" }}
+      </div>
     </div>
 
   </div>
 
+  <!-- =========================
+       FECHA FORMAL
+  ========================== -->
   <p class="fechas">
-    Salta, {{ exencion.fecha_emision|date:"d" }} de
+    Salta,
+    {{ exencion.fecha_emision|date:"d" }} de
     {{ exencion.fecha_emision|date:"F" }} de
     {{ exencion.fecha_emision|date:"Y" }}.
   </p>
 
+  <!-- =========================
+       FIRMA
+  ========================== -->
   <div class="firma">
-    <img src="{{ firma_path }}" class="firma-img"    alt="Firma">
+    <img src="{{ firma_path }}" class="firma-img" alt="Firma">
     <div class="firma-nombre">Secretaría de Cultura</div>
     <div class="firma-cargo">Gobierno de la Provincia de Salta</div>
   </div>

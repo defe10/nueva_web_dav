@@ -174,3 +174,7 @@ LOGIN_REDIRECT_URL = '/registro/seleccionar-tipo/'
 # ============================================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" #DESARROLLO
+

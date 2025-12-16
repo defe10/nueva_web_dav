@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 LUGARES_RESIDENCIA = [
     ('', '- Seleccionar -'),
     ('SC', 'Salta Capital'),
+    ("otro", "Otro"),
     ('Ag', 'Aguaray'),
     ('AB', 'Aguas Blancas'),
     ('An', 'Angastaco'),
@@ -61,7 +62,6 @@ LUGARES_RESIDENCIA = [
     ('TG', 'Tolar Grande'),
     ('Ur', 'Urundel'),
     ('Va', 'Vaqueros'),
-    ("otro", "Otro"),
 ]
 
 SITUACION_IVA = [('', '- Seleccionar -'),
@@ -190,74 +190,136 @@ AREA_CULTURAL = [
 # -------------------------------
 
 class PersonaHumana(models.Model):
+
+    # ------------------
+    # Datos personales
+    # ------------------
     nombre_completo = models.CharField(max_length=200)
     cuil_cuit = models.CharField(max_length=20)
     fecha_nacimiento = models.DateField()
     edad = models.PositiveIntegerField()
-    genero = models.CharField(max_length=50, choices=[
-        ('', '- Seleccionar -'),
-        ("M", "Masculino"),
-        ("F", "Femenino"),
-        ("NB", "No binario"),
-        ("O", "Otro"),
-    ])
+
+    genero = models.CharField(
+        max_length=10,
+        choices=[
+            ('', '- Seleccionar -'),
+            ('M', 'Masculino'),
+            ('F', 'Femenino'),
+            ('NB', 'No binario'),
+            ('O', 'Otro'),
+        ]
+    )
+
+    nivel_educativo = models.CharField(
+        max_length=50,
+        choices=[
+            ('', '- Seleccionar -'),
+            ('Pc', 'Primario completo'),
+            ('Sc', 'Secundario completo'),
+            ('Tc', 'Terciario completo'),
+            ('Uc', 'Universitario completo'),
+            ('Pos', 'Posgrado completo'),
+        ],
+        verbose_name="Nivel educativo alcanzado"
+    )
+
+    # ------------------
+    # Domicilio real (OBLIGATORIO)
+    # ------------------
     lugar_residencia = models.CharField(
-    max_length=100,
-    choices=LUGARES_RESIDENCIA,
-    default="",
-)
+        max_length=100,
+        choices=LUGARES_RESIDENCIA
+    )
+
     otro_lugar_residencia = models.CharField(
-    max_length=150,
-    blank=True,
-    null=True,
-)
-    nivel_educativo = models.CharField(max_length=50, choices=[
-        ('', '- Seleccionar -'),
-        ('Pc', 'Primario completo'),
-        ('Sc', 'Secundario completo'),
-        ('Tc', 'Terciario completo'),
-        ('Uc', 'Universitario completo'),
-        ('Pos', 'Posgrado completo'),
-    ])
+        max_length=150,
+        blank=True,
+        null=True
+    )
+
     domicilio_real = models.CharField(max_length=250)
+    codigo_postal_real = models.CharField(max_length=10)
+
     telefono = models.CharField(max_length=50)
     email = models.EmailField()
 
+    # Relación con usuario
     user = models.OneToOneField(
-    User,
-    on_delete=models.CASCADE,
-    related_name="persona_humana",
-    null=True,
-    blank=True
-)
+        User,
+        on_delete=models.CASCADE,
+        related_name="persona_humana",
+        null=True,
+        blank=True
+    )
 
-
-    # Datos fiscales
+    # ------------------
+    # Datos fiscales (NO obligatorios en registro)
+    # ------------------
     situacion_iva = models.CharField(
-    max_length=100,
-    choices=SITUACION_IVA,
-    default="",
-)
+        max_length=5,
+        choices=SITUACION_IVA,
+        blank=True,
+        null=True
+    )
+
     actividad_dgr = models.CharField(
-    max_length=50,
-    choices=ACTIVIDAD_DGR,
-    default="",
-)
-    domicilio_fiscal = models.CharField(max_length=250, blank=True, null=True)
+        max_length=10,
+        choices=ACTIVIDAD_DGR,
+        blank=True,
+        null=True
+    )
 
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    domicilio_fiscal = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True
+    )
 
+    codigo_postal_fiscal = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True
+    )
 
+    localidad_fiscal = models.CharField(
+        max_length=100,
+        choices=LUGARES_RESIDENCIA,
+        blank=True,
+        null=True
+    )
+
+    # ------------------
     # Datos profesionales
-    area_desempeno_1 = models.CharField(max_length=50, choices=AREA_DESEMPENO_1, verbose_name="Área de desempeño 1")
-    area_desempeno_2 = models.CharField(max_length=50, choices=AREA_DESEMPENO_2, verbose_name="Área de desempeño 2")
-    area_cultural = models.CharField(max_length=50, choices=AREA_CULTURAL, verbose_name="Área cultural complementaria")
+    # ------------------
+    area_desempeno_1 = models.CharField(
+        max_length=50,
+        choices=AREA_DESEMPENO_1,
+        verbose_name="Área de desempeño principal"
+    )
+
+    area_desempeno_2 = models.CharField(
+        max_length=50,
+        choices=AREA_DESEMPENO_2,
+        blank=True,
+        null=True,
+        verbose_name="Área de desempeño secundaria"
+    )
+
+    area_cultural = models.CharField(
+        max_length=50,
+        choices=AREA_CULTURAL,
+        verbose_name="Área cultural complementaria"
+    )
+
     link_1 = models.CharField(max_length=250)
     link_2 = models.CharField(max_length=250, blank=True, null=True)
     link_3 = models.CharField(max_length=250, blank=True, null=True)
 
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return self.nombre_completo
+
 
 
 # -------------------------------
@@ -265,29 +327,50 @@ class PersonaHumana(models.Model):
 # -------------------------------
 
 class PersonaJuridica(models.Model):
-    tipo_persona_juridica = models.CharField(max_length=100, choices=[
-        ("asociacion", "Asociación Civil"),
-        ("fundacion", "Fundación"),
-        ("empresa", "Empresa"),
-        ("cooperativa", "Cooperativa"),
-    ])
+
+    tipo_persona_juridica = models.CharField(
+        max_length=100,
+        choices=[
+            ("asociacion", "Asociación Civil"),
+            ("fundacion", "Fundación"),
+            ("empresa", "Empresa"),
+            ("cooperativa", "Cooperativa"),
+        ]
+    )
+
     cuil_cuit = models.CharField(max_length=20)
     razon_social = models.CharField(max_length=200)
-    nombre_comercial = models.CharField(max_length=200, blank=True, null=True)
+    nombre_comercial = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True
+    )
 
+    # ------------------
+    # Datos fiscales (OBLIGATORIOS)
+    # ------------------
     domicilio_fiscal = models.CharField(max_length=250)
-    lugar_residencia = models.CharField(
-    max_length=100,
-    choices=LUGARES_RESIDENCIA,
-    default="",
-)
-    otro_lugar_residencia = models.CharField(
-    max_length=150,
-    blank=True,
-    null=True,
-)
 
-    # Fecha de constitución (antes usabas fecha_nacimiento)
+    localidad_fiscal = models.CharField(
+        max_length=100,
+        choices=LUGARES_RESIDENCIA
+    )
+
+    codigo_postal_fiscal = models.CharField(max_length=10)
+
+    situacion_iva = models.CharField(
+        max_length=5,
+        choices=SITUACION_IVA
+    )
+
+    actividad_dgr = models.CharField(
+        max_length=10,
+        choices=ACTIVIDAD_DGR
+    )
+
+    # ------------------
+    # Datos institucionales
+    # ------------------
     fecha_constitucion = models.DateField()
     antiguedad = models.PositiveIntegerField()
 
@@ -295,36 +378,34 @@ class PersonaJuridica(models.Model):
     email = models.EmailField()
 
     user = models.OneToOneField(
-    User,
-    on_delete=models.CASCADE,
-    related_name="persona_juridica",
-    null=True,
-    blank=True
-)
+        User,
+        on_delete=models.CASCADE,
+        related_name="persona_juridica",
+        null=True,
+        blank=True
+    )
 
-
-    # Datos fiscales
-    situacion_iva = models.CharField(
-    max_length=100,
-    choices=SITUACION_IVA,
-    default="",
-)
-    actividad_dgr = models.CharField(
-    max_length=50,
-    choices=ACTIVIDAD_DGR,
-    default="",
-)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-
-
+    # ------------------
     # Datos profesionales
-    area_desempeno_JJPP_1 = models.CharField(max_length=50, choices=AREA_DESEMPENO_PPJJ_1, verbose_name="Área de desempeño PPJJ 1")
-    area_desempeno_JJPP_2 = models.CharField(max_length=50, choices=AREA_DESEMPENO_PPJJ_2, verbose_name="Área de desempeño PPJJ 2")
+    # ------------------
+    area_desempeno_JJPP_1 = models.CharField(
+        max_length=50,
+        choices=AREA_DESEMPENO_PPJJ_1,
+        verbose_name="Área de desempeño principal"
+    )
+
+    area_desempeno_JJPP_2 = models.CharField(
+        max_length=50,
+        choices=AREA_DESEMPENO_PPJJ_2,
+        verbose_name="Área de desempeño secundaria"
+    )
+
     link_1 = models.CharField(max_length=250)
     link_2 = models.CharField(max_length=250)
     link_3 = models.CharField(max_length=250)
 
-
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.razon_social
+

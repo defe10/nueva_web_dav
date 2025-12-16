@@ -50,6 +50,18 @@
       <div class="col-lg-8">
         <div class="memberRegistro mb-5 text-left" id="documentacion">
 
+          {% if error_fiscal %}
+          <div class="alert alert-warning">
+            <strong>No es posible enviar la documentación.</strong><br>
+            Para solicitar una exención impositiva debés completar todos los datos fiscales
+            en el Registro Audiovisual.<br><br>
+            <a href="{% url 'registro_audiovisual:editar_persona_humana' %}" class="btn btn-sm btn-outline-primary">
+            Completar datos fiscales
+            </a>
+          </div>
+          {% endif %}
+
+
           <form method="post" enctype="multipart/form-data" class="row datos_pers">
             {% csrf_token %}
 

@@ -2,12 +2,13 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
-from convocatorias.models import Convocatoria
-from registro_audiovisual.models import PersonaHumana, PersonaJuridica
-
 from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
+
+from convocatorias.models import Convocatoria
+from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 from .utils import generar_pdf_exencion
+
 
 ESTADOS_EXENCION = [
     ("ENVIADA", "Enviada"),
@@ -44,11 +45,15 @@ class Exencion(models.Model):
         null=True
     )
 
-    # Datos que van al PDF
+    # Datos que van al PDF (congelados en la exención)
     nombre_razon_social = models.CharField(max_length=255)
     email = models.EmailField()
     cuit = models.CharField(max_length=20)
+
     domicilio_fiscal = models.CharField(max_length=255)
+    localidad_fiscal = models.CharField(max_length=100, blank=True, null=True)
+    codigo_postal_fiscal = models.CharField(max_length=10, blank=True, null=True)
+
     actividad_dgr = models.CharField(max_length=255)
 
     # Estado
@@ -92,13 +97,42 @@ class Exencion(models.Model):
         self.estado = "APROBADA"
         self.fecha_emision = hoy
         self.fecha_vencimiento = hoy.replace(year=hoy.year + 1)
-        self.save(
-            update_fields=[
-                "estado",
-                "fecha_emision",
-                "fecha_vencimiento"
-            ]
+        self.save(update_fields=["estado", "fecha_emision", "fecha_vencimiento"])
+
+    def aprobar_y_generar_pdf(self):
+        """
+        Aprueba la exención, genera el PDF y lo envía por mail.
+        (Útil si querés llamarlo desde admin o desde otra capa)
+        """
+        # 1) Aprobar
+        self.marcar_aprobada()
+
+        # 2) Generar PDF
+        pdf_content = generar_pdf_exencion(self)
+        filename = f"Constancia_{self.numero_constancia}.pdf"
+
+        self.certificado_pdf.save(
+            filename,
+            ContentFile(pdf_content),
+            save=True
         )
+
+        # 3) Enviar correo
+        if self.email:
+            email = EmailMessage(
+                subject=f"Constancia de exención {self.numero_constancia}",
+                body=(
+                    f"Hola {self.nombre_razon_social},\n\n"
+                    "Tu solicitud de exención impositiva fue aprobada.\n"
+                    "Adjuntamos la constancia en formato PDF.\n\n"
+                    "Secretaría de Cultura de Salta"
+                ),
+                to=[self.email],
+            )
+            email.attach(filename, pdf_content, "application/pdf")
+            email.send()
+
+
 class ExencionDocumento(models.Model):
     exencion = models.ForeignKey(
         Exencion,
@@ -114,36 +148,3 @@ class ExencionDocumento(models.Model):
 
     def __str__(self):
         return f"Documento {self.id} – Exención {self.exencion_id}"
-
-def aprobar_y_generar_pdf(self):
-    """
-    Aprueba la exención, genera el PDF y lo envía por mail.
-    """
-
-    # 1. Aprobar
-    self.marcar_aprobada()
-
-    # 2. Generar PDF
-    pdf_content = generar_pdf_exencion(self)
-    filename = f"Constancia_{self.numero_constancia}.pdf"
-
-    self.certificado_pdf.save(
-        filename,
-        ContentFile(pdf_content),
-        save=True
-    )
-
-    # 3. Enviar correo
-    if self.email:
-        email = EmailMessage(
-            subject=f"Constancia de exención {self.numero_constancia}",
-            body=(
-                f"Hola {self.nombre_razon_social},\n\n"
-                "Tu solicitud de exención impositiva fue aprobada.\n"
-                "Adjuntamos la constancia en formato PDF.\n\n"
-                "Secretaría de Cultura de Salta"
-            ),
-            to=[self.email],
-        )
-        email.attach(filename, pdf_content, "application/pdf")
-        email.send()

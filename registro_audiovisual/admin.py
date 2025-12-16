@@ -1,53 +1,55 @@
 from django.contrib import admin
-from .models import PersonaHumana, PersonaJuridica
-import openpyxl
-from openpyxl.utils import get_column_letter
 from django.http import HttpResponse
+import openpyxl
+
+from .models import PersonaHumana, PersonaJuridica
 
 
 # ============================================================
-# ACCIÓN GLOBAL — EXPORTAR A EXCEL (CSV)
+# ACCIÓN GLOBAL — EXPORTAR A EXCEL (.xlsx)
 # ============================================================
 
 def exportar_excel(modeladmin, request, queryset):
     """
-    Exporta los registros seleccionados a un archivo XLSX real.
+    Exporta los registros seleccionados a un archivo XLSX.
+    Muestra los valores legibles de choices cuando corresponde.
     """
 
-    # Crear workbook
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Datos"
 
-    # Obtener todos los campos del modelo
+    # Campos del modelo
     campos = [field.name for field in modeladmin.model._meta.fields]
 
-    # Escribir encabezados
+    # Encabezados
     for col, campo in enumerate(campos, start=1):
         ws.cell(row=1, column=col, value=campo)
 
-    # Escribir datos
+    # Filas
     for row, obj in enumerate(queryset, start=2):
         for col, campo in enumerate(campos, start=1):
             valor = getattr(obj, campo)
 
-            # Si es fecha u objeto complejo → convertir a string
-            if callable(valor):
-                valor = valor()
+            # Si es campo con choices → mostrar display
+            try:
+                display_method = f"get_{campo}_display"
+                if hasattr(obj, display_method):
+                    valor = getattr(obj, display_method)()
+            except Exception:
+                pass
+
             if valor is None:
                 valor = ""
-                
+
             ws.cell(row=row, column=col, value=str(valor))
 
-    # Preparar respuesta HTTP
     nombre = modeladmin.model.__name__.lower()
 
     response = HttpResponse(
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={
-            "Content-Disposition": f'attachment; filename="{nombre}.xlsx"'
-        },
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+    response["Content-Disposition"] = f'attachment; filename="{nombre}.xlsx"'
 
     wb.save(response)
     return response
@@ -78,20 +80,25 @@ class PersonaHumanaAdmin(admin.ModelAdmin):
         "otro_lugar_residencia",
         "nivel_educativo",
         "domicilio_real",
+        "codigo_postal_real",
         "telefono",
         "email",
         "situacion_iva",
         "actividad_dgr",
         "domicilio_fiscal",
+        "localidad_fiscal",
+        "codigo_postal_fiscal",
         "area_desempeno_1",
         "area_desempeno_2",
         "area_cultural",
-        "link_1",
-        "link_2",
-        "link_3",
     )
 
-    search_fields = ("nombre_completo", "cuil_cuit", "email", "telefono")
+    search_fields = (
+        "nombre_completo",
+        "cuil_cuit",
+        "email",
+        "telefono",
+    )
 
     list_filter = (
         "genero",
@@ -104,6 +111,8 @@ class PersonaHumanaAdmin(admin.ModelAdmin):
 
     ordering = ("-fecha_creacion",)
 
+    readonly_fields = ("fecha_creacion",)
+
     fieldsets = (
         ("🔹 Datos Personales", {
             "fields": (
@@ -114,6 +123,7 @@ class PersonaHumanaAdmin(admin.ModelAdmin):
                 ("lugar_residencia", "otro_lugar_residencia"),
                 "nivel_educativo",
                 "domicilio_real",
+                "codigo_postal_real",
                 ("telefono", "email"),
             )
         }),
@@ -123,6 +133,8 @@ class PersonaHumanaAdmin(admin.ModelAdmin):
                 "situacion_iva",
                 "actividad_dgr",
                 "domicilio_fiscal",
+                "localidad_fiscal",
+                "codigo_postal_fiscal",
             )
         }),
 
@@ -142,8 +154,6 @@ class PersonaHumanaAdmin(admin.ModelAdmin):
         }),
     )
 
-    readonly_fields = ("fecha_creacion",)
-
 
 # ============================================================
 # PERSONA JURÍDICA
@@ -162,8 +172,8 @@ class PersonaJuridicaAdmin(admin.ModelAdmin):
         "cuil_cuit",
         "tipo_persona_juridica",
         "domicilio_fiscal",
-        "lugar_residencia",
-        "otro_lugar_residencia",
+        "localidad_fiscal",
+        "codigo_postal_fiscal",
         "fecha_constitucion",
         "antiguedad",
         "email",
@@ -172,23 +182,28 @@ class PersonaJuridicaAdmin(admin.ModelAdmin):
         "actividad_dgr",
         "area_desempeno_JJPP_1",
         "area_desempeno_JJPP_2",
-        "link_1",
-        "link_2",
-        "link_3",
         "fecha_creacion",
     )
 
-    search_fields = ("razon_social", "cuil_cuit", "email", "telefono")
+    search_fields = (
+        "razon_social",
+        "nombre_comercial",
+        "cuil_cuit",
+        "email",
+        "telefono",
+    )
 
     list_filter = (
         "tipo_persona_juridica",
-        "lugar_residencia",
+        "localidad_fiscal",
         "situacion_iva",
         "actividad_dgr",
         "fecha_constitucion",
     )
 
     ordering = ("-fecha_creacion",)
+
+    readonly_fields = ("fecha_creacion",)
 
     fieldsets = (
         ("🔹 Datos Jurídicos", {
@@ -201,12 +216,12 @@ class PersonaJuridicaAdmin(admin.ModelAdmin):
             )
         }),
 
-        ("🔹 Contacto y Domicilio", {
+        ("🔹 Domicilio Fiscal y Contacto", {
             "fields": (
                 "domicilio_fiscal",
-                ("lugar_residencia", "otro_lugar_residencia"),
-                "email",
-                "telefono",
+                "localidad_fiscal",
+                "codigo_postal_fiscal",
+                ("email", "telefono"),
             )
         }),
 
@@ -231,5 +246,3 @@ class PersonaJuridicaAdmin(admin.ModelAdmin):
             "fields": ("fecha_creacion",)
         }),
     )
-
-    readonly_fields = ("fecha_creacion",)

@@ -3,183 +3,191 @@
 
 {% block content %}
 
+<!-- ========================================================= -->
 <!-- HERO -->
-<section class="fomento-hero text-center">
-  <h1 class="fw-bold mb-3">Convocatorias y Programas</h1>
-  <p class="lead text-muted">
-    Descubrí todas las líneas del Plan IDEA, cursos de formación e incentivos audiovisuales disponibles en la provincia.
-  </p>
+<!-- ========================================================= -->
+<section class="py-5 text-center bg-light border-bottom">
+  <div class="container">
+    <h1 class="fw-bold mb-3">Convocatorias y Programas</h1>
+    <p class="lead text-muted mb-0">
+      Convocatorias, programas, cursos e incentivos audiovisuales vigentes
+      en la provincia de Salta.
+    </p>
+  </div>
 </section>
 
-<div class="container">
+<!-- ========================================================= -->
+<!-- CONVOCATORIAS (ESTILO INICIO / MUBI) -->
+<!-- ========================================================= -->
+<section class="py-5">
+  <div class="container">
 
-  <!-- =============================================== -->
-  <!-- 1) LÍNEAS DE FOMENTO (PLAN IDEA) -->
-  <!-- =============================================== -->
-  <h2 class="seccion-titulo">Líneas de Fomento · PLAN IDEA</h2>
+    <!-- TÍTULO -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="fw-bold mb-0">Convocatorias abiertas</h2>
+    </div>
 
-  <div class="carrusel-fondo">
-    <div class="carrusel-wrap">
-      <div class="flecha izq" onclick="moverCarrusel(this, -1)">‹</div>
-      <div class="flecha der" onclick="moverCarrusel(this, 1)">›</div>
+    <!-- FILTROS (NEGRO / EDITORIAL) -->
+    <div class="mb-4 d-flex flex-wrap gap-2 filtros-convocatorias">
 
-      <div class="carrusel">
+      <a href="?"
+         class="filtro {% if not request.GET.categoria %}active{% endif %}">
+        Todas
+      </a>
+
+      <a href="?categoria=CONCURSO"
+         class="filtro {% if request.GET.categoria == 'CONCURSO' %}active{% endif %}">
+        Concursos
+      </a>
+
+      <a href="?categoria=PROGRAMA"
+         class="filtro {% if request.GET.categoria == 'PROGRAMA' %}active{% endif %}">
+        Programas
+      </a>
+
+      <a href="?categoria=SUBSIDIO"
+         class="filtro {% if request.GET.categoria == 'SUBSIDIO' %}active{% endif %}">
+        Subsidios
+      </a>
+
+      <a href="?categoria=CURSO"
+         class="filtro {% if request.GET.categoria == 'CURSO' %}active{% endif %}">
+        Cursos
+      </a>
+
+      <a href="?categoria=INCENTIVO"
+         class="filtro {% if request.GET.categoria == 'INCENTIVO' %}active{% endif %}">
+        Incentivos
+      </a>
+
+      <a href="?categoria=BENEFICIO"
+         class="filtro {% if request.GET.categoria == 'BENEFICIO' %}active{% endif %}">
+        Beneficios
+      </a>
+
+    </div>
+
+    <!-- GRID DE CARDS -->
+    {% if fomento or formacion or incentivo or beneficio %}
+      <div class="row g-3">
+
         {% for c in fomento %}
-        <div class="card-area h-100">
-          <div class="card-img-top-area">
-            {% if c.imagen %}
-              <img src="{{ c.imagen.url }}" class="img-area">
-            {% else %}
-              <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
-            {% endif %}
-          </div>
-
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1">
-              {{ c.get_categoria_display }}
-            </small>
-
-            <h5 class="mb-2">{{ c.titulo }}</h5>
-
-            <p class="small text-muted">
-              {{ c.descripcion_corta|truncatewords:20 }}
-            </p>
-
+          {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
+          <div class="col-md-6 col-lg-4">
             <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
-               class="card-plus">
-              <i class="bi bi-plus-circle-fill"></i>
+               class="convocatoria-card-mubi">
+
+              {% if c.imagen %}
+                <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+              {% else %}
+                <div class="convocatoria-placeholder"></div>
+              {% endif %}
+
+              <div class="overlay">
+                <span class="categoria">
+                  {{ c.get_categoria_display }}
+                </span>
+                <h5 class="titulo">{{ c.titulo }}</h5>
+                <p class="fecha">
+                  Abierta hasta {{ c.fecha_fin|date:"d/m/Y" }}
+                </p>
+              </div>
+
             </a>
           </div>
-        </div>
-        {% empty %}
-          <p class="text-muted small ps-3">
-            No hay convocatorias disponibles.
-          </p>
+          {% endif %}
         {% endfor %}
-      </div>
-    </div>
-  </div>
 
-  <!-- =============================================== -->
-  <!-- 2) INCENTIVOS Y BENEFICIOS -->
-  <!-- =============================================== -->
-  <h2 class="seccion-titulo">Incentivos y Beneficios</h2>
-
-  <div class="row g-4 mb-5">
-
-    {% for c in beneficio %}
-    <div class="col-sm-12 col-md-6 col-lg-3">
-      <div class="card-area h-100">
-        <div class="card-img-top-area">
-          {% if c.imagen %}
-            <img src="{{ c.imagen.url }}" class="img-area">
-          {% else %}
-            <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
-          {% endif %}
-        </div>
-
-        <div class="card-body">
-          <small class="text-muted text-uppercase d-block mb-1">
-            {{ c.get_categoria_display }}
-          </small>
-
-          <h5 class="mb-2">{{ c.titulo }}</h5>
-
-          <p class="small text-muted">
-            {{ c.descripcion_corta|truncatewords:20 }}
-          </p>
-
-          <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
-             class="card-plus">
-            <i class="bi bi-plus-circle-fill"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-
-    {% for c in incentivo %}
-    <div class="col-sm-12 col-md-6 col-lg-3">
-      <div class="card-area h-100">
-        <div class="card-img-top-area">
-          {% if c.imagen %}
-            <img src="{{ c.imagen.url }}" class="img-area">
-          {% else %}
-            <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
-          {% endif %}
-        </div>
-
-        <div class="card-body">
-          <small class="text-muted text-uppercase d-block mb-1">
-            {{ c.get_categoria_display }}
-          </small>
-
-          <h5 class="mb-2">{{ c.titulo }}</h5>
-
-          <p class="small text-muted">
-            {{ c.descripcion_corta|truncatewords:20 }}
-          </p>
-
-          <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
-             class="card-plus">
-            <i class="bi bi-plus-circle-fill"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-
-    {% if not beneficio and not incentivo %}
-      <p class="text-muted small ps-3">
-        No hay incentivos ni beneficios disponibles.
-      </p>
-    {% endif %}
-  </div>
-
-  <!-- =============================================== -->
-  <!-- 3) CURSOS Y FORMACIÓN -->
-  <!-- =============================================== -->
-  <h2 class="seccion-titulo">Cursos y Formación</h2>
-
-  <div class="carrusel-fondo">
-    <div class="carrusel-wrap">
-      <div class="carrusel">
         {% for c in formacion %}
-        <div class="card card-area shadow-sm h-100">
-          <div class="card-img-top-area">
-            {% if c.imagen %}
-              <img src="{{ c.imagen.url }}" class="img-area">
-            {% else %}
-              <img src="{% static 'sitio_publico/img/default.jpg' %}" class="img-area">
-            {% endif %}
-          </div>
-
-          <div class="card-body">
-            <small class="text-muted text-uppercase d-block mb-1">
-              {{ c.get_categoria_display }}
-            </small>
-
-            <h5 class="mb-2">{{ c.titulo }}</h5>
-
-            <p class="small text-muted">
-              {{ c.descripcion_corta|truncatewords:20 }}
-            </p>
-
+          {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
+          <div class="col-md-6 col-lg-4">
             <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
-               class="card-plus">
-              <i class="bi bi-plus-circle-fill"></i>
+               class="convocatoria-card-mubi">
+
+              {% if c.imagen %}
+                <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+              {% else %}
+                <div class="convocatoria-placeholder"></div>
+              {% endif %}
+
+              <div class="overlay">
+                <span class="categoria">
+                  {{ c.get_categoria_display }}
+                </span>
+                <h5 class="titulo">{{ c.titulo }}</h5>
+                <p class="fecha">
+                  Abierta hasta {{ c.fecha_fin|date:"d/m/Y" }}
+                </p>
+              </div>
+
             </a>
           </div>
-        </div>
-        {% empty %}
-          <p class="text-muted small ps-3">
-            No hay cursos disponibles.
-          </p>
+          {% endif %}
         {% endfor %}
-      </div>
-    </div>
-  </div>
 
-</div>
+        {% for c in incentivo %}
+          {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
+          <div class="col-md-6 col-lg-4">
+            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+               class="convocatoria-card-mubi">
+
+              {% if c.imagen %}
+                <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+              {% else %}
+                <div class="convocatoria-placeholder"></div>
+              {% endif %}
+
+              <div class="overlay">
+                <span class="categoria">
+                  {{ c.get_categoria_display }}
+                </span>
+                <h5 class="titulo">{{ c.titulo }}</h5>
+                <p class="fecha">
+                  Abierta hasta {{ c.fecha_fin|date:"d/m/Y" }}
+                </p>
+              </div>
+
+            </a>
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        {% for c in beneficio %}
+          {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
+          <div class="col-md-6 col-lg-4">
+            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+               class="convocatoria-card-mubi">
+
+              {% if c.imagen %}
+                <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+              {% else %}
+                <div class="convocatoria-placeholder"></div>
+              {% endif %}
+
+              <div class="overlay">
+                <span class="categoria">
+                  {{ c.get_categoria_display }}
+                </span>
+                <h5 class="titulo">{{ c.titulo }}</h5>
+                <p class="fecha">
+                  Abierta hasta {{ c.fecha_fin|date:"d/m/Y" }}
+                </p>
+              </div>
+
+            </a>
+          </div>
+          {% endif %}
+        {% endfor %}
+
+      </div>
+
+    {% else %}
+      <div class="alert alert-light border text-muted">
+        No hay convocatorias abiertas en este momento.
+      </div>
+    {% endif %}
+
+  </div>
+</section>
 
 {% endblock %}
