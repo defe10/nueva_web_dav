@@ -24,6 +24,8 @@ urlpatterns = [
 
     # Beneficios – Exención
     path('exencion/', include('exencion.urls')),
+
+    path("", include("sitio_publico.urls")),
 ]
 
 

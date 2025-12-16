@@ -3,62 +3,75 @@
 
 {% block content %}
 
-<!-- HERO -->
+<!-- HERO UNIFICADO -->
 <section class="fomento-hero text-center">
   <h1 class="fw-bold mb-2">Postulación completada</h1>
-  <p class="text-muted">
+  <p class="text-muted mb-0">
     {{ convocatoria.titulo }}
   </p>
 </section>
 
-<div class="container py-5">
-
+<div class="container mt-2">
   <div class="row justify-content-center">
     <div class="col-lg-8">
 
-      <div class="card shadow-sm text-center">
-        <div class="card-body p-4">
-
-          <!-- Mensaje principal -->
-          <h3 class="mb-3">¡Tu postulación fue enviada correctamente!</h3>
-
-          <p class="text-muted mb-4">
-            Hemos recibido tu postulación para la convocatoria
-            <strong>{{ convocatoria.titulo }}</strong>.<br>
-            Nuestro equipo revisará la información presentada y
-            se contactará con vos en caso de ser necesario.
-          </p>
-
-          <!-- Resumen -->
-          {% if postulacion %}
-          <div class="alert alert-info text-start small">
-            <strong>Resumen de tu envío</strong><br>
-            Postulación Nº: {{ postulacion.id }}<br>
-            Proyecto: {{ postulacion.nombre_proyecto }}<br>
-            Línea: {{ convocatoria.get_linea_display }}<br>
-            Fecha de envío: {{ postulacion.fecha_envio|date:"d/m/Y H:i" }}
-          </div>
-          {% endif %}
-
-          <!-- Botones -->
-          <div class="mt-4 d-flex justify-content-center gap-3">
-            <a href="{% url 'convocatorias:convocatoria_detalle' convocatoria.slug %}"
-               class="btn btn-primary">
-              Ver convocatoria
-            </a>
-
-            <a href="{% url 'convocatorias:convocatorias_home' %}"
-               class="btn btn-outline-primary">
-              Volver a convocatorias
-            </a>
-          </div>
-
-        </div>
+      <div class="dav-steps">
+        <div class="step">1. Datos del proyecto</div>
+        <div class="step">2. Documentación personal</div>
+        <div class="step">3. Documentación del proyecto</div>
+        <div class="step active">4. Completado</div>
       </div>
 
     </div>
   </div>
+</div>
 
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="dav-card text-center">
+
+        <!-- Mensaje principal -->
+        <h3 class="mb-3">
+          ¡Tu postulación fue enviada correctamente!
+        </h3>
+
+        <p class="text-muted mb-4">
+          Hemos recibido tu postulación para la convocatoria
+          <strong>{{ convocatoria.titulo }}</strong>.<br>
+          Nuestro equipo revisará la información presentada y
+          se contactará con vos en caso de ser necesario.
+        </p>
+
+        <!-- Resumen -->
+        {% if postulacion %}
+        <div class="alert alert-info text-start small">
+          <strong>Resumen de tu envío</strong><br>
+          Postulación Nº: {{ postulacion.id }}<br>
+          Proyecto: {{ postulacion.nombre_proyecto }}<br>
+          Línea: {{ convocatoria.get_linea_display }}<br>
+          Fecha de envío: {{ postulacion.fecha_envio|date:"d/m/Y H:i" }}
+        </div>
+        {% endif %}
+
+        <!-- Botones -->
+        <div class="mt-4 d-flex justify-content-center gap-3">
+          <a href="{% url 'convocatorias:convocatoria_detalle' convocatoria.slug %}"
+             class="btn btn-primary">
+            Ver convocatoria
+          </a>
+
+          <a href="{% url 'convocatorias:convocatorias_home' %}"
+             class="btn btn-outline-primary">
+            Volver a convocatorias
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
 </div>
 
 {% endblock %}

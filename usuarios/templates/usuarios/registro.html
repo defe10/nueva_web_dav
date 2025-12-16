@@ -5,7 +5,8 @@
 {% block content %}
 
 <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
-    <div class="card shadow p-4" style="max-width: 480px; width: 100%; border-radius: 12px;">
+    <div class="p-4 shadow"
+         style="max-width: 480px; width: 100%; border-radius: 16px; background: #fff;">
 
         <h3 class="text-center mb-3">Crear cuenta</h3>
         <p class="text-muted text-center">
@@ -15,14 +16,16 @@
         <!-- Mensajes -->
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
 
         <form method="POST" novalidate>
             {% csrf_token %}
 
-            <!-- HONEYPOT (campo invisible para bots) -->
+            <!-- HONEYPOT -->
             <div style="display:none;">
                 {{ form.honeypot }}
             </div>

@@ -1,0 +1,292 @@
+/* ============================================================
+   HERO (UNIFICADO)
+   ============================================================ */
+
+.fomento-hero {
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 60px 35px;
+    margin-bottom: 35px;
+}
+
+/* Variante por si querés un hero más compacto en algunas pantallas */
+@media (max-width: 576px) {
+    .fomento-hero {
+        padding: 45px 20px;
+    }
+}
+
+/* ============================================================
+   BOTONES EDITORIALES (HOME / INSTITUCIONAL)
+   ============================================================ */
+
+.dav-filter {
+    display: inline-block;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 20px;
+    border: 1px solid #cfcfcf;
+    background: #fff;
+    color: #333;
+    text-decoration: none;
+    transition: all .2s ease;
+}
+
+.dav-filter:hover {
+    background: #f0f0f0;
+    color: #000;
+}
+
+.dav-filter.active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+
+
+/* ============================================================
+   HERO TÍTULO CONVOCATORIA (ESTILO MUBI)
+   ============================================================ */
+
+.convocatoria-hero {
+    position: relative;
+    min-height: 220px;
+    border-radius: 16px;
+    background-size: cover;
+    background-position: center;
+    background-color: #e5e5e5;
+    /* fallback */
+    overflow: hidden;
+}
+
+.convocatoria-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+            rgba(0, 0, 0, 0.75),
+            rgba(0, 0, 0, 0.2));
+    display: flex;
+    align-items: flex-end;
+    padding: 24px;
+}
+
+.convocatoria-hero-title {
+    color: #fff;
+    font-weight: 800;
+    font-size: 2rem;
+    line-height: 1.2;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .convocatoria-hero {
+        min-height: 180px;
+    }
+
+    .convocatoria-hero-title {
+        font-size: 1.6rem;
+    }
+}
+
+
+/* ============================================================
+   TÍTULOS DE SECCIÓN
+   ============================================================ */
+
+.seccion-titulo {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #666;
+    margin: 40px 0 15px 0;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e2e2e2;
+}
+
+/* ============================================================
+   TARJETAS (UNIFICADAS)
+   - reemplaza memberRegistro + cards sueltas
+   ============================================================ */
+
+.dav-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dav-card h3 {
+    font-weight: 800;
+}
+
+.dav-card h5 {
+    font-weight: 800;
+}
+
+.dav-card-acento {
+    color: #50C1E9;
+    font-weight: 900;
+}
+
+/* Si querés mantener el look de bootstrap “card” pero con tu estética */
+.dav-card.bs-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.dav-card.bs-card .dav-card-body {
+    padding: 25px;
+}
+
+/* ============================================================
+   PASOS (LA BARRA 1-2-3 / 1-2)
+   ============================================================ */
+
+.dav-steps {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 22px;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.dav-steps .step {
+    flex: 1;
+    text-align: center;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.dav-steps .step.active {
+    font-weight: 800;
+    color: #0dcaf0;
+    /* bootstrap info */
+    border-bottom-color: #0dcaf0;
+}
+
+@media (max-width: 768px) {
+    .dav-steps {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dav-steps .step {
+        text-align: left;
+    }
+}
+
+/* ============================================================
+   DETALLE DE CONVOCATORIA (lo que ya tenías)
+   ============================================================ */
+
+.ficha-convocatoria .convocatoria-left {
+    padding-right: 0;
+}
+
+@media (min-width: 992px) {
+    .ficha-convocatoria .convocatoria-left {
+        padding-right: 40px;
+    }
+
+    .ficha-convocatoria .convocatoria-right {
+        padding-left: 40px;
+    }
+}
+
+.border-dotted {
+    border-top: 2px dotted #a3a3a3;
+}
+
+.descripcion-convocatoria p {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+/* ============================================================
+   JURADOS / FORMADORES (lo que ya tenías)
+   ============================================================ */
+
+.jurado-card {
+    border-radius: 10px;
+}
+
+.jurado-foto {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 70px;
+}
+
+@media (max-width: 767px) {
+    .jurado-foto {
+        display: none;
+    }
+}
+
+.jurado-bio {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* ============================================================
+   ICON BOXES (si las seguís usando en registro)
+   ============================================================ */
+
+.icon-box-rosa,
+.icon-box-celeste,
+.icon-box-violeta,
+.icon-box-azul {
+    border-radius: 10px;
+    padding: 20px 50px 20px 20px;
+    color: #fff;
+}
+
+.icon-box-rosa {
+    background-color: #E887C7;
+}
+
+.icon-box-celeste {
+    background-color: #50C1E9;
+}
+
+.icon-box-violeta {
+    background-color: #7A1DA7;
+}
+
+.icon-box-azul {
+    background-color: #39378D;
+}
+
+a.LinkIconBox {
+    text-decoration: none;
+    color: #fff;
+}
+
+a.LinkIconBox:hover {
+    text-decoration: underline;
+}
+
+/* ============================================================
+   ACORDEÓN (si se usa)
+   ============================================================ */
+
+.accordion-button {
+    background-color: #fff;
+    color: #2f354a;
+    font-weight: 600;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #e8e8e0;
+    color: #2f354a;
+}
+
+.accordion-body span {
+    color: #7A1DA7;
+    font-weight: 900;
+}

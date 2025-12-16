@@ -1,0 +1,201 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- ========================================================= -->
+<!-- HERO UNIFICADO -->
+<!-- ========================================================= -->
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Programas y actividades</h1>
+  <p class="text-muted mb-0">
+    Dirección de Audiovisuales · Secretaría de Cultura de la Provincia de Salta
+  </p>
+</section>
+
+<div class="container py-4">
+
+  <!-- ========================================================= -->
+  <!-- TEXTO INTRODUCTORIO -->
+  <!-- ========================================================= -->
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+
+      <div class="dav-card mb-4">
+        <p class="mb-0">
+          La Dirección de Audiovisuales desarrolla e implementa programas y actividades orientadas
+          al fortalecimiento del sector audiovisual de la provincia de Salta, promoviendo la formación,
+          la producción, la circulación de contenidos y el acceso a los bienes culturales audiovisuales.
+          <br><br>
+          Estas acciones se articulan con políticas públicas de alcance provincial, nacional e internacional,
+          y buscan acompañar a los distintos actores del ecosistema audiovisual en sus procesos de creación,
+          desarrollo y profesionalización.
+        </p>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- BOTONES EDITORIALES -->
+      <!-- ========================================================= -->
+      <div class="d-flex flex-wrap gap-2 mb-4">
+
+        <a href="#bloque-formacion"
+           class="btn btn-dark btn-sm dav-filter"
+           data-bs-toggle="collapse"
+           role="button">
+          Formación
+        </a>
+
+        <a href="#bloque-fomento"
+           class="btn btn-dark btn-sm dav-filter"
+           data-bs-toggle="collapse"
+           role="button">
+          Fomento
+        </a>
+
+        <a href="#bloque-exhibicion"
+           class="btn btn-dark btn-sm dav-filter"
+           data-bs-toggle="collapse"
+           role="button">
+          Exhibición
+        </a>
+
+        <a href="#bloque-articulacion"
+           class="btn btn-dark btn-sm dav-filter"
+           data-bs-toggle="collapse"
+           role="button">
+          Articulación
+        </a>
+
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- CONTENIDO -->
+      <!-- ========================================================= -->
+      <div id="programasAccordion">
+
+        <!-- ======================= -->
+        <!-- FORMACIÓN -->
+        <!-- ======================= -->
+        <div class="collapse show"
+             id="bloque-formacion"
+             data-bs-parent="#programasAccordion">
+
+          <div class="dav-card mb-3">
+            <h3 class="mb-3">Programas de formación</h3>
+            <p class="mb-0">
+              La Dirección de Audiovisuales impulsa programas de formación orientados al desarrollo
+              del capital humano del sector audiovisual, abarcando instancias de capacitación técnica,
+              artística y profesional.
+              <br><br>
+              Estas propuestas incluyen talleres, clínicas, laboratorios, programas formativos y
+              acciones de capacitación continua, destinados tanto a personas que se inician en la
+              actividad como a profesionales en ejercicio, con el objetivo de fortalecer la calidad
+              y competitividad de la producción audiovisual local.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- ======================= -->
+        <!-- FOMENTO -->
+        <!-- ======================= -->
+        <div class="collapse"
+             id="bloque-fomento"
+             data-bs-parent="#programasAccordion">
+
+          <div class="dav-card mb-3">
+            <h3 class="mb-3">Programas de fomento</h3>
+            <p class="mb-0">
+              A través de distintas líneas de fomento, la Dirección de Audiovisuales promueve la
+              génesis, el desarrollo y la producción de proyectos audiovisuales en la provincia de Salta.
+              <br><br>
+              Estos programas contemplan concursos, apoyos económicos, incentivos y acompañamiento
+              técnico, orientados a fortalecer el entramado productivo local y generar condiciones
+              favorables para el crecimiento sostenible de la industria audiovisual.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- ======================= -->
+        <!-- EXHIBICIÓN -->
+        <!-- ======================= -->
+        <div class="collapse"
+             id="bloque-exhibicion"
+             data-bs-parent="#programasAccordion">
+
+          <div class="dav-card mb-3">
+            <h3 class="mb-3">Exhibición y circulación</h3>
+            <p class="mb-0">
+              La Dirección de Audiovisuales desarrolla acciones orientadas a la difusión y exhibición
+              de obras audiovisuales, promoviendo el acceso del público a producciones locales,
+              nacionales e internacionales.
+              <br><br>
+              Estas actividades incluyen ciclos de cine, festivales, muestras, proyecciones especiales
+              y programas de formación de audiencias, contribuyendo a la ampliación de circuitos de
+              exhibición y a la circulación de contenidos audiovisuales.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- ======================= -->
+        <!-- ARTICULACIÓN -->
+        <!-- ======================= -->
+        <div class="collapse"
+             id="bloque-articulacion"
+             data-bs-parent="#programasAccordion">
+
+          <div class="dav-card mb-3">
+            <h3 class="mb-3">Articulación y gestión</h3>
+            <p class="mb-0">
+              La Dirección de Audiovisuales promueve la articulación entre el sector público y privado,
+              organismos culturales, instituciones educativas y actores del ecosistema audiovisual,
+              con el fin de potenciar el desarrollo de programas y actividades conjuntas.
+              <br><br>
+              Asimismo, brinda acompañamiento y asesoramiento en la gestión de proyectos, fomentando
+              la vinculación con organismos provinciales, nacionales e internacionales, y fortaleciendo
+              el posicionamiento de Salta como un territorio activo en el ámbito audiovisual.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ========================================================= -->
+<!-- JS: BOTONES ACTIVOS -->
+<!-- ========================================================= -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const botones = document.querySelectorAll(".dav-filter");
+  const bloques = document.querySelectorAll("#programasAccordion .collapse");
+
+  function activarBoton(idActivo) {
+    botones.forEach(btn => {
+      const target = btn.getAttribute("href").replace("#", "");
+      btn.classList.toggle("active", target === idActivo);
+    });
+  }
+
+  bloques.forEach(bloque => {
+    bloque.addEventListener("shown.bs.collapse", function () {
+      activarBoton(bloque.id);
+    });
+  });
+
+  const abierto = document.querySelector("#programasAccordion .collapse.show");
+  if (abierto) {
+    activarBoton(abierto.id);
+  }
+
+});
+</script>
+
+{% endblock %}

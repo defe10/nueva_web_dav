@@ -25,3 +25,10 @@ def inicio(request):
             "vigentes": convocatorias_vigentes
         }
     )
+
+
+def institucional(request):
+    return render(request, "sitio_publico/institucional.html")
+
+def programas(request):
+    return render(request, "sitio_publico/programas.html")

@@ -5,7 +5,7 @@
 {% block content %}
 
 <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
-    <div class="card shadow p-4" style="width: 100%; max-width: 420px; border-radius: 12px;">
+    <div class="p-4 shadow" style="width: 100%; max-width: 420px; border-radius: 16px; background: #fff;">
 
         <h3 class="text-center mb-4">Ingresar</h3>
 
@@ -19,7 +19,7 @@
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ next }}">
 
-            <!-- HONEYPOT (campo invisible para bots) -->
+            <!-- HONEYPOT -->
             <div style="display:none;">
                 {{ form.honeypot }}
             </div>
@@ -42,7 +42,7 @@
                 {{ form.password|add_class:"form-control" }}
             </div>
 
-            <!-- Botón ingresar -->
+            <!-- Botón -->
             <button class="btn btn-primary w-100" type="submit">
                 Ingresar
             </button>

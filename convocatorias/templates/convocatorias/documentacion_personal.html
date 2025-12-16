@@ -3,22 +3,22 @@
 
 {% block content %}
 
-<!-- HERO -->
+<!-- HERO UNIFICADO -->
 <section class="fomento-hero text-center">
   <h1 class="fw-bold mb-2">Documentación personal</h1>
-  <p class="text-muted">
+  <p class="text-muted mb-0">
     {{ postulacion.nombre_proyecto }}
   </p>
 </section>
 
-<div class="container mt-4">
+<div class="container mt-2">
   <div class="row justify-content-center">
-    <div class="col-lg-8 text-center">
-S
-      <div class="d-flex justify-content-between mb-4 small text-muted">
-        <div>1. Datos del proyecto</div>
-        <div class="fw-bold text-info">2. Documentación personal</div>
-        <div>3. Documentación del proyecto</div>
+    <div class="col-lg-8">
+
+      <div class="dav-steps">
+        <div class="step">1. Datos del proyecto</div>
+        <div class="step active">2. Documentación personal</div>
+        <div class="step">3. Documentación del proyecto</div>
       </div>
 
     </div>
@@ -26,60 +26,54 @@ S
 </div>
 
 <div class="container py-3">
-
   <div class="row justify-content-center">
 
     <!-- INFO -->
     <div class="col-lg-4 mb-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="fw-bold mb-3">Subí tu documentación personal</h5>
-          <p class="mb-0 small">
-            Documentación obligatoria del responsable del proyecto:<br><br>
-            • DNI o pasaporte<br>
-            • Constancia de CUIT<br>
-            • Constancia de DGR / ARBA<br><br>
-            <strong>Formatos admitidos:</strong> PDF.
-          </p>
-        </div>
+      <div class="dav-card">
+        <h5 class="fw-bold mb-3">Subí tu documentación personal</h5>
+        <p class="mb-0 small">
+          Documentación obligatoria del responsable del proyecto:<br><br>
+          • DNI o pasaporte<br>
+          • Constancia de CUIT<br>
+          • Constancia de DGR / ARBA<br><br>
+          <strong>Formatos admitidos:</strong> PDF.
+        </p>
       </div>
     </div>
 
     <!-- FORMULARIO -->
     <div class="col-lg-8">
-      <div class="card shadow-sm">
-        <div class="card-body">
+      <div class="dav-card">
 
-          <form method="post"
-                enctype="multipart/form-data"
-                class="row g-3">
-            {% csrf_token %}
+        <form method="post"
+              enctype="multipart/form-data"
+              class="row g-3">
+          {% csrf_token %}
 
-            <div class="col-12">
-              <label class="form-label">
-                Seleccionar archivos
-              </label>
-              <input type="file"
-                     name="archivos"
-                     multiple
-                     class="form-control"
-                     required>
-            </div>
+          <div class="col-12">
+            <label class="form-label">
+              Seleccionar archivos
+            </label>
+            <input type="file"
+                   name="archivos"
+                   multiple
+                   class="form-control"
+                   required>
+          </div>
 
-            <div class="col-12 text-end mt-4">
-              <button type="submit" class="btn btn-primary">
-                Continuar
-              </button>
-            </div>
+          <div class="col-12 text-end mt-4">
+            <button type="submit" class="btn btn-primary">
+              Continuar
+            </button>
+          </div>
 
-          </form>
+        </form>
 
-        </div>
       </div>
     </div>
 
   </div>
-
 </div>
 
 {% endblock %}

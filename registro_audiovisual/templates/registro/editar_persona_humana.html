@@ -1,47 +1,41 @@
 {% extends "sitio_publico/base.html" %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
-{% endblock %}
-
 {% block content %}
 
-<!-- HERO -->
-<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-  <h1 class="mb-3">Registro Audiovisual</h1>
-  <h2>Persona Humana</h2>
-</div>
+<!-- HERO UNIFICADO -->
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Registro Audiovisual</h1>
+  <p class="text-muted mb-0">Persona Humana</p>
+</section>
 
-<div class="container mt-4">
+<div class="container mt-2">
   <div class="row justify-content-center">
-    <div class="col-lg-8 text-center">
+    <div class="col-lg-8">
 
-      <div class="d-flex justify-content-between mb-4 small text-muted">
-        <div>1. Tipo de persona</div>
-        <div class="fw-bold text-info">2. Completar datos y enviar</div>
-        <div>3. Completado</div>
+      <div class="dav-steps">
+        <div class="step">1. Tipo de persona</div>
+        <div class="step active">2. Completar datos y enviar</div>
+        <div class="step">3. Completado</div>
       </div>
 
     </div>
   </div>
 </div>
 
-
-
 <div class="container py-3">
   <div class="row justify-content-center">
 
     <!-- INFO -->
     <div class="col-lg-4 mb-4">
-      <div class="memberRegistro">
+      <div class="dav-card">
         <h5 class="mb-3">Completá tus datos personales y fiscales</h5>
         <p class="small">
           Asegurate de ingresar tus datos exactamente como figuran en tu DNI.
           Mantener esta información actualizada es fundamental para validar
           tu inscripción y agilizar cualquier trámite administrativo.
         </p>
-        <p class="small">
+        <p class="small mb-0">
           Al finalizar, hacé clic en <strong>“Enviar”</strong> para completar
           el registro. Podrás actualizar tus datos cuando quieras desde
           <em>Mi cuenta</em>.
@@ -51,7 +45,7 @@
 
     <!-- FORMULARIO -->
     <div class="col-lg-8">
-      <div class="memberRegistro">
+      <div class="dav-card">
 
         <h3 class="mb-2">Formulario de inscripción</h3>
         <p class="text-muted mb-4">
@@ -69,19 +63,14 @@
           <div class="col-md-8">
             <label class="form-label">Nombre completo</label>
             {{ form.nombre_completo }}
-            <small class="text-muted">
-            Debe coincidir con el DNI.
-            </small>
+            <small class="text-muted">Debe coincidir con el DNI.</small>
             {{ form.nombre_completo.errors }}
           </div>
-
 
           <div class="col-md-4">
             <label class="form-label">CUIL / CUIT</label>
             {{ form.cuil_cuit }}
-            <small class="text-muted">
-            Sin espacios ni guiones.
-            </small>
+            <small class="text-muted">Sin espacios ni guiones.</small>
             {{ form.cuil_cuit.errors }}
           </div>
 
@@ -106,9 +95,7 @@
           <div class="col-12">
             <label class="form-label">Domicilio real</label>
             {{ form.domicilio_real }}
-            <small class="text-muted">
-            Debe coincidir con el DNI.
-            </small>
+            <small class="text-muted">Debe coincidir con el DNI.</small>
             {{ form.domicilio_real.errors }}
           </div>
 
@@ -140,7 +127,7 @@
             <label class="form-label">Teléfono</label>
             {{ form.telefono }}
             <small class="text-muted">
-            Ingresá el número con código de área, sin 0 y sin 15.
+              Ingresá el número con código de área, sin 0 y sin 15.
             </small>
             {{ form.telefono.errors }}
           </div>
@@ -168,7 +155,7 @@
             {{ form.actividad_dgr.errors }}
           </div>
 
-          <div class="col-4">
+          <div class="col-md-4">
             <label class="form-label">Domicilio fiscal</label>
             {{ form.domicilio_fiscal }}
             {{ form.domicilio_fiscal.errors }}
@@ -243,60 +230,5 @@
 
   </div>
 </div>
-
-<!-- JS: OTRO LUGAR -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const select = document.getElementById("id_lugar_residencia");
-  const otroWrapper = document.getElementById("otro-lugar-wrapper");
-
-  if (!select || !otroWrapper) return;
-
-  function toggleOtro() {
-    if (!select.value) {
-      otroWrapper.style.display = "none";
-      return;
-    }
-
-    const selectedText =
-      select.options[select.selectedIndex].text.toLowerCase();
-
-    if (selectedText.includes("otro")) {
-      otroWrapper.style.display = "block";
-    } else {
-      otroWrapper.style.display = "none";
-    }
-  }
-
-  select.addEventListener("change", toggleOtro);
-  toggleOtro();
-});
-</script>
-
-
-<!-- JS: EDAD -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  const fechaInput = document.querySelector("#id_fecha_nacimiento");
-  const edadInput = document.querySelector("#id_edad");
-
-  function calcularEdad() {
-    const fecha = new Date(fechaInput.value);
-    if (!isNaN(fecha)) {
-      const hoy = new Date();
-      let edad = hoy.getFullYear() - fecha.getFullYear();
-      const m = hoy.getMonth() - fecha.getMonth();
-      if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
-        edad--;
-      }
-      edadInput.value = edad;
-    } else {
-      edadInput.value = "";
-    }
-  }
-
-  fechaInput.addEventListener("change", calcularEdad);
-});
-</script>
 
 {% endblock %}

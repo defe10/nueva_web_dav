@@ -1,43 +1,39 @@
 {% extends "sitio_publico/base.html" %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
-{% endblock %}
-
 {% block content %}
 
-<!-- HERO REGISTRO -->
-<div class="registro-base-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-  <h1 class="mb-3">Plataforma de Registros</h1>
-  <h2>Inicio · Registro Audiovisual</h2>
-</div>
-<div class="container mt-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-8 text-center">
+<!-- HERO (UNIFICADO) -->
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Plataforma de Registros</h1>
+  <p class="text-muted mb-0">Inicio · Registro Audiovisual</p>
+</section>
 
-      <div class="d-flex justify-content-between mb-4 small text-muted">
-        <div class="fw-bold text-info">1. Tipo de persona</div>
-        <div>2. Completar datos y enviar</div>
+<div class="container mt-2">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="dav-steps">
+        <div class="step active">1. Tipo de persona</div>
+        <div class="step">2. Completar datos y enviar</div>
       </div>
 
     </div>
   </div>
 </div>
 
-
-<div class="container py-5">
+<div class="container py-3">
   <div class="row justify-content-center">
 
     <!-- INFO -->
     <div class="col-lg-4 mb-4">
-      <div class="memberRegistro">
+      <div class="dav-card">
         <h5 class="mb-3">¿Quiénes pueden inscribirse?</h5>
         <p>
           Podrán inscribirse en este Registro personas humanas y jurídicas
           radicadas en la provincia de Salta.
         </p>
-        <p>
+        <p class="mb-0">
           En el caso de personas jurídicas, podrán inscribirse empresas,
           asociaciones civiles, fundaciones o cooperativas.
         </p>
@@ -46,7 +42,7 @@
 
     <!-- FORMULARIO -->
     <div class="col-lg-8 mb-4">
-      <div class="memberRegistro text-center">
+      <div class="dav-card text-center">
         <h3 class="mb-2">Tipo de inscripción</h3>
         <p class="text-muted mb-4">
           Elegí el tipo de personería que querés inscribir.

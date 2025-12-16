@@ -52,11 +52,8 @@
       href="{% static 'sitio_publico/css/bootstrap_personalizado.css' %}"
     />
     <link rel="stylesheet" href="{% static 'sitio_publico/css/main.css' %}" />
-    <link
-      rel="stylesheet"
-      href="{% static 'sitio_publico/css/fomento.css' %}"
-    />
-    <link rel="stylesheet" href="{% static 'sitio_publico/css/registro.css' %}">
+    <link rel="stylesheet" href="{% static 'sitio_publico/css/ui.css' %}">
+    
 
 
 
@@ -96,10 +93,7 @@
           <a class="nav-link active" href="{% url 'inicio' %}">Inicio</a>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link" href="#">Institucional</a>
-        </li>
-
+       
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle"
@@ -109,24 +103,28 @@
           >Programas</a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li>
-              <a class="dropdown-item" href="{% url 'convocatorias:convocatorias_home' %}">
+              <a class="dropdown-item" href="{% url 'sitio_publico:programas' %}"">
                 IDEA 2026
               </a>
             </li>
-            <li><a class="dropdown-item" href="#">Cash Rebate</a></li>
-            <li><a class="dropdown-item" href="#">Cinemóvil</a></li>
-            <li><a class="dropdown-item" href="#">Exención impositiva</a></li>
+            <li><a class="dropdown-item" href="{% url 'sitio_publico:programas' %}">Cash Rebate</a></li>
+            <li><a class="dropdown-item" href="{% url 'sitio_publico:programas' %}">Cinemóvil</a></li>
+            <li><a class="dropdown-item" href="{% url 'sitio_publico:programas' %}">Exención impositiva</a></li>
             <li>
               <a class="dropdown-item" href="https://saltaset.gob.ar">
                 Salta Set
               </a>
-            </li>
-          </ul>
+        </li>
+      </ul>
+
+         <li class="nav-item">
+          <a class="nav-link me-5" href="{% url 'sitio_publico:institucional' %}">Institucional</a>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link" href="#">Contactos</a>
+
+          
         </li>
+
 
         <!-- ========================= -->
         <!--   MI CUENTA / SALIR       -->
