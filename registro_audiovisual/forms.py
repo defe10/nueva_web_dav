@@ -1,6 +1,6 @@
 from django import forms
 from datetime import date
-from .models import PersonaHumana, PersonaJuridica, LUGARES_RESIDENCIA
+from .models import PersonaHumana, PersonaJuridica
 
 
 # ============================================================
@@ -26,7 +26,7 @@ class PersonaHumanaForm(forms.ModelForm):
             "telefono",
             "email",
 
-            # Datos fiscales (opcionales en registro)
+            # Datos fiscales
             "situacion_iva",
             "actividad_dgr",
             "domicilio_fiscal",
@@ -43,15 +43,10 @@ class PersonaHumanaForm(forms.ModelForm):
         ]
 
         widgets = {
-            # Datos personales
             "nombre_completo": forms.TextInput(attrs={"class": "form-control"}),
             "cuil_cuit": forms.TextInput(attrs={"class": "form-control"}),
-            "fecha_nacimiento": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
-            ),
-            "edad": forms.NumberInput(
-                attrs={"class": "form-control", "readonly": "readonly"}
-            ),
+            "fecha_nacimiento": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+            "edad": forms.NumberInput(attrs={"class": "form-control", "readonly": "readonly"}),
             "genero": forms.Select(attrs={"class": "form-select"}),
             "lugar_residencia": forms.Select(attrs={"class": "form-select"}),
             "otro_lugar_residencia": forms.TextInput(attrs={"class": "form-control"}),
@@ -61,14 +56,12 @@ class PersonaHumanaForm(forms.ModelForm):
             "telefono": forms.TextInput(attrs={"class": "form-control"}),
             "email": forms.EmailInput(attrs={"class": "form-control"}),
 
-            # Datos fiscales
             "situacion_iva": forms.Select(attrs={"class": "form-select"}),
             "actividad_dgr": forms.Select(attrs={"class": "form-select"}),
             "domicilio_fiscal": forms.TextInput(attrs={"class": "form-control"}),
             "codigo_postal_fiscal": forms.TextInput(attrs={"class": "form-control"}),
             "localidad_fiscal": forms.Select(attrs={"class": "form-select"}),
 
-            # Datos profesionales
             "area_desempeno_1": forms.Select(attrs={"class": "form-select"}),
             "area_desempeno_2": forms.Select(attrs={"class": "form-select"}),
             "area_cultural": forms.Select(attrs={"class": "form-select"}),
@@ -90,23 +83,24 @@ class PersonaHumanaForm(forms.ModelForm):
                 "Debe especificar el lugar de residencia."
             )
 
-        # Calcular edad automáticamente
-        fecha_nac = cleaned_data.get("fecha_nacimiento")
-        if fecha_nac:
-            hoy = date.today()
-            cleaned_data["edad"] = (
-                hoy.year
-                - fecha_nac.year
-                - ((hoy.month, hoy.day) < (fecha_nac.month, fecha_nac.day))
-            )
-
         return cleaned_data
 
-    def clean_email(self):
-        email = self.cleaned_data.get("email")
-        if email and "@" not in email:
-            raise forms.ValidationError("Ingrese un correo electrónico válido.")
-        return email
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Calcular edad SIEMPRE en backend
+        if instance.fecha_nacimiento:
+            hoy = date.today()
+            instance.edad = (
+                hoy.year
+                - instance.fecha_nacimiento.year
+                - ((hoy.month, hoy.day) < (instance.fecha_nacimiento.month, instance.fecha_nacimiento.day))
+            )
+
+        if commit:
+            instance.save()
+
+        return instance
 
 
 # ============================================================
@@ -118,28 +112,23 @@ class PersonaJuridicaForm(forms.ModelForm):
     class Meta:
         model = PersonaJuridica
         fields = [
-            # Datos institucionales
             "tipo_persona_juridica",
             "cuil_cuit",
             "razon_social",
             "nombre_comercial",
 
-            # Datos fiscales (OBLIGATORIOS)
             "domicilio_fiscal",
             "localidad_fiscal",
             "codigo_postal_fiscal",
 
-            # Datos generales
             "fecha_constitucion",
             "antiguedad",
             "telefono",
             "email",
 
-            # Datos fiscales complementarios
             "situacion_iva",
             "actividad_dgr",
 
-            # Datos profesionales
             "area_desempeno_JJPP_1",
             "area_desempeno_JJPP_2",
             "link_1",
@@ -157,12 +146,8 @@ class PersonaJuridicaForm(forms.ModelForm):
             "localidad_fiscal": forms.Select(attrs={"class": "form-select"}),
             "codigo_postal_fiscal": forms.TextInput(attrs={"class": "form-control"}),
 
-            "fecha_constitucion": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
-            ),
-            "antiguedad": forms.NumberInput(
-                attrs={"class": "form-control", "readonly": "readonly"}
-            ),
+            "fecha_constitucion": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+            "antiguedad": forms.NumberInput(attrs={"class": "form-control", "readonly": "readonly"}),
 
             "telefono": forms.TextInput(attrs={"class": "form-control"}),
             "email": forms.EmailInput(attrs={"class": "form-control"}),
@@ -178,23 +163,19 @@ class PersonaJuridicaForm(forms.ModelForm):
             "link_3": forms.TextInput(attrs={"class": "form-control"}),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
+    def save(self, commit=True):
+        instance = super().save(commit=False)
 
-        # Calcular antigüedad automáticamente
-        fecha_const = cleaned_data.get("fecha_constitucion")
-        if fecha_const:
+        # Calcular antigüedad SIEMPRE en backend
+        if instance.fecha_constitucion:
             hoy = date.today()
-            cleaned_data["antiguedad"] = (
+            instance.antiguedad = (
                 hoy.year
-                - fecha_const.year
-                - ((hoy.month, hoy.day) < (fecha_const.month, fecha_const.day))
+                - instance.fecha_constitucion.year
+                - ((hoy.month, hoy.day) < (instance.fecha_constitucion.month, instance.fecha_constitucion.day))
             )
 
-        return cleaned_data
+        if commit:
+            instance.save()
 
-    def clean_email(self):
-        email = self.cleaned_data.get("email")
-        if email and "@" not in email:
-            raise forms.ValidationError("Ingrese un correo electrónico válido.")
-        return email
+        return instance

@@ -40,13 +40,12 @@ def editar_persona_humana(request):
         if form.is_valid():
             persona = form.save(commit=False)
             persona.user = user
-            persona.email = user.email  # 🔑 aseguramos email
+            persona.email = user.email
             persona.save()
 
-            return redirect(
-                reverse("registro_audiovisual:inscripcion_exitosa")
-                + f"?tipo=humana&id={persona.id}"
-            )
+        return redirect(
+            reverse("registro_audiovisual:editar_persona_humana")
+        )
 
     else:
         form = PersonaHumanaForm(

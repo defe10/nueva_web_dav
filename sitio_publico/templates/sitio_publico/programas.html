@@ -38,81 +38,101 @@
       <!-- ========================================================= -->
       <div class="d-flex flex-wrap gap-2 mb-4">
 
-        <a href="#bloque-formacion"
-           class="btn btn-dark btn-sm dav-filter"
-           data-bs-toggle="collapse"
-           role="button">
-          Formación
+        <a
+          href="#bloque-fomento"
+          class="btn btn-dark btn-sm dav-filter"
+          data-bs-toggle="collapse"
+          role="button"
+          aria-expanded="false"
+          aria-controls="bloque-fomento"
+        >
+          FOMENTO IDEA
         </a>
 
-        <a href="#bloque-fomento"
-           class="btn btn-dark btn-sm dav-filter"
-           data-bs-toggle="collapse"
-           role="button">
-          Fomento
+        <a
+          href="#bloque-promocion"
+          class="btn btn-dark btn-sm dav-filter"
+          data-bs-toggle="collapse"
+          role="button"
+          aria-expanded="false"
+          aria-controls="bloque-promocion"
+        >
+          CASH REBATE
         </a>
 
-        <a href="#bloque-exhibicion"
-           class="btn btn-dark btn-sm dav-filter"
-           data-bs-toggle="collapse"
-           role="button">
-          Exhibición
+        <a
+          href="#bloque-exhibicion"
+          class="btn btn-dark btn-sm dav-filter"
+          data-bs-toggle="collapse"
+          role="button"
+          aria-expanded="false"
+          aria-controls="bloque-exhibicion"
+        >
+          CINE MOVIL+
         </a>
 
-        <a href="#bloque-articulacion"
-           class="btn btn-dark btn-sm dav-filter"
-           data-bs-toggle="collapse"
-           role="button">
-          Articulación
+        <a
+          href="#bloque-formacion"
+          class="btn btn-dark btn-sm dav-filter"
+          data-bs-toggle="collapse"
+          role="button"
+          aria-expanded="false"
+          aria-controls="bloque-formacion"
+        >
+          FORMACIÓN
         </a>
 
       </div>
 
       <!-- ========================================================= -->
-      <!-- CONTENIDO -->
+      <!-- CONTENIDO (ACCORDION) -->
       <!-- ========================================================= -->
       <div id="programasAccordion">
 
         <!-- ======================= -->
-        <!-- FORMACIÓN -->
+        <!-- FOMENTO -->
         <!-- ======================= -->
         <div class="collapse show"
-             id="bloque-formacion"
+             id="bloque-fomento"
              data-bs-parent="#programasAccordion">
 
           <div class="dav-card mb-3">
-            <h3 class="mb-3">Programas de formación</h3>
+            <h3 class="mb-3">Plan de fomento IDEA</h3>
             <p class="mb-0">
-              La Dirección de Audiovisuales impulsa programas de formación orientados al desarrollo
-              del capital humano del sector audiovisual, abarcando instancias de capacitación técnica,
-              artística y profesional.
-              <br><br>
-              Estas propuestas incluyen talleres, clínicas, laboratorios, programas formativos y
-              acciones de capacitación continua, destinados tanto a personas que se inician en la
-              actividad como a profesionales en ejercicio, con el objetivo de fortalecer la calidad
-              y competitividad de la producción audiovisual local.
+              El <strong>Plan de Fomento IDEA - Impulso al Desarrollo Audiovisual</strong> impulsa
+              la producción audiovisual local y promueve la generación de contenidos de interés público
+              para su difusión en medios audiovisuales.<br><br>
+              El Plan de Fomento IDEA es diseñado con la participación del sector audiovisual de Salta para crear un plan consensuado,
+              eficaz y pertinente a las necesidades de desarrollo de la actividad.
             </p>
+            <a href="{% url 'convocatorias:convocatorias_home' %}" class="btn btn-outline-primary btn-lg boton-programa mt-4">
+              Convocatorias
+            </a>
           </div>
 
         </div>
 
         <!-- ======================= -->
-        <!-- FOMENTO -->
+        <!-- PROMOCIÓN -->
         <!-- ======================= -->
         <div class="collapse"
-             id="bloque-fomento"
+             id="bloque-promocion"
              data-bs-parent="#programasAccordion">
 
           <div class="dav-card mb-3">
-            <h3 class="mb-3">Programas de fomento</h3>
+            <h3 class="mb-3">Salta Set Film Commission · Cash Rebate</h3>
             <p class="mb-0">
-              A través de distintas líneas de fomento, la Dirección de Audiovisuales promueve la
-              génesis, el desarrollo y la producción de proyectos audiovisuales en la provincia de Salta.
+              <strong>Salta Set</strong> tiene la misión de promocionar Salta
+              como escenario ideal para el rodaje de producciones audiovisuales. Brinda un servicio público
+              a la industria, asistiendo a las productoras, apoyando al sector local y estimulando la inversión
+              en todas las regiones de la provincia.
               <br><br>
-              Estos programas contemplan concursos, apoyos económicos, incentivos y acompañamiento
-              técnico, orientados a fortalecer el entramado productivo local y generar condiciones
-              favorables para el crecimiento sostenible de la industria audiovisual.
+              Además, ofrece beneficios como Salta <strong>Cash Rebate</strong>, un programa de reembolso a inversiones de
+              producciones nacionales e internacionales que filmen en la provincia de Salta.
             </p>
+            <a href="https://saltaset.gob.ar/beneficios" class="btn btn-outline-primary btn-lg boton-programa mt-4">
+              Salta Set
+            </a>
           </div>
 
         </div>
@@ -125,37 +145,48 @@
              data-bs-parent="#programasAccordion">
 
           <div class="dav-card mb-3">
-            <h3 class="mb-3">Exhibición y circulación</h3>
-            <p class="mb-0">
-              La Dirección de Audiovisuales desarrolla acciones orientadas a la difusión y exhibición
-              de obras audiovisuales, promoviendo el acceso del público a producciones locales,
-              nacionales e internacionales.
-              <br><br>
-              Estas actividades incluyen ciclos de cine, festivales, muestras, proyecciones especiales
-              y programas de formación de audiencias, contribuyendo a la ampliación de circuitos de
-              exhibición y a la circulación de contenidos audiovisuales.
+            <h3 class="mb-3">Exhibición y difusión</h3>
+              <p class="mt-4"><strong>Cinemóvil:</strong> el Cinemóvil promueve la exhibición de películas argentinas
+              llevando proyecciones a toda la provincia, con el objetivo de fomentar
+              la diversidad cultural, fortalecer la identidad local, nacional y pluricultural.</p>
+              <a href="https://docs.google.com/forms/u/5/d/e/1FAIpQLScM82HdZ_Yw9X0tZ0dAmgfChVniWLddXLoi4QBa2ceX-VV87Q/viewform?usp=send_form" class="btn btn-outline-primary btn-lg boton-programa mt-2">
+              Solicitar
+              </a>
+              <p class="mt-4"><strong>Semana de cine en Salta:</strong> Festival de cine anual. Tiene como objetivo generar
+              un espacio de encuentro cinematográfico y formación audiovisual.
+              </p>
+              <a href="https://saltacine.gob.ar/" class="btn btn-outline-primary btn-lg boton-programa mt-2">
+              Semana de Cine
+              </a>
+              <p class="mt-4"><strong>Las escuelas van al cine:</strong> programa de formación de
+              audiencias infantiles y juveniles, fortaleciendo la relación de estudiantes de escuelas primarias y secundarias con
+              el cine en general y la cinematografía argentina en particular.</p>
+              <a href="mailto:lasescuelasvanalcinesalta@gmail.com" class="btn btn-outline-primary btn-lg boton-programa mt-2">
+              Reservar
+              </a>
+              <p class="mt-4"><strong>Los Martes</strong> ciclo de cine que ofrece una programación alternativa a las carteleras
+              comerciales habituales. Este ciclo incluye estrenos destacados de cine regional, nacional e internacional, con el
+              objetivo de diversificar la oferta cultural en Salta y fomentar la exhibición de producciones independientes.
             </p>
           </div>
 
         </div>
 
         <!-- ======================= -->
-        <!-- ARTICULACIÓN -->
+        <!-- FORMACIÓN -->
         <!-- ======================= -->
         <div class="collapse"
-             id="bloque-articulacion"
+             id="bloque-formacion"
              data-bs-parent="#programasAccordion">
 
           <div class="dav-card mb-3">
-            <h3 class="mb-3">Articulación y gestión</h3>
+            <h3 class="mb-3">Programas de formación</h3>
             <p class="mb-0">
-              La Dirección de Audiovisuales promueve la articulación entre el sector público y privado,
-              organismos culturales, instituciones educativas y actores del ecosistema audiovisual,
-              con el fin de potenciar el desarrollo de programas y actividades conjuntas.
+              Hemos creado <strong>ESTUDIO 387</strong>, un programa que apunta a fortalecer la producción audiovisual local y capacitar a
+              los estudiantes avanzados y profesionales del sector para que adquieran conocimientos y herramientas específicas.
               <br><br>
-              Asimismo, brinda acompañamiento y asesoramiento en la gestión de proyectos, fomentando
-              la vinculación con organismos provinciales, nacionales e internacionales, y fortaleciendo
-              el posicionamiento de Salta como un territorio activo en el ámbito audiovisual.
+              Con un enfoque en la excelencia, la iniciativa busca que los participantes logren una formación
+              que les permita competir en mercados tanto locales como internacionales.
             </p>
           </div>
 
@@ -169,7 +200,7 @@
 </div>
 
 <!-- ========================================================= -->
-<!-- JS: BOTONES ACTIVOS -->
+<!-- JS: BOTONES ACTIVOS + aria-expanded -->
 <!-- ========================================================= -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -179,8 +210,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function activarBoton(idActivo) {
     botones.forEach(btn => {
-      const target = btn.getAttribute("href").replace("#", "");
-      btn.classList.toggle("active", target === idActivo);
+      const target = (btn.getAttribute("href") || "").replace("#", "");
+      const esActivo = (target === idActivo);
+
+      btn.classList.toggle("active", esActivo);
+      btn.setAttribute("aria-expanded", esActivo ? "true" : "false");
     });
   }
 

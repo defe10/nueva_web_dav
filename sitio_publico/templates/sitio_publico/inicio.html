@@ -58,7 +58,7 @@
             audiovisual local.
           </h4>
           <div>
-            <a href="#" class="btn btn-outline-light btn-lg boton-programa">
+            <a href="{% url 'sitio_publico:programas' %}" class="btn btn-outline-light btn-lg boton-programa">
               Programas y actividades
             </a>
           </div>
@@ -132,15 +132,133 @@
   </div>
 </section>
 
+
+<!-- Botón lateral Gestión y Trámites -->
+{% comment %} <button
+  id="btnGestion"
+  class="offcanvas-btn-left"
+  type="button"
+  data-bs-toggle="offcanvas"
+  data-bs-target="#offcanvasGestion"
+  aria-controls="offcanvasGestion"
+>
+  Gestión y Trámites
+</button>
+
+<div
+  class="offcanvas offcanvas-start"
+  tabindex="-1"
+  id="offcanvasGestion"
+  aria-labelledby="offcanvasGestionLabel"
+>
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasGestionLabel">
+      Gestión y Trámites
+    </h5>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="offcanvas"
+      aria-label="Cerrar"
+    ></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <p class="text-muted small">
+      Accedé a los trámites y gestiones vinculadas al sector audiovisual.
+    </p>
+
+    <div class="list-group list-group-flush">
+      <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}" class="list-group-item list-group-item-action">
+        Inscripción en el Registro Audiovisual
+      </a>
+
+      <a href="{% url 'convocatorias:convocatorias_home' %}" class="list-group-item list-group-item-action">
+        Solicitud de Cine Móvil
+      </a>
+
+      <button
+        class="list-group-item list-group-item-action"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#infoAvales"
+        aria-expanded="false"
+        aria-controls="infoAvales"
+        >
+        Solicitud de avales
+      </button>
+
+      <div class="collapse mt-2" id="infoAvales">
+        <div class="small text-muted ps-3 pe-2">
+          <p class="mb-2">
+            La Dirección de Audiovisuales de Salta, a solicitud de quien lo requiera,
+            puede emitir avales o cartas de interés para ser presentadas ante los organismos
+            o instituciones que así lo precisen.
+          </p>
+          <p class="mb-2">
+            Para ello, deberá remitir una solicitud formal al correo audiovisuales@edusalta.gov.ar,
+            dirigida al director, Federico Casoni, adjuntando una nota en la que se detallen los motivos
+            por los cuales se requiere dicho instrumento. Se solicita que, como mínimo, este pedido se efectúe
+            con 5 días de antelación previo al cierre de la convocatoria, evento o instancia que se trate.
+          </p>
+          <p class="mb-0">
+            Asimismo, en caso de tratarse de un proyecto, se deberá adjuntar dossier o carpeta donde se despliegue la propuesta en su integralidad,
+            de manera de tomar conocimiento en su conjunto.
+          </p>
+        </div>
+      </div>
+
+
+      <button
+        class="list-group-item list-group-item-action"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#infocash"
+        aria-expanded="false"
+        aria-controls="infocash"
+        >
+        Cash Rebate
+      </button>
+
+      <div class="collapse mt-2" id="infocash">
+        <div class="small text-muted ps-3 pe-2">
+          <p class="mb-2">
+            Para acceder a la convocatoria de Cash Rebate debe ir a convocatorias abiertas/ Beneficios o dirigirse a htttps://saltaset.gob.ar/beneficios
+          </p>
+        </div>
+      </div>
+
+      <button
+        class="list-group-item list-group-item-action"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#infoexencion"
+        aria-expanded="false"
+        aria-controls="infoexencion"
+        >
+        Exención impositiva
+      </button>
+
+      <div class="collapse mt-2" id="infoexencion">
+        <div class="small text-muted ps-3 pe-2">
+          <p class="mb-2">
+            Para acceder a la convocatoria de Cash Rebate debe ir a convocatorias abiertas/ Beneficios o dirigirse a htttps://saltaset.gob.ar/beneficios
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>  {% endcomment %}
+
+
+
 <section class="py-5 bg-light">
   <div class="container">
 
     <!-- TÍTULO -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h3 class="fw-bold mb-0">Convocatorias abiertas</h3>
-      <a href="{% url 'convocatorias:convocatorias_home' %}" class="btn btn-link fw-bold">
-        Ver todas →
-      </a>
     </div>
 
     <!-- FILTROS -->
@@ -229,7 +347,6 @@
 </div>
 </section>
 
-
 <section class="py-5">
   <div class="container">
     <h3 class="fw-bold mb-4">Gestiones y trámites</h3>
@@ -283,5 +400,6 @@
     </div>
   </div>
 </section>
+
 
 {% endblock %} 

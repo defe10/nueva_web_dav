@@ -213,4 +213,4 @@ class PostulacionAdmin(admin.ModelAdmin):
         wb.save(response)
         return response
 
-    exportar_excel_postulaciones.short_description = "Exportar seleccionadas a Excel (.xlsx)"
+    exportar_excel_postulaciones.short_description = "📤 Exportar seleccionadas a Excel (.xlsx)"

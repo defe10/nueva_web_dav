@@ -4,37 +4,26 @@
     {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Dirección de Audiovisuales - Secretaría de Cultura de Salta"
-    />
-    <meta
-      name="keywords"
-      content="audiovisuales, salta, cultura, cine, film commission"
-    />
+
+    <meta name="description" content="Dirección de Audiovisuales - Secretaría de Cultura de Salta" />
+    <meta name="keywords" content="audiovisuales, salta, cultura, cine, film commission" />
     <meta name="author" content="Gobierno de Salta" />
 
     <!-- Open Graph -->
     <meta property="og:title" content="Dirección de Audiovisuales de Salta" />
-    <meta
-      property="og:description"
-      content="Programas, convocatorias y servicios para el sector audiovisual."
-    />
-    <meta
-      property="og:image"
-      content="{% static 'sitio_publico/img/social-share.jpg' %}"
-    />
+    <meta property="og:description" content="Programas, convocatorias y servicios para el sector audiovisual." />
+    <meta property="og:image" content="{% static 'sitio_publico/img/social-share.jpg' %}" />
     <meta property="og:type" content="website" />
 
     <title>{% block title %}Dirección de Audiovisuales{% endblock %}</title>
 
-    <!-- Google Fonts: Montserrat -->
+    <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
-    <!-- Bootstrap base -->
+    <!-- Bootstrap -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -47,171 +36,179 @@
     />
 
     <!-- CSS personalizados -->
-    <link
-      rel="stylesheet"
-      href="{% static 'sitio_publico/css/bootstrap_personalizado.css' %}"
-    />
+    <link rel="stylesheet" href="{% static 'sitio_publico/css/bootstrap_personalizado.css' %}" />
     <link rel="stylesheet" href="{% static 'sitio_publico/css/main.css' %}" />
-    <link rel="stylesheet" href="{% static 'sitio_publico/css/ui.css' %}">
-    
-
-
-
+    <link rel="stylesheet" href="{% static 'sitio_publico/css/ui.css' %}" />
 
     {% block extra_css %}{% endblock %}
     {% block head %}{% endblock %}
   </head>
 
   <body>
+
+    <!-- ===================== -->
     <!-- NAVBAR -->
+    <!-- ===================== -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container">
-    <a
-      class="navbar-brand d-flex align-items-center"
-      href="{% url 'inicio' %}"
-    >
-      <img
-        src="{% static 'sitio_publico/img/SEC DE CULTURA - AZUL.png' %}"
-        alt="Secretaría de Cultura, Gobierno de Salta"
-        style="height: 40px"
-      />
-    </a>
+      <div class="container">
 
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarToggler"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'inicio' %}">
+          <img
+            src="{% static 'sitio_publico/img/SEC DE CULTURA - AZUL.png' %}"
+            alt="Secretaría de Cultura, Gobierno de Salta"
+            style="height: 40px"
+          />
+        </a>
 
-    <div class="collapse navbar-collapse" id="navbarToggler">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarToggler"
+          aria-controls="navbarToggler"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'inicio' %}">Inicio</a>
-        </li>
+        <div class="collapse navbar-collapse" id="navbarToggler">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
-       
-        <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle"
-            href="#"
-            role="button"
-            data-bs-toggle="dropdown"
-          >Programas</a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li>
-              <a class="dropdown-item" href="{% url 'sitio_publico:programas' %}"">
-                IDEA 2026
-              </a>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'inicio' %}">Inicio</a>
             </li>
-            <li><a class="dropdown-item" href="{% url 'sitio_publico:programas' %}">Cash Rebate</a></li>
-            <li><a class="dropdown-item" href="{% url 'sitio_publico:programas' %}">Cinemóvil</a></li>
-            <li><a class="dropdown-item" href="{% url 'sitio_publico:programas' %}">Exención impositiva</a></li>
-            <li>
-              <a class="dropdown-item" href="https://saltaset.gob.ar">
-                Salta Set
+
+            <!-- PROGRAMAS -->
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Programas
               </a>
-        </li>
-      </ul>
 
-         <li class="nav-item">
-          <a class="nav-link me-5" href="{% url 'sitio_publico:institucional' %}">Institucional</a>
-        </li>
-
-
-          
-        </li>
-
-
-        <!-- ========================= -->
-        <!--   MI CUENTA / SALIR       -->
-        <!-- ========================= -->
-        {% if user.is_authenticated %}
-            <!-- Si está logueado: mostrar MI CUENTA y SALIR -->
-            <li class="nav-item me-2">
-              <a class="btn btn-primary" href="{% url 'usuarios:panel_usuario' %}">
-                Mi cuenta
-              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="{% url 'sitio_publico:programas' %}#bloque-fomento">
+                    IDEA 2026
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'sitio_publico:programas' %}#bloque-promocion">
+                    Cash Rebate
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'sitio_publico:programas' %}#bloque-exhibicion">
+                    Exhibición
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'sitio_publico:programas' %}#bloque-formacion">
+                    Formación
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="https://saltaset.gob.ar" target="_blank" rel="noopener">
+                    Salta Set
+                  </a>
+                </li>
+              </ul>
             </li>
 
             <li class="nav-item">
-              <a class="btn btn-outline-primary" href="{% url 'usuarios:logout' %}">
-                Salir
+              <a class="nav-link" href="{% url 'sitio_publico:institucional' %}">
+                Institucional
               </a>
             </li>
 
-        {% else %}
-            <!-- Si NO está logueado: solo mostrar MI CUENTA (login) -->
-            <li class="nav-item ms-2">
-              <a class="btn btn-outline-primary" href="{% url 'usuarios:login' %}">
-                Mi cuenta
-              </a>
-            </li>
-        {% endif %}
+            <!-- MI CUENTA / SALIR -->
+            {% if user.is_authenticated %}
+              <li class="nav-item ms-3">
+                <a class="btn btn-primary btn-sm" href="{% url 'usuarios:panel_usuario' %}">
+                  Mi cuenta
+                </a>
+              </li>
+              <li class="nav-item ms-2">
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'usuarios:logout' %}">
+                  Salir
+                </a>
+              </li>
+            {% else %}
+              <li class="nav-item ms-3">
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'usuarios:login' %}">
+                  Mi cuenta
+                </a>
+              </li>
+            {% endif %}
 
-      </ul>
-    </div>
-  </div>
-</nav>
-
-{% if messages %}
-  <div class="container mt-3">
-    {% for message in messages %}
-      <div class="alert 
-        {% if message.tags == 'error' %}alert-danger
-        {% elif message.tags == 'success' %}alert-success
-        {% elif message.tags == 'warning' %}alert-warning
-        {% else %}alert-info{% endif %}
-        alert-dismissible fade show"
-        role="alert">
-
-        {{ message }}
-
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </ul>
+        </div>
       </div>
-    {% endfor %}
-  </div>
-{% endif %}
+    </nav>
 
-    <!-- CONTENIDO -->
-    {% block layout %}
-    <div class="container py-4">{% block content %}{% endblock %}</div>
-    {% endblock %}
-
-    {% if user.is_staff %}
-    <div class="container my-4">
-      <div class="p-4 border rounded bg-light shadow-sm">
-        <h5 class="fw-bold mb-3">Panel de administración</h5>
-
-        <a href="{% url 'convocatorias:crear_convocatoria' %}" class="btn btn-primary btn-sm">
-          Crear nueva convocatoria
-        </a>
-
-        <a
-          href="{% url 'convocatorias:convocatorias_home' %}"
-          class="btn btn-outline-secondary btn-sm"
-        >
-          Ver convocatorias vigentes
-        </a>
+    <!-- ===================== -->
+    <!-- MENSAJES -->
+    <!-- ===================== -->
+    {% if messages %}
+      <div class="container mt-3">
+        {% for message in messages %}
+          <div class="alert
+            {% if message.tags == 'error' %}alert-danger
+            {% elif message.tags == 'success' %}alert-success
+            {% elif message.tags == 'warning' %}alert-warning
+            {% else %}alert-info{% endif %}
+            alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
       </div>
-    </div>
     {% endif %}
 
+    <!-- ===================== -->
+    <!-- CONTENIDO -->
+    <!-- ===================== -->
+    {% block layout %}
+      <div class="container py-4">
+        {% block content %}{% endblock %}
+      </div>
+    {% endblock %}
+
+    <!-- ===================== -->
+    <!-- PANEL STAFF -->
+    <!-- ===================== -->
+    {% if user.is_staff %}
+      <div class="container my-4">
+        <div class="p-4 border rounded bg-light shadow-sm">
+          <h5 class="fw-bold mb-3">Panel de administración</h5>
+          <a href="{% url 'convocatorias:crear_convocatoria' %}" class="btn btn-primary btn-sm">
+            Crear nueva convocatoria
+          </a>
+          <a href="{% url 'convocatorias:convocatorias_home' %}" class="btn btn-outline-secondary btn-sm">
+            Ver convocatorias vigentes
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- ===================== -->
     <!-- FOOTER -->
+    <!-- ===================== -->
     <footer class="footer mt-auto py-4 bg-light border-top">
       <div class="container">
         <div class="row">
+
           <div class="col-md-4 mb-3">
-            <img
-              src="{% static 'sitio_publico/img/SEC DE CULTURA - AZUL.png' %}"
-              style="height: 40px"
-            />
+            <img src="{% static 'sitio_publico/img/SEC DE CULTURA - AZUL.png' %}" style="height: 40px" />
             <p class="small text-muted mt-2">
-              Dirección de Audiovisuales<br />Secretaría de Cultura · Gobierno
-              de Salta
+              Dirección de Audiovisuales<br />
+              Secretaría de Cultura · Gobierno de Salta
             </p>
           </div>
 
@@ -219,13 +216,8 @@
             <h6 class="text-uppercase fw-bold small">Enlaces útiles</h6>
             <ul class="list-unstyled small">
               <li><a href="{% url 'inicio' %}" class="text-muted">Inicio</a></li>
-              <li><a href="#" class="text-muted">Institucional</a></li>
-              <li><a href="#" class="text-muted">Servicios</a></li>
-              <li>
-                <a href="{% url 'convocatorias:convocatorias_home' %}" class="text-muted"
-                  >Convocatorias</a
-                >
-              </li>
+              <li><a href="{% url 'sitio_publico:institucional' %}" class="text-muted">Institucional</a></li>
+              <li><a href="{% url 'convocatorias:convocatorias_home' %}" class="text-muted">Convocatorias</a></li>
             </ul>
           </div>
 
@@ -235,19 +227,21 @@
             <p class="small text-muted mb-1">+54 387 XXX XXXX</p>
             <p class="small text-muted">Juramento 180 · Salta Capital</p>
           </div>
+
         </div>
 
         <div class="text-center pt-3 border-top small text-muted">
-          © {% now "Y" %} Secretaría de Cultura de Salta — Todos los derechos
-          reservados
+          © {% now "Y" %}Secretaría de Cultura de Salta — Todos los derechos reservados
         </div>
       </div>
     </footer>
 
-    <!-- BOOTSTRAP JS -->
+    <!-- ===================== -->
+    <!-- JS -->
+    <!-- ===================== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- CARRUSEL JS -->
+    <!-- Carrusel -->
     <script>
       function moverCarrusel(flecha, direccion) {
         const wrap = flecha.closest(".carrusel-wrap");
@@ -256,29 +250,34 @@
         const contenedor = wrap.querySelector(".carrusel");
         if (!contenedor) return;
 
-        const card =
-          contenedor.querySelector(".card-area") ||
-          contenedor.querySelector(".card-fomento");
-
+        const card = contenedor.querySelector(".card-area, .card-fomento");
         if (!card) return;
 
         const styles = window.getComputedStyle(contenedor);
         const gap = parseInt(styles.gap || styles.columnGap || 0);
-
         const cardWidth = card.offsetWidth + gap;
 
-        let destino = contenedor.scrollLeft + direccion * cardWidth;
-
         const maxScroll = contenedor.scrollWidth - contenedor.clientWidth + gap;
-
+        let destino = contenedor.scrollLeft + direccion * cardWidth;
         destino = Math.max(0, Math.min(destino, maxScroll));
 
-        contenedor.scrollTo({
-          left: destino,
-          behavior: "smooth",
-        });
+        contenedor.scrollTo({ left: destino, behavior: "smooth" });
       }
     </script>
+
+    <!-- Offcanvas botón -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const offcanvas = document.getElementById("offcanvasGestion");
+        const boton = document.getElementById("btnGestion");
+        if (!offcanvas || !boton) return;
+
+        offcanvas.addEventListener("show.bs.offcanvas", () => boton.style.display = "none");
+        offcanvas.addEventListener("hidden.bs.offcanvas", () => boton.style.display = "block");
+      });
+    </script>
+
+    
 
     {% block extra_js %}{% endblock %}
   </body>

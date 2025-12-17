@@ -30,12 +30,12 @@
     <div class="col-lg-4 mb-4">
       <div class="dav-card">
         <h5 class="mb-3">Completá tus datos personales y fiscales</h5>
-        <p class="small">
-          Asegurate de ingresar tus datos exactamente como figuran en tu DNI.
+        <p>
+          Asegurate de ingresar tus datos exactamente como figuran en tu DNI.<br><br>
           Mantener esta información actualizada es fundamental para validar
           tu inscripción y agilizar cualquier trámite administrativo.
         </p>
-        <p class="small mb-0">
+        <p class="mb-0">
           Al finalizar, hacé clic en <strong>“Enviar”</strong> para completar
           el registro. Podrás actualizar tus datos cuando quieras desde
           <em>Mi cuenta</em>.
@@ -230,5 +230,30 @@
 
   </div>
 </div>
+
+<!-- JS: EDAD -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const fechaInput = document.querySelector("#id_fecha_nacimiento");
+  const edadInput = document.querySelector("#id_edad");
+
+  function calcularEdad() {
+    const fecha = new Date(fechaInput.value);
+    if (!isNaN(fecha)) {
+      const hoy = new Date();
+      let edad = hoy.getFullYear() - fecha.getFullYear();
+      const m = hoy.getMonth() - fecha.getMonth();
+      if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
+        edad--;
+      }
+      edadInput.value = edad;
+    } else {
+      edadInput.value = "";
+    }
+  }
+
+  fechaInput.addEventListener("change", calcularEdad);
+});
+</script>
 
 {% endblock %}
