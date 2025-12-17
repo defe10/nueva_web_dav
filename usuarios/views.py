@@ -18,6 +18,7 @@ from django.core.mail import EmailMultiAlternatives
 # Modelos
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 from exencion.models import Exencion
+from convocatorias.models import Postulacion
 
 
 # ============================================================
@@ -160,14 +161,30 @@ def activar_cuenta(request, uidb64, token):
 def panel_usuario(request):
     user = request.user
 
+    # ----------------------------------
+    # Registro audiovisual
+    # ----------------------------------
     persona_humana = PersonaHumana.objects.filter(user=user).first()
     persona_juridica = PersonaJuridica.objects.filter(user=user).first()
 
+    # ----------------------------------
+    # Exención (última solicitud)
+    # ----------------------------------
     exencion = (
         Exencion.objects
         .filter(user=user)
         .order_by("-fecha_creacion")
         .first()
+    )
+
+    # ----------------------------------
+    # Convocatorias (postulaciones)
+    # ----------------------------------
+    postulaciones = (
+        Postulacion.objects
+        .filter(user=user)
+        .select_related("convocatoria")
+        .order_by("-fecha_envio")
     )
 
     return render(
@@ -177,5 +194,6 @@ def panel_usuario(request):
             "persona_humana": persona_humana,
             "persona_juridica": persona_juridica,
             "exencion": exencion,
+            "postulaciones": postulaciones,
         },
     )

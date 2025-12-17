@@ -401,8 +401,8 @@ class PersonaJuridica(models.Model):
     )
 
     link_1 = models.CharField(max_length=250)
-    link_2 = models.CharField(max_length=250)
-    link_3 = models.CharField(max_length=250)
+    link_2 = models.CharField(max_length=250, blank=True, null=True)
+    link_3 = models.CharField(max_length=250, blank=True, null=True)
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 

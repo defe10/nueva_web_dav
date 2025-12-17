@@ -44,6 +44,7 @@
                         </p>
                     {% endif %}
                 {% else %}
+                    
                     <p class="mb-2">
                         <strong>Estado del registro audiovisual:</strong>
                         <span class="badge bg-warning text-dark ms-2">
@@ -53,6 +54,48 @@
                 {% endif %}
 
                 <hr>
+                    <p class="mb-3"><strong>Mis convocatorias:</strong></p>
+                    <hr>
+
+{% if postulaciones %}
+    {% for p in postulaciones %}
+        <p class="mb-2">
+            <strong>{{ p.convocatoria.titulo }}</strong><br>
+            <span class="text-muted small">
+                Proyecto: <strong>{{ p.nombre_proyecto }}</strong>
+            </span>
+
+            <span class="badge ms-2
+                {% if p.estado == 'enviado' %}
+                    bg-secondary
+                {% elif p.estado == 'revision_admin' %}
+                    bg-info
+                {% elif p.estado == 'observado' %}
+                    bg-warning text-dark
+                {% elif p.estado == 'admitido' %}
+                    bg-primary
+                {% elif p.estado == 'evaluacion_jurado' %}
+                    bg-primary
+                {% elif p.estado == 'seleccionado' %}
+                    bg-success
+                {% elif p.estado == 'no_seleccionado' %}
+                    bg-danger
+                {% elif p.estado == 'finalizado' %}
+                    bg-success
+                {% else %}
+                    bg-secondary
+                {% endif %}
+            ">
+                {{ p.get_estado_display }}
+            </span>
+        </p>
+    {% endfor %}
+{% else %}
+    <p class="text-muted small">
+        No participaste en ninguna convocatoria.
+    </p>
+{% endif %}
+
 
                 <!-- ACCIONES -->
                 <div class="d-grid gap-3 mt-4">
@@ -103,6 +146,9 @@
                     </a>
 
                 </div>
+                
+
+
 
             </div>
             <!-- /PANEL -->

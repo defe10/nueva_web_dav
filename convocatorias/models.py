@@ -40,7 +40,7 @@ BLOQUE_PERSONAS_TITULO = [
 
 
 # ==========================================
-# JURADOS (opcional, se mantiene)
+# JURADOS (opcional)
 # ==========================================
 class Jurado(models.Model):
     nombre = models.CharField(max_length=200)
@@ -55,14 +55,12 @@ class Jurado(models.Model):
 # ==========================================
 class Convocatoria(models.Model):
 
-    # ---- Datos generales ----
     titulo = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
 
     descripcion_corta = models.TextField(blank=True)
     descripcion_larga = models.TextField(blank=True)
 
-    # ---- Curso asincrónico ----
     url_curso = models.URLField(
         "URL del curso asincrónico",
         blank=True,
@@ -73,10 +71,8 @@ class Convocatoria(models.Model):
     categoria = models.CharField(max_length=20, choices=CATEGORIAS)
     tematica_genero = models.CharField(max_length=200, blank=True)
 
-    # ---- Línea ----
     linea = models.CharField(max_length=20, choices=LINEAS)
 
-    # ---- Contenidos ----
     requisitos = models.TextField(blank=True)
     beneficios = models.TextField(blank=True)
 
@@ -92,11 +88,9 @@ class Convocatoria(models.Model):
         null=True
     )
 
-    # ---- Fechas ----
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
 
-    # ---- Bloque personas ----
     bloque_personas = models.CharField(
         max_length=20,
         choices=BLOQUE_PERSONAS_TITULO,
@@ -115,10 +109,7 @@ class Convocatoria(models.Model):
     jurado3_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
     jurado3_bio = models.TextField(blank=True)
 
-    # ---- Orden ----
     orden = models.PositiveIntegerField(default=0)
-
-    # ---- URL alternativa ----
     url_destino = models.CharField(max_length=300, blank=True)
 
     class Meta:
@@ -139,7 +130,7 @@ class Convocatoria(models.Model):
 
 
 # ==========================================
-# POSTULACIÓN (entidad central)
+# POSTULACIÓN
 # ==========================================
 class Postulacion(models.Model):
 
@@ -171,20 +162,23 @@ class Postulacion(models.Model):
     genero = models.CharField(max_length=50, choices=GENERO)
 
     declaracion_jurada = models.BooleanField(default=False)
-
     fecha_envio = models.DateTimeField(auto_now_add=True)
 
     ESTADOS = [
-        ("ENVIADA", "Enviada"),
-        ("REVISION", "En revisión"),
-        ("SUBSANAR", "Subsanar"),
-        ("APROBADA", "Aprobada"),
-        ("RECHAZADA", "Rechazada"),
+        ("enviado", "Enviado"),
+        ("revision_admin", "En revisión administrativa"),
+        ("observado", "Observado (requiere subsanación)"),
+        ("admitido", "Admitido"),
+        ("evaluacion_jurado", "En evaluación por jurado"),
+        ("seleccionado", "Seleccionado"),
+        ("no_seleccionado", "No seleccionado"),
+        ("finalizado", "Finalizado"),
     ]
+
     estado = models.CharField(
-        max_length=20,
+        max_length=30,
         choices=ESTADOS,
-        default="ENVIADA"
+        default="enviado"
     )
 
     class Meta:
@@ -197,7 +191,7 @@ class Postulacion(models.Model):
 
 
 # ==========================================
-# DOCUMENTOS DE POSTULACIÓN
+# DOCUMENTOS DE POSTULACIÓN (ÚNICO MODELO)
 # ==========================================
 class DocumentoPostulacion(models.Model):
 
@@ -212,15 +206,9 @@ class DocumentoPostulacion(models.Model):
         related_name="documentos"
     )
 
-    tipo = models.CharField(
-        max_length=20,
-        choices=TIPOS
-    )
+    tipo = models.CharField(max_length=20, choices=TIPOS)
 
-    archivo = models.FileField(
-        upload_to="postulaciones/documentos/"
-    )
-
+    archivo = models.FileField(upload_to="postulaciones/documentos/")
     fecha_subida = models.DateTimeField(auto_now_add=True)
 
     class Meta:

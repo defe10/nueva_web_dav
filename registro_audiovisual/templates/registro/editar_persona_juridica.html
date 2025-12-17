@@ -113,10 +113,14 @@
             {{ form.fecha_constitucion.errors }}
           </div>
 
-          <div class="col-md-2">
-            <label class="form-label">Antigüedad</label>
-            {{ form.antiguedad }}
-            {{ form.antiguedad.errors }}
+          <div class="mb-3">
+            <label class="form-label">Antigüedad (años)</label>
+              <input
+                type="text"
+                id="antiguedad_calculada"
+                class="form-control"
+                readonly
+              >
           </div>
 
           <div class="col-md-5">
@@ -199,29 +203,60 @@
 
   </div>
 </div>
-<!-- JS: ANTIGÜEDAD -->
+
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   const fechaInput = document.querySelector("#id_fecha_constitucion");
-  const antiguedadInput = document.querySelector("#id_antiguedad");
+  const antiguedadInput = document.querySelector("#antiguedad_calculada");
+
+  if (!fechaInput || !antiguedadInput) return;
 
   function calcularAntiguedad() {
-    const fecha = new Date(fechaInput.value);
-    if (!isNaN(fecha)) {
-      const hoy = new Date();
-      let antiguedad = hoy.getFullYear() - fecha.getFullYear();
-      const m = hoy.getMonth() - fecha.getMonth();
-      if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
-        antiguedad--;
-      }
-      antiguedadInput.value = antiguedad;
-    } else {
+    if (!fechaInput.value) {
       antiguedadInput.value = "";
+      return;
     }
+
+    const fecha = new Date(fechaInput.value);
+    const hoy = new Date();
+
+    let antiguedad = hoy.getFullYear() - fecha.getFullYear();
+    const m = hoy.getMonth() - fecha.getMonth();
+
+    if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
+      antiguedad--;
+    }
+
+    antiguedadInput.value = antiguedad;
   }
 
   fechaInput.addEventListener("change", calcularAntiguedad);
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const selectLocalidad = document.querySelector("#id_localidad_fiscal");
+  const wrapperOtro = document.querySelector("#otro-lugar-wrapper");
+
+  if (!selectLocalidad || !wrapperOtro) return;
+
+  function toggleOtroLugar() {
+    if (selectLocalidad.value === "otro") {
+      wrapperOtro.style.display = "block";
+    } else {
+      wrapperOtro.style.display = "none";
+    }
+  }
+
+  // 👉 ejecutar al cargar (modo editar)
+  toggleOtroLugar();
+
+  // 👉 ejecutar al cambiar
+  selectLocalidad.addEventListener("change", toggleOtroLugar);
+});
+</script>
+
+
 
 {% endblock %}

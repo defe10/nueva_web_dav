@@ -82,8 +82,12 @@
 
           <div class="col-md-4">
             <label class="form-label">Edad</label>
-            {{ form.edad }}
-            {{ form.edad.errors }}
+              <input
+              type="text"
+              id="edad_calculada"
+              class="form-control"
+              readonly
+            >
           </div>
 
           <div class="col-md-4">
@@ -231,29 +235,62 @@
   </div>
 </div>
 
-<!-- JS: EDAD -->
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   const fechaInput = document.querySelector("#id_fecha_nacimiento");
-  const edadInput = document.querySelector("#id_edad");
+  const edadInput = document.querySelector("#edad_calculada");
+
+  if (!fechaInput || !edadInput) return;
 
   function calcularEdad() {
-    const fecha = new Date(fechaInput.value);
-    if (!isNaN(fecha)) {
-      const hoy = new Date();
-      let edad = hoy.getFullYear() - fecha.getFullYear();
-      const m = hoy.getMonth() - fecha.getMonth();
-      if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
-        edad--;
-      }
-      edadInput.value = edad;
-    } else {
+    if (!fechaInput.value) {
       edadInput.value = "";
+      return;
     }
+
+    const fecha = new Date(fechaInput.value);
+    const hoy = new Date();
+
+    let edad = hoy.getFullYear() - fecha.getFullYear();
+    const m = hoy.getMonth() - fecha.getMonth();
+
+    if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
+      edad--;
+    }
+
+    edadInput.value = edad;
   }
 
+  // 👉 calcular al cargar si ya hay fecha
+  calcularEdad();
+
+  // 👉 recalcular si cambia
   fechaInput.addEventListener("change", calcularEdad);
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const selectLugar = document.querySelector("#id_lugar_residencia");
+  const wrapperOtro = document.querySelector("#otro-lugar-wrapper");
+
+  if (!selectLugar || !wrapperOtro) return;
+
+  function toggleOtroLugar() {
+    if (selectLugar.value === "otro") {
+      wrapperOtro.style.display = "block";
+    } else {
+      wrapperOtro.style.display = "none";
+    }
+  }
+
+  // 👉 ejecutar al cargar (modo editar)
+  toggleOtroLugar();
+
+  // 👉 ejecutar al cambiar
+  selectLugar.addEventListener("change", toggleOtroLugar);
+});
+</script>
+
 
 {% endblock %}

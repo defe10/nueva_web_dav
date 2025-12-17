@@ -38,28 +38,25 @@ def editar_persona_humana(request):
         form = PersonaHumanaForm(request.POST, instance=persona_existente)
 
         if form.is_valid():
-            persona = form.save(commit=False)
+            persona = form.save()
             persona.user = user
-            persona.email = user.email
-            persona.save()
+            persona.save(update_fields=["user"])
 
-        return redirect(
-            reverse("registro_audiovisual:editar_persona_humana")
-        )
+            return redirect(
+                reverse("registro_audiovisual:inscripcion_exitosa")
+                + f"?tipo=humana&id={persona.id}"
+            )
 
     else:
-        form = PersonaHumanaForm(
-            instance=persona_existente,
-            initial={
-                "email": user.email  # 🔑 prellenado
-            }
-        )
+        form = PersonaHumanaForm(instance=persona_existente)  # 👈 SIN initial
 
     return render(
         request,
         "registro/editar_persona_humana.html",
         {"form": form}
     )
+
+
 
 
 
@@ -77,10 +74,9 @@ def editar_persona_juridica(request):
         form = PersonaJuridicaForm(request.POST, instance=persona_existente)
 
         if form.is_valid():
-            persona = form.save(commit=False)
+            persona = form.save()
             persona.user = user
-            persona.email = user.email  # 🔑 aseguramos email
-            persona.save()
+            persona.save(update_fields=["user"])
 
             return redirect(
                 reverse("registro_audiovisual:inscripcion_exitosa")
@@ -88,18 +84,14 @@ def editar_persona_juridica(request):
             )
 
     else:
-        form = PersonaJuridicaForm(
-            instance=persona_existente,
-            initial={
-                "email": user.email  # 🔑 prellenado
-            }
-        )
+        form = PersonaJuridicaForm(instance=persona_existente)  # 👈 SIN initial
 
     return render(
         request,
         "registro/editar_persona_juridica.html",
         {"form": form}
     )
+
 
 
 # ============================================================
@@ -127,3 +119,4 @@ def inscripcion_exitosa(request):
             "persona": persona,
         }
     )
+

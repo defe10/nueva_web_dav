@@ -16,7 +16,6 @@ class PersonaHumanaForm(forms.ModelForm):
             "nombre_completo",
             "cuil_cuit",
             "fecha_nacimiento",
-            "edad",
             "genero",
             "lugar_residencia",
             "otro_lugar_residencia",
@@ -45,8 +44,15 @@ class PersonaHumanaForm(forms.ModelForm):
         widgets = {
             "nombre_completo": forms.TextInput(attrs={"class": "form-control"}),
             "cuil_cuit": forms.TextInput(attrs={"class": "form-control"}),
-            "fecha_nacimiento": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
-            "edad": forms.NumberInput(attrs={"class": "form-control", "readonly": "readonly"}),
+
+            # 🔑 CLAVE PARA QUE APAREZCA AL EDITAR
+            "fecha_nacimiento": forms.DateInput(
+                format="%Y-%m-%d",
+                attrs={"class": "form-control", "type": "date"}
+            ),
+
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+
             "genero": forms.Select(attrs={"class": "form-select"}),
             "lugar_residencia": forms.Select(attrs={"class": "form-select"}),
             "otro_lugar_residencia": forms.TextInput(attrs={"class": "form-control"}),
@@ -54,7 +60,6 @@ class PersonaHumanaForm(forms.ModelForm):
             "domicilio_real": forms.TextInput(attrs={"class": "form-control"}),
             "codigo_postal_real": forms.TextInput(attrs={"class": "form-control"}),
             "telefono": forms.TextInput(attrs={"class": "form-control"}),
-            "email": forms.EmailInput(attrs={"class": "form-control"}),
 
             "situacion_iva": forms.Select(attrs={"class": "form-select"}),
             "actividad_dgr": forms.Select(attrs={"class": "form-select"}),
@@ -73,7 +78,6 @@ class PersonaHumanaForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        # Validación: otro lugar de residencia
         if (
             cleaned_data.get("lugar_residencia") == "otro"
             and not cleaned_data.get("otro_lugar_residencia")
@@ -86,9 +90,12 @@ class PersonaHumanaForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
+        """
+        Calcula la edad siempre en backend.
+        La vista debe usar SOLO form.save()
+        """
         instance = super().save(commit=False)
 
-        # Calcular edad SIEMPRE en backend
         if instance.fecha_nacimiento:
             hoy = date.today()
             instance.edad = (
@@ -122,7 +129,6 @@ class PersonaJuridicaForm(forms.ModelForm):
             "codigo_postal_fiscal",
 
             "fecha_constitucion",
-            "antiguedad",
             "telefono",
             "email",
 
@@ -146,8 +152,11 @@ class PersonaJuridicaForm(forms.ModelForm):
             "localidad_fiscal": forms.Select(attrs={"class": "form-select"}),
             "codigo_postal_fiscal": forms.TextInput(attrs={"class": "form-control"}),
 
-            "fecha_constitucion": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
-            "antiguedad": forms.NumberInput(attrs={"class": "form-control", "readonly": "readonly"}),
+            # 🔑 CLAVE PARA QUE APAREZCA AL EDITAR
+            "fecha_constitucion": forms.DateInput(
+                format="%Y-%m-%d",
+                attrs={"class": "form-control", "type": "date"}
+            ),
 
             "telefono": forms.TextInput(attrs={"class": "form-control"}),
             "email": forms.EmailInput(attrs={"class": "form-control"}),
@@ -164,9 +173,11 @@ class PersonaJuridicaForm(forms.ModelForm):
         }
 
     def save(self, commit=True):
+        """
+        Calcula antigüedad en backend.
+        """
         instance = super().save(commit=False)
 
-        # Calcular antigüedad SIEMPRE en backend
         if instance.fecha_constitucion:
             hoy = date.today()
             instance.antiguedad = (
