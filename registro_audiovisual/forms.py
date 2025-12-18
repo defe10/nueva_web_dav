@@ -36,9 +36,11 @@ class PersonaHumanaForm(forms.ModelForm):
             "area_desempeno_1",
             "area_desempeno_2",
             "area_cultural",
-            "link_1",
-            "link_2",
-            "link_3",
+            "portfolio_web",
+            "canal_video",
+            "instagram",
+            "linkedin",
+            "link_trabajo_destacado",
         ]
 
         widgets = {
@@ -70,9 +72,11 @@ class PersonaHumanaForm(forms.ModelForm):
             "area_desempeno_1": forms.Select(attrs={"class": "form-select"}),
             "area_desempeno_2": forms.Select(attrs={"class": "form-select"}),
             "area_cultural": forms.Select(attrs={"class": "form-select"}),
-            "link_1": forms.TextInput(attrs={"class": "form-control"}),
-            "link_2": forms.TextInput(attrs={"class": "form-control"}),
-            "link_3": forms.TextInput(attrs={"class": "form-control"}),
+            "portfolio_web": forms.URLInput(attrs={"class": "form-control"}),
+            "canal_video": forms.URLInput(attrs={"class": "form-control"}),
+            "instagram": forms.URLInput(attrs={"class": "form-control"}),
+            "linkedin": forms.URLInput(attrs={"class": "form-control"}),
+            "link_trabajo_destacado": forms.URLInput(attrs={"class": "form-control"}),
         }
 
     def clean(self):
@@ -137,9 +141,11 @@ class PersonaJuridicaForm(forms.ModelForm):
 
             "area_desempeno_JJPP_1",
             "area_desempeno_JJPP_2",
-            "link_1",
-            "link_2",
-            "link_3",
+            "portfolio_web",
+            "canal_video",
+            "instagram",
+            "linkedin",
+            "link_trabajo_destacado",
         ]
 
         widgets = {
@@ -167,9 +173,11 @@ class PersonaJuridicaForm(forms.ModelForm):
             "area_desempeno_JJPP_1": forms.Select(attrs={"class": "form-select"}),
             "area_desempeno_JJPP_2": forms.Select(attrs={"class": "form-select"}),
 
-            "link_1": forms.TextInput(attrs={"class": "form-control"}),
-            "link_2": forms.TextInput(attrs={"class": "form-control"}),
-            "link_3": forms.TextInput(attrs={"class": "form-control"}),
+            "portfolio_web": forms.URLInput(attrs={"class": "form-control"}),
+            "canal_video": forms.URLInput(attrs={"class": "form-control"}),
+            "instagram": forms.URLInput(attrs={"class": "form-control"}),
+            "linkedin": forms.URLInput(attrs={"class": "form-control"}),
+            "link_trabajo_destacado": forms.URLInput(attrs={"class": "form-control"}),
         }
 
     def save(self, commit=True):

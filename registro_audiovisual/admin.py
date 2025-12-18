@@ -143,9 +143,11 @@ class PersonaHumanaAdmin(admin.ModelAdmin):
                 "area_desempeno_1",
                 "area_desempeno_2",
                 "area_cultural",
-                "link_1",
-                "link_2",
-                "link_3",
+                "portfolio_web",
+                "canal_video",
+                "instagram",
+                "linkedin",
+                "link_trabajo_destacado",
             )
         }),
 
@@ -236,9 +238,11 @@ class PersonaJuridicaAdmin(admin.ModelAdmin):
             "fields": (
                 "area_desempeno_JJPP_1",
                 "area_desempeno_JJPP_2",
-                "link_1",
-                "link_2",
-                "link_3",
+                "portfolio_web",
+                "canal_video",
+                "instagram",
+                "linkedin",
+                "link_trabajo_destacado",
             )
         }),
 

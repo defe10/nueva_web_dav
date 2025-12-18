@@ -169,25 +169,42 @@
             {{ form.area_desempeno_JJPP_2.errors }}
           </div>
 
+          <div class="col-12 mt-4">
+          <h5 class="mb-3">Presencia y trabajos</h5>
+          <p class="text-muted small">
+          Podés compartir links a tu portfolio, canales, redes profesionales o trabajos destacados.
+          </p>
+        </div>
+
           <div class="col-12">
-            <label class="form-label">Link de trabajos</label>
-            {{ form.link_1 }}
-            {{ form.link_1.errors }}
+            {{ form.portfolio_web.label_tag }}
+            {{ form.portfolio_web }}
+            {{ form.portfolio_web.errors }}
           </div>
 
           <div class="col-12">
-            <label class="form-label">Link de trabajos</label>
-            {{ form.link_2 }}
-            {{ form.link_2.errors }}
+            {{ form.canal_video.label_tag }}
+            {{ form.canal_video }}
+            {{ form.canal_video.errors }}
           </div>
 
-          {% if form.link_3 %}
           <div class="col-12">
-            <label class="form-label">Link de trabajos</label>
-            {{ form.link_3 }}
-            {{ form.link_3.errors }}
+            {{ form.instagram.label_tag }}
+            {{ form.instagram }}
+            {{ form.instagram.errors }}
           </div>
-          {% endif %}
+
+          <div class="col-12">
+            {{ form.linkedin.label_tag }}
+            {{ form.linkedin }}
+            {{ form.linkedin.errors }}
+          </div>
+
+          <div class="col-12">
+            {{ form.link_trabajo_destacado.label_tag }}
+            {{ form.link_trabajo_destacado }}
+            {{ form.link_trabajo_destacado.errors }}
+          </div>
 
           <!-- BOTÓN -->
           <div class="col-12 text-end mt-4">

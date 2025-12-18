@@ -311,9 +311,41 @@ class PersonaHumana(models.Model):
         verbose_name="Área cultural complementaria"
     )
 
-    link_1 = models.CharField(max_length=250)
-    link_2 = models.CharField(max_length=250, blank=True, null=True)
-    link_3 = models.CharField(max_length=250, blank=True, null=True)
+    portfolio_web = models.URLField(
+        "Sitio web / Portfolio",
+        blank=True,
+        null=True,
+        help_text="Sitio web personal, de la productora o portfolio online (Vimeo, Behance, etc.)"
+    )
+
+    canal_video = models.URLField(
+        "Canal audiovisual",
+        blank=True,
+        null=True,
+        help_text="Canal de YouTube, Vimeo u otra plataforma de video"
+    )
+
+    instagram = models.URLField(
+        "Instagram",
+        blank=True,
+        null=True,
+        help_text="Perfil de Instagram profesional"
+    )
+
+    linkedin = models.URLField(
+        "LinkedIn",
+        blank=True,
+        null=True,
+        help_text="Perfil de LinkedIn"
+    )
+
+    link_trabajo_destacado = models.URLField(
+        "Trabajo destacado",
+        blank=True,
+        null=True,
+        help_text="Link a una obra o trabajo audiovisual relevante"
+    )
+
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
@@ -400,9 +432,40 @@ class PersonaJuridica(models.Model):
         verbose_name="Área de desempeño secundaria"
     )
 
-    link_1 = models.CharField(max_length=250)
-    link_2 = models.CharField(max_length=250, blank=True, null=True)
-    link_3 = models.CharField(max_length=250, blank=True, null=True)
+    portfolio_web = models.URLField(
+        "Sitio web / Portfolio",
+        blank=True,
+        null=True,
+        help_text="Sitio web personal, de la productora o portfolio online (Vimeo, Behance, etc.)"
+    )
+
+    canal_video = models.URLField(
+        "Canal audiovisual",
+        blank=True,
+        null=True,
+        help_text="Canal de YouTube, Vimeo u otra plataforma de video"
+    )
+
+    instagram = models.URLField(
+        "Instagram",
+        blank=True,
+        null=True,
+        help_text="Perfil de Instagram profesional"
+    )
+
+    linkedin = models.URLField(
+        "LinkedIn",
+        blank=True,
+        null=True,
+        help_text="Perfil de LinkedIn"
+    )
+
+    link_trabajo_destacado = models.URLField(
+        "Trabajo destacado",
+        blank=True,
+        null=True,
+        help_text="Link a una obra o trabajo audiovisual relevante"
+    )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
