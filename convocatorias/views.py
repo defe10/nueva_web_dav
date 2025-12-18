@@ -9,12 +9,14 @@ from convocatorias.models import (
     Postulacion,
     DocumentoPostulacion,
     InscripcionCurso,
-    AsignacionJuradoCategoria,
-    PuntajeJurado,
+    AsignacionJuradoConvocatoria,
 )
 
 from .forms import PostulacionForm, ConvocatoriaForm, DocumentoSubsanadoForm
 from django.contrib import messages
+
+
+
 
 
 
@@ -321,30 +323,17 @@ def subir_documento_subsanado(request, postulacion_id):
 
 
 @login_required
-def panel_jurado(request):
+def ver_documentacion_proyecto(request, postulacion_id):
 
-    # categorías asignadas al jurado
-    categorias = AsignacionJuradoCategoria.objects.filter(
-        jurado=request.user
-    ).values_list("categoria", flat=True)
+    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
 
-    # proyectos a evaluar
-    postulaciones = Postulacion.objects.filter(
-        estado="evaluacion_jurado",
-        convocatoria__categoria__in=categorias
-    ).distinct()
-
-    # puntajes ya cargados por este jurado
-    puntajes = {
-        p.postulacion_id: p
-        for p in PuntajeJurado.objects.filter(jurado=request.user)
-    }
+    documentos = postulacion.documentos.all()
 
     return render(
         request,
-        "convocatorias/panel_jurado.html",
+        "convocatorias/ver_documentacion_proyecto.html",
         {
-            "postulaciones": postulaciones,
-            "puntajes": puntajes,
+            "postulacion": postulacion,
+            "documentos": documentos,
         }
     )

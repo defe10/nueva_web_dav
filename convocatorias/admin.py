@@ -15,8 +15,7 @@ from .models import (
     Postulacion,
     DocumentoPostulacion,
     ObservacionAdministrativa,
-    AsignacionJuradoCategoria,
-    PuntajeJurado,
+    AsignacionJuradoConvocatoria,
 )
 from django.urls import path
 
@@ -344,18 +343,10 @@ class ObservacionAdministrativaAdmin(admin.ModelAdmin):
     search_fields = ("descripcion",)
 
 
-@admin.register(AsignacionJuradoCategoria)
-class AsignacionJuradoCategoriaAdmin(admin.ModelAdmin):
-    list_display = ("jurado", "categoria", "fecha_asignacion")
-    list_filter = ("categoria",)
-    search_fields = ("jurado__username", "categoria")
+@admin.register(AsignacionJuradoConvocatoria)
+class AsignacionJuradoConvocatoriaAdmin(admin.ModelAdmin):
+    list_display = ("jurado", "convocatoria", "fecha_asignacion")
+    list_filter = ("convocatoria",)
+    search_fields = ("jurado__username", "convocatoria__titulo")
 
 
-@admin.register(PuntajeJurado)
-class PuntajeJuradoAdmin(admin.ModelAdmin):
-    list_display = ("jurado", "postulacion", "puntaje", "fecha")
-    list_filter = ("jurado",)
-    search_fields = (
-        "jurado__username",
-        "postulacion__nombre_proyecto",
-    )

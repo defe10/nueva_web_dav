@@ -12,18 +12,3 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
-    operations = [
-        migrations.CreateModel(
-            name='PuntajeJurado',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('puntaje', models.PositiveIntegerField(verbose_name='Puntaje')),
-                ('fecha', models.DateTimeField(auto_now_add=True)),
-                ('jurado', models.ForeignKey(limit_choices_to={'groups__name': 'jurado'}, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Jurado')),
-                ('postulacion', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='puntajes', to='convocatorias.postulacion', verbose_name='Proyecto evaluado')),
-            ],
-            options={
-                'unique_together': {('jurado', 'postulacion')},
-            },
-        ),
-    ]

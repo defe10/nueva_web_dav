@@ -78,6 +78,12 @@ urlpatterns = [
         name="crear_convocatoria"
     ),
 
+    path(
+    "ver-documentacion/<int:postulacion_id>/",
+    views.ver_documentacion_proyecto,
+    name="ver_documentacion_proyecto"
+    ),
+
     # --------------------------------
     # DETALLE DE CONVOCATORIA
     # ⚠️ SIEMPRE ÚLTIMO
@@ -87,4 +93,6 @@ urlpatterns = [
         views.convocatoria_detalle,
         name="convocatoria_detalle"
     ),
+
+
 ]

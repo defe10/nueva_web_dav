@@ -1,0 +1,70 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+{% load roles %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h1 class="fw-bold mb-4 text-center">Panel de Jurado</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+
+            <!-- PANEL -->
+            <div class="p-4 shadow"
+                 style="border-radius: 16px; background: #fff;">
+
+                <h4 class="fw-bold mb-3">
+                    Documentación del proyecto
+                </h4>
+
+                <p class="text-muted mb-3">
+                    Proyecto: <strong>{{ postulacion.nombre_proyecto }}</strong><br>
+                    Convocatoria: <strong>{{ postulacion.convocatoria.titulo }}</strong>
+                </p>
+
+                <hr>
+
+                {% if documentos %}
+                    <ul class="list-group mb-3">
+                        {% for doc in documentos %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ doc.get_tipo_display }}
+                                <a href="{{ doc.archivo.url }}"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Ver documento
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">
+                        No hay documentación de proyecto cargada.
+                    </p>
+                {% endif %}
+
+                <hr>
+
+                <!-- ACCIONES -->
+                <div class="d-grid gap-3 mt-4">
+                    <a href="{% url 'usuarios:panel_jurado' %}"
+                       class="btn btn-outline-secondary">
+                        Volver al panel de jurado
+                    </a>
+
+                    <a href="{% url 'usuarios:logout' %}"
+                       class="btn btn-outline-danger">
+                        Cerrar sesión
+                    </a>
+                </div>
+
+            </div>
+            <!-- /PANEL -->
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

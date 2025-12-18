@@ -129,7 +129,7 @@
             <!-- MI CUENTA / SALIR -->
             {% if user.is_authenticated %}
               <li class="nav-item ms-3">
-                <a class="btn btn-primary btn-sm" href="{% url 'usuarios:panel_usuario' %}">
+                <a class="btn btn-primary btn-sm" href="{% url 'usuarios:redireccion_post_login' %}">
                   Mi cuenta
                 </a>
               </li>
@@ -140,7 +140,7 @@
               </li>
             {% else %}
               <li class="nav-item ms-3">
-                <a class="btn btn-outline-primary btn-sm" href="{% url 'usuarios:login' %}">
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'usuarios:redireccion_post_login' %}">
                   Mi cuenta
                 </a>
               </li>

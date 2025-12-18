@@ -274,7 +274,7 @@ class ObservacionAdministrativa(models.Model):
 
 
 
-class AsignacionJuradoCategoria(models.Model):
+class AsignacionJuradoConvocatoria(models.Model):
     jurado = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -282,48 +282,21 @@ class AsignacionJuradoCategoria(models.Model):
         verbose_name="Jurado"
     )
 
-    categoria = models.CharField(
-        max_length=50,
-        verbose_name="Categoría asignada",
-        help_text="Debe coincidir con la categoría de la convocatoria (ej: cortometrajes)"
+    convocatoria = models.ForeignKey(
+        Convocatoria,
+        on_delete=models.CASCADE,
+        verbose_name="Convocatoria asignada"
     )
 
-    fecha_asignacion = models.DateTimeField(
-        auto_now_add=True
-    )
+    fecha_asignacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Asignación de jurado a categoría"
-        verbose_name_plural = "Asignaciones de jurados a categorías"
-        unique_together = ("jurado", "categoria")
+        unique_together = ("jurado", "convocatoria")
+        verbose_name = "Asignación de jurado a convocatoria"
+        verbose_name_plural = "Asignaciones de jurados a convocatorias"
 
     def __str__(self):
-        return f"{self.jurado.username} → {self.categoria}"
-    
+        return f"{self.jurado.username} → {self.convocatoria.titulo}"
 
-class PuntajeJurado(models.Model):
-    jurado = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        limit_choices_to={"groups__name": "jurado"},
-        verbose_name="Jurado"
-    )
 
-    postulacion = models.ForeignKey(
-        Postulacion,
-        on_delete=models.CASCADE,
-        related_name="puntajes",
-        verbose_name="Proyecto evaluado"
-    )
 
-    puntaje = models.PositiveIntegerField(
-        verbose_name="Puntaje"
-    )
-
-    fecha = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ("jurado", "postulacion")
-
-    def __str__(self):
-        return f"{self.jurado} → {self.postulacion} ({self.puntaje})"

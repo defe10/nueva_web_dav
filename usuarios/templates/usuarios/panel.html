@@ -29,9 +29,10 @@
                 <p><strong>Rol:</strong> {{ user|rol_usuario }}</p>
 
                 {% if user|rol_usuario == "Administrador" %}
-                <div class="alert alert-secondary mt-3">
-                    <strong>Acceso administrativo:</strong> habilitado
-                </div>
+                <a href="/admin/"
+                    class="btn btn-dark w-100 mt-3">
+                    Ir al panel de administración
+                </a>
                 {% endif %}
 
                 <hr>

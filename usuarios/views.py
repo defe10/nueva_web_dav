@@ -18,16 +18,17 @@ from django.core.mail import EmailMultiAlternatives
 # Modelos
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 from exencion.models import Exencion
-from convocatorias.models import Postulacion
+from convocatorias.models import Postulacion, AsignacionJuradoConvocatoria
 
 
+    
 # ============================================================
 # LOGOUT
 # ============================================================
 
 def logout_usuario(request):
     logout(request)
-    return redirect("inicio")
+    return redirect("/")
 
 
 # ============================================================
@@ -193,11 +194,15 @@ def redireccion_post_login(request):
 def panel_usuario(request):
     user = request.user
 
+    # ----------------------------------
     # Registro audiovisual
+    # ----------------------------------
     persona_humana = PersonaHumana.objects.filter(user=user).first()
     persona_juridica = PersonaJuridica.objects.filter(user=user).first()
 
+    # ----------------------------------
     # Última exención
+    # ----------------------------------
     exencion = (
         Exencion.objects
         .filter(user=user)
@@ -205,7 +210,9 @@ def panel_usuario(request):
         .first()
     )
 
-    # Postulaciones
+    # ----------------------------------
+    # Postulaciones del usuario
+    # ----------------------------------
     postulaciones = (
         Postulacion.objects
         .filter(user=user)
@@ -232,9 +239,39 @@ def panel_usuario(request):
 @login_required(login_url="/usuarios/login/")
 def panel_jurado(request):
     user = request.user
+    print(">>> ENTRÓ A panel_jurado (usuarios) <<<")
 
-    # Seguridad extra
+    # Seguridad
     if not user.groups.filter(name="jurado").exists():
         return redirect("usuarios:panel_usuario")
 
-    return render(request, "usuarios/panel_jurado.html")
+    # Convocatorias asignadas
+    convocatorias_asignadas = (
+        AsignacionJuradoConvocatoria.objects
+        .filter(jurado=user)
+        .values_list("convocatoria_id", flat=True)
+    )
+
+    print("DEBUG jurado:", user.username)
+    print("DEBUG convocatorias_asignadas:", list(convocatorias_asignadas))
+
+    postulaciones = (
+        Postulacion.objects
+        .filter(
+            estado="evaluacion_jurado",
+            convocatoria_id__in=convocatorias_asignadas
+        )
+        .select_related("convocatoria", "user")
+        .order_by("-fecha_envio")
+    )
+
+    print("DEBUG postulaciones:", postulaciones.count())
+
+    return render(
+        request,
+        "usuarios/panel_jurado.html",
+        {
+            "postulaciones": postulaciones,
+        }
+    )
+
