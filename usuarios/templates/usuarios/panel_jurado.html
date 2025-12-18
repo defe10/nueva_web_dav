@@ -1,0 +1,49 @@
+{% extends "sitio_publico/base.html" %}
+{% block content %}
+
+<div class="container py-5">
+
+    <h1 class="fw-bold mb-4 text-center">Panel de Jurado</h1>
+
+    {% if postulaciones %}
+        {% for p in postulaciones %}
+            <div class="card mb-3">
+                <div class="card-body">
+
+                    <h5 class="fw-bold">{{ p.nombre_proyecto }}</h5>
+                    <p class="text-muted mb-2">
+                        Convocatoria: {{ p.convocatoria.titulo }}
+                    </p>
+
+                    {% if p.id in puntajes %}
+                        <span class="badge bg-success">
+                            Puntaje enviado: {{ puntajes.p.id.puntaje }}
+                        </span>
+                    {% else %}
+                        <form method="post" action="{% url 'convocatorias:puntuar' p.id %}">
+                            {% csrf_token %}
+                            <input type="number"
+                                   name="puntaje"
+                                   min="1"
+                                   max="10"
+                                   required
+                                   class="form-control mb-2"
+                                   placeholder="Puntaje (1 a 10)">
+                            <button class="btn btn-primary btn-sm">
+                                Enviar puntaje
+                            </button>
+                        </form>
+                    {% endif %}
+
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted text-center">
+            No tenés proyectos asignados para evaluar.
+        </p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

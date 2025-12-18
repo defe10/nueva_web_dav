@@ -1,5 +1,6 @@
 {% extends "sitio_publico/base.html" %}
 {% load static %}
+{% load roles %}
 
 {% block content %}
 
@@ -25,6 +26,16 @@
 
                 <hr>
 
+                <p><strong>Rol:</strong> {{ user|rol_usuario }}</p>
+
+                {% if user|rol_usuario == "Administrador" %}
+                <div class="alert alert-secondary mt-3">
+                    <strong>Acceso administrativo:</strong> habilitado
+                </div>
+                {% endif %}
+
+                <hr>
+
                 <!-- ESTADO DEL REGISTRO -->
                 {% if persona_humana or persona_juridica %}
                     <p class="mb-2">
@@ -44,7 +55,6 @@
                         </p>
                     {% endif %}
                 {% else %}
-                    
                     <p class="mb-2">
                         <strong>Estado del registro audiovisual:</strong>
                         <span class="badge bg-warning text-dark ms-2">
@@ -54,49 +64,82 @@
                 {% endif %}
 
                 <hr>
-                    <p class="mb-3"><strong>Mis convocatorias:</strong></p>
-                    
 
-{% if postulaciones %}
-    {% for p in postulaciones %}
-        <p class="mb-2">
-            <strong>{{ p.convocatoria.titulo }}</strong><br>
-            <span class="text-muted small">
-                Proyecto: <strong>{{ p.nombre_proyecto }}</strong>
-            </span>
+                <!-- MIS CONVOCATORIAS -->
+                <p class="mb-3"><strong>Mis convocatorias:</strong></p>
 
-            <span class="badge ms-2
-                {% if p.estado == 'enviado' %}
-                    bg-secondary
-                {% elif p.estado == 'revision_admin' %}
-                    bg-info
-                {% elif p.estado == 'observado' %}
-                    bg-warning text-dark
-                {% elif p.estado == 'admitido' %}
-                    bg-primary
-                {% elif p.estado == 'evaluacion_jurado' %}
-                    bg-primary
-                {% elif p.estado == 'seleccionado' %}
-                    bg-success
-                {% elif p.estado == 'no_seleccionado' %}
-                    bg-danger
-                {% elif p.estado == 'finalizado' %}
-                    bg-success
-                {% else %}
-                    bg-secondary
+                {% if postulaciones %}
+                    {% for p in postulaciones %}
+                        <p class="mb-2">
+                            <strong>{{ p.convocatoria.titulo }}</strong><br>
+                            <span class="text-muted small">
+                                Proyecto: <strong>{{ p.nombre_proyecto }}</strong>
+                            </span>
+
+                            <span class="badge ms-2
+                                {% if p.estado == 'enviado' %}
+                                    bg-secondary
+                                {% elif p.estado == 'revision_admin' %}
+                                    bg-info
+                                {% elif p.estado == 'observado' %}
+                                    bg-warning text-dark
+                                {% elif p.estado == 'admitido' %}
+                                    bg-primary
+                                {% elif p.estado == 'evaluacion_jurado' %}
+                                    bg-primary
+                                {% elif p.estado == 'seleccionado' %}
+                                    bg-success
+                                {% elif p.estado == 'no_seleccionado' %}
+                                    bg-danger
+                                {% elif p.estado == 'finalizado' %}
+                                    bg-success
+                                {% else %}
+                                    bg-secondary
+                                {% endif %}
+                            ">
+                                {{ p.get_estado_display }}
+                            </span>
+                        </p>
+
+
+
+
+                        
+                        {# ============================= #}
+                        {# OBSERVACIONES / SUBSANACIÓN  #}
+                        {# ============================= #}
+                        {% if p.estado == "observado" %}
+                <div class="alert alert-warning mt-3">
+                    <h6 class="fw-bold mb-2">
+                        Observaciones pendientes
+                    </h6>
+
+                    <ul class="mb-2">
+                        {% for obs in p.observaciones.all %}
+                            {% if not obs.subsanada %}
+                                <li>
+                                    <strong>{{ obs.get_tipo_documento_display }}:</strong>
+                                    {{ obs.descripcion }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+
+                    <a href="{% url 'convocatorias:subir_documento_subsanado' p.id %}"
+                    class="btn btn-warning btn-sm mt-2">
+                        Subir documentación solicitada
+                    </a>
+                </div>
                 {% endif %}
-            ">
-                {{ p.get_estado_display }}
-            </span>
-        </p>
-    {% endfor %}
-{% else %}
-    <p class="text-muted small">
-        No participaste en ninguna convocatoria.
-    </p>
-    <hr>
-{% endif %}
 
+                        <hr>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted small">
+                        No participaste en ninguna convocatoria.
+                    </p>
+                    <hr>
+                {% endif %}
 
                 <!-- ACCIONES -->
                 <div class="d-grid gap-3 mt-4">
@@ -147,9 +190,6 @@
                     </a>
 
                 </div>
-                
-
-
 
             </div>
             <!-- /PANEL -->

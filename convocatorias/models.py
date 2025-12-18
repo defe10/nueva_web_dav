@@ -198,6 +198,7 @@ class DocumentoPostulacion(models.Model):
     TIPOS = [
         ("PERSONAL", "Documentación personal"),
         ("PROYECTO", "Documentación del proyecto"),
+        ("SUBSANADO", "Documentación subsanada"),
     ]
 
     postulacion = models.ForeignKey(
@@ -206,18 +207,13 @@ class DocumentoPostulacion(models.Model):
         related_name="documentos"
     )
 
-    tipo = models.CharField(max_length=20, choices=TIPOS)
+    tipo = models.CharField(
+        max_length=20,
+        choices=TIPOS
+    )
 
     archivo = models.FileField(upload_to="postulaciones/documentos/")
     fecha_subida = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Documento de postulación"
-        verbose_name_plural = "Documentos de postulación"
-        ordering = ["-fecha_subida"]
-
-    def __str__(self):
-        return f"{self.get_tipo_display()} – {self.postulacion.nombre_proyecto}"
 
 
 # ==========================================
@@ -235,3 +231,99 @@ class InscripcionCurso(models.Model):
 
     def __str__(self):
         return f"{self.user.username} → {self.convocatoria.titulo}"
+
+
+
+class ObservacionAdministrativa(models.Model):
+
+    TIPOS_DOCUMENTO = [
+        ("PERSONAL", "Documentación personal"),
+        ("PROYECTO", "Documentación del proyecto"),
+    ]
+
+    postulacion = models.ForeignKey(
+        Postulacion,
+        on_delete=models.CASCADE,
+        related_name="observaciones"
+    )
+
+    tipo_documento = models.CharField(
+        max_length=20,
+        choices=TIPOS_DOCUMENTO,
+        help_text="Tipo de documentación a subsanar"
+    )
+
+    descripcion = models.CharField(
+        max_length=255,
+        help_text="Ej: Falta DNI, Falta CBU, Presupuesto sin firma"
+    )
+
+    creada_por = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    subsanada = models.BooleanField(default=False)
+
+
+# convocatorias/models.py
+
+
+
+class AsignacionJuradoCategoria(models.Model):
+    jurado = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={"groups__name": "jurado"},
+        verbose_name="Jurado"
+    )
+
+    categoria = models.CharField(
+        max_length=50,
+        verbose_name="Categoría asignada",
+        help_text="Debe coincidir con la categoría de la convocatoria (ej: cortometrajes)"
+    )
+
+    fecha_asignacion = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = "Asignación de jurado a categoría"
+        verbose_name_plural = "Asignaciones de jurados a categorías"
+        unique_together = ("jurado", "categoria")
+
+    def __str__(self):
+        return f"{self.jurado.username} → {self.categoria}"
+    
+
+class PuntajeJurado(models.Model):
+    jurado = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={"groups__name": "jurado"},
+        verbose_name="Jurado"
+    )
+
+    postulacion = models.ForeignKey(
+        Postulacion,
+        on_delete=models.CASCADE,
+        related_name="puntajes",
+        verbose_name="Proyecto evaluado"
+    )
+
+    puntaje = models.PositiveIntegerField(
+        verbose_name="Puntaje"
+    )
+
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("jurado", "postulacion")
+
+    def __str__(self):
+        return f"{self.jurado} → {self.postulacion} ({self.puntaje})"

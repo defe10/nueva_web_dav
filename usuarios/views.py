@@ -32,6 +32,7 @@ def logout_usuario(request):
 
 # ============================================================
 # REGISTRO DE USUARIO
+# (solo usuarios comunes, NO jurados)
 # ============================================================
 
 def registro(request):
@@ -39,7 +40,9 @@ def registro(request):
         form = RegistroUsuarioForm(request.POST)
 
         if form.is_valid():
-            usuario = form.save()  # se crea inactivo
+            usuario = form.save(commit=False)
+            usuario.is_active = False
+            usuario.save()
 
             current_site = get_current_site(request)
             subject = "Confirmá tu cuenta"
@@ -83,7 +86,11 @@ def registro(request):
     else:
         form = RegistroUsuarioForm()
 
-    return render(request, "usuarios/registro.html", {"form": form})
+    return render(
+        request,
+        "usuarios/registro.html",
+        {"form": form},
+    )
 
 
 # ============================================================
@@ -111,10 +118,12 @@ def login_usuario(request):
 
             login(request, user)
 
+            # Si Django pasó ?next=, se respeta
             if next_url and next_url.startswith("/"):
                 return redirect(next_url)
 
-            return redirect("inicio")
+            # 👇 REDIRECCIÓN CENTRALIZADA POR ROL
+            return redirect("usuarios:redireccion_post_login")
 
     else:
         form = LoginForm()
@@ -122,7 +131,10 @@ def login_usuario(request):
     return render(
         request,
         "usuarios/login.html",
-        {"form": form, "next": next_url},
+        {
+            "form": form,
+            "next": next_url,
+        },
     )
 
 
@@ -154,22 +166,38 @@ def activar_cuenta(request, uidb64, token):
 
 
 # ============================================================
-# PANEL DE USUARIO
+# REDIRECCIÓN POST LOGIN (CLAVE)
+# ============================================================
+
+@login_required(login_url="/usuarios/login/")
+def redireccion_post_login(request):
+    user = request.user
+
+    # Jurado
+    if user.groups.filter(name="jurado").exists():
+        return redirect("usuarios:panel_jurado")
+
+    # Admin
+    if user.is_staff or user.is_superuser:
+        return redirect("/admin/")
+
+    # Usuario común
+    return redirect("usuarios:panel_usuario")
+
+
+# ============================================================
+# PANEL DE USUARIO COMÚN
 # ============================================================
 
 @login_required(login_url="/usuarios/login/")
 def panel_usuario(request):
     user = request.user
 
-    # ----------------------------------
     # Registro audiovisual
-    # ----------------------------------
     persona_humana = PersonaHumana.objects.filter(user=user).first()
     persona_juridica = PersonaJuridica.objects.filter(user=user).first()
 
-    # ----------------------------------
-    # Exención (última solicitud)
-    # ----------------------------------
+    # Última exención
     exencion = (
         Exencion.objects
         .filter(user=user)
@@ -177,9 +205,7 @@ def panel_usuario(request):
         .first()
     )
 
-    # ----------------------------------
-    # Convocatorias (postulaciones)
-    # ----------------------------------
+    # Postulaciones
     postulaciones = (
         Postulacion.objects
         .filter(user=user)
@@ -197,3 +223,18 @@ def panel_usuario(request):
             "postulaciones": postulaciones,
         },
     )
+
+
+# ============================================================
+# PANEL DE JURADO
+# ============================================================
+
+@login_required(login_url="/usuarios/login/")
+def panel_jurado(request):
+    user = request.user
+
+    # Seguridad extra
+    if not user.groups.filter(name="jurado").exists():
+        return redirect("usuarios:panel_usuario")
+
+    return render(request, "usuarios/panel_jurado.html")

@@ -52,7 +52,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container">
 
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'inicio' %}">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'sitio_publico:inicio' %}">
           <img
             src="{% static 'sitio_publico/img/SEC DE CULTURA - AZUL.png' %}"
             alt="Secretaría de Cultura, Gobierno de Salta"
@@ -76,7 +76,7 @@
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'inicio' %}">Inicio</a>
+              <a class="nav-link" href="{% url 'sitio_publico:inicio' %}">Inicio</a>
             </li>
 
             <!-- PROGRAMAS -->
@@ -215,7 +215,7 @@
           <div class="col-md-4 mb-3">
             <h6 class="text-uppercase fw-bold small">Enlaces útiles</h6>
             <ul class="list-unstyled small">
-              <li><a href="{% url 'inicio' %}" class="text-muted">Inicio</a></li>
+              <li><a href="{% url 'sitio_publico:inicio' %}" class="text-muted">Inicio</a></li>
               <li><a href="{% url 'sitio_publico:institucional' %}" class="text-muted">Institucional</a></li>
               <li><a href="{% url 'convocatorias:convocatorias_home' %}" class="text-muted">Convocatorias</a></li>
             </ul>

@@ -1,0 +1,61 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+
+            <div class="p-4 shadow"
+                 style="border-radius: 16px; background: #fff;">
+
+                <h3 class="fw-bold mb-3">
+                    Subir documentación solicitada
+                </h3>
+
+                <p class="text-muted">
+                    Subí el documento requerido para subsanar la observación
+                    administrativa realizada sobre tu postulación.
+                </p>
+
+                <hr>
+
+                <p class="mb-3">
+                    <strong>Proyecto:</strong> {{ postulacion.nombre_proyecto }}
+                </p>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        {{ form.archivo.label_tag }}
+                        {{ form.archivo }}
+                        {% if form.archivo.errors %}
+                            <div class="text-danger small">
+                                {{ form.archivo.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning">
+                            Subir documento
+                        </button>
+
+                        <a href="{% url 'usuarios:panel_usuario' %}"
+                           class="btn btn-outline-secondary">
+                            Volver al panel
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

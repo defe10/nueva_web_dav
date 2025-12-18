@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.text import slugify
 from .models import Postulacion, Convocatoria, Jurado
-
+from .models import DocumentoPostulacion
 
 # convocatorias/forms.py
 from django import forms
@@ -103,3 +103,7 @@ class ConvocatoriaForm(forms.ModelForm):
 
         return obj
 
+class DocumentoSubsanadoForm(forms.ModelForm):
+    class Meta:
+        model = DocumentoPostulacion
+        fields = ["archivo"]

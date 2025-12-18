@@ -14,6 +14,9 @@ from .models import (
     Convocatoria,
     Postulacion,
     DocumentoPostulacion,
+    ObservacionAdministrativa,
+    AsignacionJuradoCategoria,
+    PuntajeJurado,
 )
 from django.urls import path
 
@@ -326,3 +329,33 @@ class PostulacionAdmin(admin.ModelAdmin):
         return response
 
     exportar_excel_postulaciones.short_description = "📤 Exportar seleccionadas a Excel (.xlsx)"
+
+
+@admin.register(ObservacionAdministrativa)
+class ObservacionAdministrativaAdmin(admin.ModelAdmin):
+    list_display = (
+        "postulacion",
+        "tipo_documento",
+        "descripcion",
+        "subsanada",
+        "fecha_creacion",
+    )
+    list_filter = ("subsanada", "tipo_documento")
+    search_fields = ("descripcion",)
+
+
+@admin.register(AsignacionJuradoCategoria)
+class AsignacionJuradoCategoriaAdmin(admin.ModelAdmin):
+    list_display = ("jurado", "categoria", "fecha_asignacion")
+    list_filter = ("categoria",)
+    search_fields = ("jurado__username", "categoria")
+
+
+@admin.register(PuntajeJurado)
+class PuntajeJuradoAdmin(admin.ModelAdmin):
+    list_display = ("jurado", "postulacion", "puntaje", "fecha")
+    list_filter = ("jurado",)
+    search_fields = (
+        "jurado__username",
+        "postulacion__nombre_proyecto",
+    )

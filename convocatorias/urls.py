@@ -15,8 +15,17 @@ urlpatterns = [
     ),
 
     # --------------------------------
+    # SUBSANACIÓN DE DOCUMENTACIÓN
+    # --------------------------------
+    path(
+        "subsanar/<int:postulacion_id>/",
+        views.subir_documento_subsanado,
+        name="subir_documento_subsanado"
+    ),
+
+    # --------------------------------
     # INSCRIBIRSE A UNA CONVOCATORIA
-    # (decide flujo según la línea)
+    # (decide flujo según línea)
     # --------------------------------
     path(
         "<slug:slug>/inscribirse/",
@@ -25,7 +34,7 @@ urlpatterns = [
     ),
 
     # --------------------------------
-    # FORMULARIO DE POSTULACIÓN (PASO 1)
+    # FORMULARIO DE POSTULACIÓN
     # --------------------------------
     path(
         "postular/<int:convocatoria_id>/",
@@ -34,7 +43,7 @@ urlpatterns = [
     ),
 
     # --------------------------------
-    # DOCUMENTACIÓN PERSONAL (PASO 2)
+    # DOCUMENTACIÓN PERSONAL
     # --------------------------------
     path(
         "documentacion/personal/<int:postulacion_id>/",
@@ -43,7 +52,7 @@ urlpatterns = [
     ),
 
     # --------------------------------
-    # DOCUMENTACIÓN DEL PROYECTO (PASO 3)
+    # DOCUMENTACIÓN DEL PROYECTO
     # --------------------------------
     path(
         "documentacion/proyecto/<int:postulacion_id>/",
@@ -52,7 +61,7 @@ urlpatterns = [
     ),
 
     # --------------------------------
-    # POSTULACIÓN COMPLETADA (PASO FINAL)
+    # POSTULACIÓN COMPLETADA
     # --------------------------------
     path(
         "postulacion/enviada/<int:postulacion_id>/",
@@ -70,8 +79,8 @@ urlpatterns = [
     ),
 
     # --------------------------------
-    # DETALLE DE LA CONVOCATORIA
-    # SIEMPRE ÚLTIMO
+    # DETALLE DE CONVOCATORIA
+    # ⚠️ SIEMPRE ÚLTIMO
     # --------------------------------
     path(
         "<slug:slug>/",

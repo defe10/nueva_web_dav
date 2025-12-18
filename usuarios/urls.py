@@ -19,6 +19,9 @@ urlpatterns = [
     # Panel de usuario
     # ----------------------------------
     path("panel/", views.panel_usuario, name="panel_usuario"),
+    path("panel-jurado/", views.panel_jurado, name="panel_jurado"),
+
+    path("redireccion/", views.redireccion_post_login, name="redireccion_post_login"),
 
     # ----------------------------------
     # Activación de cuenta
@@ -68,4 +71,6 @@ urlpatterns += [
         ),
         name="password_reset_complete",
     ),
+
+    
 ]

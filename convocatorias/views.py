@@ -9,9 +9,13 @@ from convocatorias.models import (
     Postulacion,
     DocumentoPostulacion,
     InscripcionCurso,
+    AsignacionJuradoCategoria,
+    PuntajeJurado,
 )
 
-from .forms import PostulacionForm, ConvocatoriaForm
+from .forms import PostulacionForm, ConvocatoriaForm, DocumentoSubsanadoForm
+from django.contrib import messages
+
 
 
 # ============================================================
@@ -273,4 +277,74 @@ def convocatoria_detalle(request, slug):
         {
             "convocatoria": convocatoria,
         },
+    )
+
+@login_required
+def subir_documento_subsanado(request, postulacion_id):
+    postulacion = get_object_or_404(
+        Postulacion,
+        id=postulacion_id,
+        user=request.user
+    )
+
+    if request.method == "POST":
+        form = DocumentoSubsanadoForm(request.POST, request.FILES)
+        if form.is_valid():
+            documento = form.save(commit=False)
+            documento.postulacion = postulacion
+            documento.tipo = "SUBSANADO"
+            documento.documento = "SUBSANADO"
+            documento.save()
+
+            # 🔁 Cambio de estado
+            postulacion.estado = "revision_admin"
+            postulacion.save()
+
+            messages.success(
+                request,
+                "La documentación fue enviada correctamente y se encuentra en revisión administrativa."
+            )
+
+            return redirect("usuarios:panel_usuario")
+    else:
+        form = DocumentoSubsanadoForm()
+
+    return render(
+        request,
+        "convocatorias/subir_documento_subsanado.html",
+        {
+            "postulacion": postulacion,
+            "form": form
+        }
+    )
+
+
+
+@login_required
+def panel_jurado(request):
+
+    # categorías asignadas al jurado
+    categorias = AsignacionJuradoCategoria.objects.filter(
+        jurado=request.user
+    ).values_list("categoria", flat=True)
+
+    # proyectos a evaluar
+    postulaciones = Postulacion.objects.filter(
+        estado="evaluacion_jurado",
+        convocatoria__categoria__in=categorias
+    ).distinct()
+
+    # puntajes ya cargados por este jurado
+    puntajes = {
+        p.postulacion_id: p
+        for p in PuntajeJurado.objects.filter(jurado=request.user)
+    }
+
+    return render(
+        request,
+        "convocatorias/panel_jurado.html",
+        {
+            "postulaciones": postulaciones,
+            "puntajes": puntajes,
+        }
     )

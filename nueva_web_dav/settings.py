@@ -166,7 +166,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_URL = '/usuarios/login/'
 
-LOGIN_REDIRECT_URL = '/registro/seleccionar-tipo/'
+LOGIN_REDIRECT_URL = '/usuarios/redireccion/'
 
 
 # ============================================
