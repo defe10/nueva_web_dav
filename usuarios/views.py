@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django_ratelimit.decorators import ratelimit
+from django_ratelimit.exceptions import Ratelimited
 
 # Formularios
 from .forms import LoginForm, RegistroUsuarioForm
@@ -98,36 +100,43 @@ def registro(request):
 # LOGIN
 # ============================================================
 
+@ratelimit(key="ip", rate="5/m", block=True)
 def login_usuario(request):
     next_url = request.GET.get("next") or request.POST.get("next")
 
     if next_url in [None, "", "None", "null", "undefined"]:
         next_url = None
 
-    if request.method == "POST":
-        form = LoginForm(request, data=request.POST)
+    try:
+        if request.method == "POST":
+            form = LoginForm(request, data=request.POST)
 
-        if form.is_valid():
-            user = form.get_user()
+            if form.is_valid():
+                user = form.get_user()
 
-            if not user.is_active:
-                messages.error(
-                    request,
-                    "Tu cuenta aún no está activada. Revisá tu correo."
-                )
-                return redirect("usuarios:login")
+                if not user.is_active:
+                    messages.error(
+                        request,
+                        "Tu cuenta aún no está activada. Revisá tu correo."
+                    )
+                    return redirect("usuarios:login")
 
-            login(request, user)
+                login(request, user)
 
-            # Si Django pasó ?next=, se respeta
-            if next_url and next_url.startswith("/"):
-                return redirect(next_url)
+                if next_url and next_url.startswith("/"):
+                    return redirect(next_url)
 
-            # 👇 REDIRECCIÓN CENTRALIZADA POR ROL
-            return redirect("usuarios:redireccion_post_login")
+                return redirect("usuarios:redireccion_post_login")
+        else:
+            form = LoginForm()
 
-    else:
-        form = LoginForm()
+    except Ratelimited:
+        messages.error(
+            request,
+            "Se superó el número máximo de intentos de inicio de sesión. "
+            "Por favor, intentá nuevamente en unos minutos."
+        )
+        return redirect("usuarios:login")
 
     return render(
         request,
