@@ -6,7 +6,7 @@
 <!-- HERO UNIFICADO -->
 <section class="fomento-hero text-center">
   <h1 class="fw-bold mb-2">Documentación personal</h1>
-  <p class="text-muted mb-0">
+  <p class="text-white mb-0">
     {{ postulacion.nombre_proyecto }}
   </p>
 </section>
@@ -32,12 +32,10 @@
     <div class="col-lg-4 mb-4">
       <div class="dav-card">
         <h5 class="fw-bold mb-3">Subí tu documentación personal</h5>
-        <p class="mb-0 small">
-          Documentación obligatoria del responsable del proyecto:<br><br>
-          • DNI o pasaporte<br>
-          • Constancia de CUIT<br>
-          • Constancia de DGR / ARBA<br><br>
-          <strong>Formatos admitidos:</strong> PDF.
+        <p class="mb-0">
+          Documentación requerida al Presentante establecida en las Bases y Condiciones de la convocatoria.<br><br>
+          <strong>Formato admitido:</strong> PDF.<br>
+          <strong>Tamaño máximo</strong> 5mb.
         </p>
       </div>
     </div>
@@ -61,6 +59,13 @@
                    class="form-control"
                    required>
           </div>
+      {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-danger">
+          {{ message }}
+          </div>
+          {% endfor %}
+          {% endif %} 
 
           <div class="col-12 text-end mt-4">
             <button type="submit" class="btn btn-primary">

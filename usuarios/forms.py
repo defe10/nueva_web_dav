@@ -37,10 +37,25 @@ class RegistroUsuarioForm(forms.ModelForm):
     # Campo honeypot (invisible al usuario)
     honeypot = forms.CharField(required=False, widget=forms.HiddenInput)
 
+    first_name = forms.CharField(
+        label="Nombre",
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(attrs={"placeholder": "Tu nombre"})
+    )
+
+    last_name = forms.CharField(
+        label="Apellido",
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "Tu apellido"})
+    )
+
     password1 = forms.CharField(
         label="Contraseña",
         widget=forms.PasswordInput(attrs={"placeholder": "Ingresá tu contraseña"})
     )
+
     password2 = forms.CharField(
         label="Repetir contraseña",
         widget=forms.PasswordInput(attrs={"placeholder": "Repetí tu contraseña"})
@@ -48,15 +63,19 @@ class RegistroUsuarioForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["email"]
+        fields = ["email", "first_name", "last_name"]
         widgets = {
             "email": forms.EmailInput(attrs={"placeholder": "tu@email.com"}),
         }
 
+    # ------------------------
+    # VALIDACIONES
+    # ------------------------
     def clean_email(self):
-        if User.objects.filter(email=self.cleaned_data.get("email")).exists():
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Ya existe una cuenta con este correo.")
-        return self.cleaned_data.get("email")
+        return email
 
     def clean_password2(self):
         p1 = self.cleaned_data.get("password1")
@@ -70,17 +89,24 @@ class RegistroUsuarioForm(forms.ModelForm):
             raise forms.ValidationError("Error inesperado.")
         return ""
 
+    # ------------------------
+    # GUARDADO
+    # ------------------------
     def save(self, commit=True):
         user = super().save(commit=False)
+
         email = self.cleaned_data["email"]
 
         user.username = email
         user.email = email
+        user.first_name = self.cleaned_data["first_name"].strip()
+        user.last_name = self.cleaned_data["last_name"].strip()
         user.set_password(self.cleaned_data["password1"])
-        user.is_active = False  # Se activa con confirmación por email
+        user.is_active = False  # activación por email
 
         if commit:
             user.save()
+
         return user
 
 

@@ -6,7 +6,7 @@
 <!-- HERO UNIFICADO -->
 <section class="fomento-hero text-center">
   <h1 class="fw-bold mb-2">Documentación del proyecto</h1>
-  <p class="text-muted mb-0">
+  <p class="text-white mb-0">
     {{ postulacion.nombre_proyecto }}
   </p>
 </section>
@@ -33,10 +33,9 @@
       <div class="dav-card">
         <h5 class="fw-bold mb-3">Subí la documentación del proyecto</h5>
         <p class="mb-0 small">
-          Podés subir uno o varios archivos según los requisitos de la convocatoria:<br>
-          dossier, guion, presupuesto, plan de rodaje, etc.<br><br>
-          <strong>Formatos admitidos:</strong> PDF, JPG o PNG.<br><br>
-          Cuando termines, hacé clic en
+          Documentación del proyecto establecida en las Bases y Condiciones de la convocatoria.<br><br>
+          <strong>Formato admitido:</strong> PDF.<br>
+          <strong>Tamaño máximo</strong> 5mb.
           <strong>“Finalizar postulación”</strong>.
         </p>
       </div>
@@ -66,6 +65,14 @@
                    class="form-control"
                    required>
           </div>
+
+          {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-danger">
+          {{ message }}
+          </div>
+          {% endfor %}
+          {% endif %} 
 
           <!-- BOTÓN -->
           <div class="col-12 text-end mt-4">

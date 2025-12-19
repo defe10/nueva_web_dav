@@ -77,6 +77,7 @@ class PersonaHumanaForm(forms.ModelForm):
             "instagram": forms.URLInput(attrs={"class": "form-control"}),
             "linkedin": forms.URLInput(attrs={"class": "form-control"}),
             "link_trabajo_destacado": forms.URLInput(attrs={"class": "form-control"}),
+
         }
 
     def clean(self):

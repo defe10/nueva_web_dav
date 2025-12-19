@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.text import slugify
+from .validators import validar_pdf, validar_tamano_archivo
 
 
 # ==========================================
@@ -140,11 +141,22 @@ class Postulacion(models.Model):
     nombre_proyecto = models.CharField(max_length=255)
 
     TIPO_PROYECTO = [
+        ('', '- Seleccionar -'),
+        ('', '- Cine -'),
         ("cine_corto", "Cortometraje"),
         ("cine_largo", "Largometraje"),
+        ('', '- Serie -'),
         ("serie", "Serie"),
         ("serie_web", "Serie Web"),
-        ("animacion", "Animación"),
+        ('', '- Animacion -'),
+        ("corto_animacion", "Cortometraje animación"),
+        ("largo_animacion", "Largoometraje animación"),
+        ("serie_animacion", "Serie animación"),
+        ("serieweb_animacion", "Serie web animación"),
+        ("videoclip_animacion", "Videoclip animación"),
+        ('', '- Otros -'),
+        ("tv", "TV"),
+        ("publicidad", "Publicidad"),
         ("videoclip", "Videoclip"),
         ("videojuego", "Videojuego"),
         ("transmedia", "Transmedia"),
@@ -157,6 +169,9 @@ class Postulacion(models.Model):
         ("documental", "Documental"),
         ("noficcion", "No ficción"),
         ("educativo", "Educativo"),
+        ("deportivo", "Deportivo"),
+        ("simulacion", "Simulacion"),
+        ("ludico", "Lúdico"),
         ("otro", "Otro"),
     ]
     genero = models.CharField(max_length=50, choices=GENERO)
@@ -212,7 +227,10 @@ class DocumentoPostulacion(models.Model):
         choices=TIPOS
     )
 
-    archivo = models.FileField(upload_to="postulaciones/documentos/")
+    archivo = models.FileField(
+    upload_to="postulaciones/documentos/",
+    validators=[validar_pdf, validar_tamano_archivo],
+)
     fecha_subida = models.DateTimeField(auto_now_add=True)
 
 
@@ -300,3 +318,12 @@ class AsignacionJuradoConvocatoria(models.Model):
 
 
 
+
+
+class ArchivoPostulacion(models.Model):
+
+    archivo = models.FileField(
+        upload_to="convocatorias/archivos/",
+        validators=[validar_pdf, validar_tamano_archivo],
+        verbose_name="Archivo del proyecto (PDF)"
+    )

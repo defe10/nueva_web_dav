@@ -18,6 +18,8 @@ from .models import (
     AsignacionJuradoConvocatoria,
 )
 from django.urls import path
+from django.urls import reverse
+from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 
 
 # ============================================================
@@ -89,12 +91,15 @@ class PostulacionAdmin(admin.ModelAdmin):
         "tipo_proyecto",
         "genero",
         "convocatoria",
+        "convocatoria__linea",
+        "convocatoria__categoria",
     )
 
     search_fields = (
         "nombre_proyecto",
         "user__username",
         "user__email",
+        "convocatoria__titulo",
     )
 
     ordering = ("-fecha_envio",)
@@ -108,7 +113,6 @@ class PostulacionAdmin(admin.ModelAdmin):
     # DETALLE
     # -------------------------
     readonly_fields = (
-        "user",
         "presentante",
         "convocatoria",
         "fecha_envio",
@@ -120,7 +124,6 @@ class PostulacionAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Datos del presentante", {
             "fields": (
-                "user",
                 "presentante",
                 "fecha_envio",
                 "edad",
@@ -150,14 +153,35 @@ class PostulacionAdmin(admin.ModelAdmin):
     usuario.short_description = "Usuario"
 
     def presentante(self, obj):
-        ph = getattr(obj.user, "persona_humana", None)
-        pj = getattr(obj.user, "persona_juridica", None)
-        if ph:
-            return ph.nombre_completo
-        if pj:
-            return pj.razon_social
-        return obj.user.username
+        persona_humana = PersonaHumana.objects.filter(user=obj.user).first()
+        persona_juridica = PersonaJuridica.objects.filter(user=obj.user).first()
+
+        if persona_humana:
+            url = reverse(
+                "admin:registro_audiovisual_personahumana_change",
+                args=[persona_humana.id]
+            )
+            return format_html(
+                '<a href="{}">{}</a>',
+                url,
+                persona_humana.nombre_completo
+            )
+
+        if persona_juridica:
+            url = reverse(
+                "admin:registro_audiovisual_personajuridica_change",
+                args=[persona_juridica.id]
+            )
+            return format_html(
+                '<a href="{}">{}</a>',
+                url,
+                persona_juridica.razon_social
+            )
+
+        return "—"
+
     presentante.short_description = "Presentante"
+
 
     def edad(self, obj):
         ph = getattr(obj.user, "persona_humana", None)

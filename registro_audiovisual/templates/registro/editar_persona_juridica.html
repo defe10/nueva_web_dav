@@ -6,7 +6,7 @@
 <!-- HERO UNIFICADO -->
 <section class="fomento-hero text-center">
   <h1 class="fw-bold mb-2">Registro Audiovisual</h1>
-  <p class="text-muted mb-0">Persona Jurídica</p>
+  <p class="text-white mb-0">Persona Jurídica</p>
 </section>
 
 <div class="container mt-2">
@@ -30,7 +30,7 @@
       <div class="dav-card">
         <h5 class="mb-3">Datos de la persona jurídica</h5>
         <p>
-          Ingresá los datos tal como figuran en la documentación oficial de la entidad.<br><br>
+          Ingresá los datos como figuran en la documentación oficial de la entidad.<br><br>
           La información correcta y actualizada es esencial para validar la inscripción
           y agilizar cualquier trámite administrativo.
         </p>
@@ -113,7 +113,7 @@
             {{ form.fecha_constitucion.errors }}
           </div>
 
-          <div class="mb-3">
+          <div class="col-md-7 mb-3">
             <label class="form-label">Antigüedad (años)</label>
               <input
                 type="text"
@@ -123,15 +123,18 @@
               >
           </div>
 
-          <div class="col-md-5">
+          <div class="col-md-6">
             <label class="form-label">Teléfono</label>
             {{ form.telefono }}
             {{ form.telefono.errors }}
           </div>
 
-          <div class="col-md-8">
+          <div class="col-md-6">
             <label class="form-label">Correo electrónico</label>
             {{ form.email }}
+            <small class="text-muted">
+              Correo para notificaciones administrativas.
+            </small>
             {{ form.email.errors }}
           </div>
 

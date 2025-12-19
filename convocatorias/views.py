@@ -8,12 +8,12 @@ from convocatorias.models import (
     Convocatoria,
     Postulacion,
     DocumentoPostulacion,
-    InscripcionCurso,
     AsignacionJuradoConvocatoria,
 )
 
 from .forms import PostulacionForm, ConvocatoriaForm, DocumentoSubsanadoForm
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 
 
 
@@ -46,22 +46,19 @@ def inscribirse_convocatoria(request, slug):
     linea = convocatoria.linea.lower()
 
     # --------------------------------------
-    # FORMACIÓN → inscripción simple
+    # FORMACIÓN → postulación directa (sin formulario)
     # --------------------------------------
     if linea == "formacion":
-        inscripcion, creada = InscripcionCurso.objects.get_or_create(
+
+        Postulacion.objects.get_or_create(
             user=request.user,
-            convocatoria=convocatoria
+            convocatoria=convocatoria,
+            defaults={
+                "estado": "INSCRIPTA"
+            }
         )
 
-        return render(
-            request,
-            "convocatorias/inscripcion_curso_completada.html",
-            {
-                "convocatoria": convocatoria,
-                "creada": creada,
-            },
-        )
+        return redirect("usuarios:panel_usuario")
 
     # --------------------------------------
     # FOMENTO + BENEFICIO → IDEA
@@ -88,6 +85,7 @@ def inscribirse_convocatoria(request, slug):
         "convocatorias:convocatoria_detalle",
         slug=convocatoria.slug
     )
+
 
 
 # ============================================================
@@ -169,25 +167,48 @@ def subir_documentacion_personal(request, postulacion_id):
     if postulacion.user != request.user:
         return redirect("convocatorias:convocatorias_home")
 
-    if request.method == "POST" and request.FILES.getlist("archivos"):
-        for archivo in request.FILES.getlist("archivos"):
-            DocumentoPostulacion.objects.create(
+    # POST: intenta guardar archivos
+    if request.method == "POST":
+        archivos = request.FILES.getlist("archivos")
+
+        if not archivos:
+            messages.error(request, "No se seleccionó ningún archivo.")
+            return render(
+                request,
+                "convocatorias/documentacion_personal.html",
+                {"postulacion": postulacion},
+            )
+
+        for archivo in archivos:
+            documento = DocumentoPostulacion(
                 postulacion=postulacion,
                 tipo="PERSONAL",
                 archivo=archivo,
-            )           
+            )
+            try:
+                documento.full_clean()  # 🔐 valida PDF + tamaño
+                documento.save()
+            except ValidationError as e:
+                # Mensaje amigable y volvemos a mostrar el mismo formulario (sin redirect loop)
+                msg = e.message_dict.get("archivo", ["Error al validar el archivo."])[0]
+                messages.error(request, msg)
+                return render(
+                    request,
+                    "convocatorias/documentacion_personal.html",
+                    {"postulacion": postulacion},
+                )
 
+        # Si todos los archivos pasaron la validación
         return redirect(
             "convocatorias:subir_documentacion_proyecto",
             postulacion_id=postulacion.id,
         )
 
+    # GET: muestra el formulario
     return render(
         request,
         "convocatorias/documentacion_personal.html",
-        {
-            "postulacion": postulacion,
-        },
+        {"postulacion": postulacion},
     )
 
 
@@ -202,25 +223,55 @@ def subir_documentacion_proyecto(request, postulacion_id):
     if postulacion.user != request.user:
         return redirect("convocatorias:convocatorias_home")
 
-    if request.method == "POST" and request.FILES.getlist("archivos"):
-        for archivo in request.FILES.getlist("archivos"):
-            DocumentoPostulacion.objects.create(
-                postulacion=postulacion,
-                tipo="PROYECTO",
-                archivo=archivo,
+    # --------------------------------------
+    # POST → subir archivos
+    # --------------------------------------
+    if request.method == "POST":
+        archivos = request.FILES.getlist("archivos")
+
+        if not archivos:
+            messages.error(request, "No se seleccionó ningún archivo.")
+            return render(
+                request,
+                "convocatorias/documentacion_proyecto.html",
+                {"postulacion": postulacion},
             )
 
+        for archivo in archivos:
+            documento = DocumentoPostulacion(
+                postulacion=postulacion,
+                tipo="PROYECTO",  # ✅ correcto
+                archivo=archivo,
+            )
+            try:
+                documento.full_clean()  # 🔐 valida PDF + tamaño
+                documento.save()
+            except ValidationError as e:
+                messages.error(
+                    request,
+                    e.message_dict.get("archivo", ["Error al validar el archivo."])[0]
+                )
+                return render(
+                    request,
+                    "convocatorias/documentacion_proyecto.html",
+                    {"postulacion": postulacion},
+                )
+
+        # --------------------------------------
+        # si todo salió bien
+        # --------------------------------------
         return redirect(
             "convocatorias:postulacion_confirmada",
             postulacion_id=postulacion.id,
         )
 
+    # --------------------------------------
+    # GET → mostrar formulario
+    # --------------------------------------
     return render(
         request,
         "convocatorias/documentacion_proyecto.html",
-        {
-            "postulacion": postulacion,
-        },
+        {"postulacion": postulacion},
     )
 
 

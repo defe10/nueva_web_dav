@@ -75,8 +75,8 @@ SITUACION_IVA = [('', '- Seleccionar -'),
 
 ACTIVIDAD_DGR = [
     ('', '- Seleccionar -'),
-    ('PF', '591110 - Producción de filmes y videocintas'),
-    ('PPF', '591120 - Postproducción de filmes y videocintas'),
+    ('591110', '591110 - Producción de filmes y videocintas'),
+    ('591120', '591120 - Postproducción de filmes y videocintas'),
     ('O', 'Otra'),
     ('N', 'Ninguna'),
 
@@ -182,6 +182,7 @@ AREA_CULTURAL = [
         ('comunicacion', 'Comunicación'),
         ('locutor', 'Locutor/a'),
         ('educacion', 'Educación'),
+        ('ninguna', 'Ninguna'),
         ('otro', 'Otro'),
     ]
 
@@ -311,38 +312,38 @@ class PersonaHumana(models.Model):
         verbose_name="Área cultural complementaria"
     )
 
-    portfolio_web = models.URLField(
+    portfolio_web = models.CharField(
         "Sitio web / Portfolio",
+        max_length=300,
         blank=True,
-        null=True,
         help_text="Sitio web personal, de la productora o portfolio online (Vimeo, Behance, etc.)"
     )
 
-    canal_video = models.URLField(
+    canal_video = models.CharField(
         "Canal audiovisual",
+        max_length=300,
         blank=True,
-        null=True,
         help_text="Canal de YouTube, Vimeo u otra plataforma de video"
     )
 
-    instagram = models.URLField(
+    instagram = models.CharField(
         "Instagram",
+        max_length=300,
         blank=True,
-        null=True,
         help_text="Perfil de Instagram profesional"
     )
 
-    linkedin = models.URLField(
+    linkedin = models.CharField(
         "LinkedIn",
+        max_length=300,
         blank=True,
-        null=True,
         help_text="Perfil de LinkedIn"
     )
 
-    link_trabajo_destacado = models.URLField(
+    link_trabajo_destacado = models.CharField(
         "Trabajo destacado",
+        max_length=300,
         blank=True,
-        null=True,
         help_text="Link a una obra o trabajo audiovisual relevante"
     )
 
@@ -432,38 +433,38 @@ class PersonaJuridica(models.Model):
         verbose_name="Área de desempeño secundaria"
     )
 
-    portfolio_web = models.URLField(
+    portfolio_web = models.CharField(
         "Sitio web / Portfolio",
+        max_length=300,
         blank=True,
-        null=True,
         help_text="Sitio web personal, de la productora o portfolio online (Vimeo, Behance, etc.)"
     )
 
-    canal_video = models.URLField(
+    canal_video = models.CharField(
         "Canal audiovisual",
+        max_length=300,
         blank=True,
-        null=True,
         help_text="Canal de YouTube, Vimeo u otra plataforma de video"
     )
 
-    instagram = models.URLField(
+    instagram = models.CharField(
         "Instagram",
+        max_length=300,
         blank=True,
-        null=True,
         help_text="Perfil de Instagram profesional"
     )
 
-    linkedin = models.URLField(
+    linkedin = models.CharField(
         "LinkedIn",
+        max_length=300,
         blank=True,
-        null=True,
         help_text="Perfil de LinkedIn"
     )
 
-    link_trabajo_destacado = models.URLField(
+    link_trabajo_destacado = models.CharField(
         "Trabajo destacado",
+        max_length=300,
         blank=True,
-        null=True,
         help_text="Link a una obra o trabajo audiovisual relevante"
     )
 

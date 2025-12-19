@@ -178,11 +178,7 @@ def redireccion_post_login(request):
     if user.groups.filter(name="jurado").exists():
         return redirect("usuarios:panel_jurado")
 
-    # Admin
-    if user.is_staff or user.is_superuser:
-        return redirect("/admin/")
-
-    # Usuario común
+    # Todos los demás (incluye admin)
     return redirect("usuarios:panel_usuario")
 
 

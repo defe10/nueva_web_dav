@@ -6,7 +6,7 @@
 <!-- HERO UNIFICADO -->
 <section class="fomento-hero text-center">
   <h1 class="fw-bold mb-2">Postulación a la convocatoria</h1>
-  <p class="text-muted">{{ convocatoria.titulo }}</p>
+  <p class="text-white">{{ convocatoria.titulo }}</p>
 </section>
 
 <div class="container mt-4">
@@ -31,11 +31,11 @@
       <div class="dav-card">
         <div class="dav-card-body">
           <h5 class="fw-bold mb-3">Completá la información del proyecto</h5>
-          <p class="mb-0 small">
+          <p class="mb-0">
             Esta información es necesaria para validar tu postulación.<br><br>
             <strong>Muy importante:</strong> antes de continuar, asegurate de
             actualizar tus datos en el Registro Audiovisual desde
-            <em>“Mi cuenta”</em>. Esa información acompañará tu convocatoria.<br><br>
+            <em>“Mi cuenta”</em>. La información del Registro acompañará tu convocatoria y tendrá validez legal.<br><br>
             Al finalizar este formulario, hacé clic en <strong>“Siguiente”</strong>.
           </p>
         </div>
@@ -85,7 +85,7 @@
             <div class="col-12 mt-3">
               <div class="form-check">
                 {{ form.declaracion_jurada }}
-                <label class="form-check-label ms-2">
+                <label class="form-check-label ms-2 small">
                   DECLARACIÓN JURADA: Confirmo que he leído las bases y condiciones
                   de <strong>{{ convocatoria.titulo }}</strong> y acepto los
                   requisitos de participación y aprobación.
