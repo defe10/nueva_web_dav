@@ -50,15 +50,26 @@ def inscribirse_convocatoria(request, slug):
     # --------------------------------------
     if linea == "formacion":
 
-        Postulacion.objects.get_or_create(
+        postulacion, creada = Postulacion.objects.get_or_create(
             user=request.user,
             convocatoria=convocatoria,
             defaults={
                 "estado": "INSCRIPTA"
             }
+    )
+
+    if creada:
+        messages.success(
+            request,
+            "Su inscripción fue registrada correctamente."
+        )
+    else:
+        messages.info(
+            request,
+            "Su inscripción ya se encuentra registrada."
         )
 
-        return redirect("usuarios:panel_usuario")
+    return redirect("usuarios:panel_usuario")
 
     # --------------------------------------
     # FOMENTO + BENEFICIO → IDEA
@@ -105,6 +116,12 @@ def postular_convocatoria(request, convocatoria_id):
     persona_juridica = PersonaJuridica.objects.filter(user=user).first()
 
     if not (persona_humana or persona_juridica):
+        messages.info(
+            request,
+            "Para inscribirse en esta convocatoria, es necesario completar previamente "
+            "los datos del Registro Audiovisual. "
+            "Una vez finalizado el registro, podrá volver a esta convocatoria y completar su inscripción."
+    )
         return redirect(
             f"/registro/seleccionar-tipo/?next=/convocatorias/{convocatoria.slug}/inscribirse/"
         )

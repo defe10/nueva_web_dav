@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- Meta básicos -->
     <meta name="description" content="Dirección de Audiovisuales - Secretaría de Cultura de Salta" />
     <meta name="keywords" content="audiovisuales, salta, cultura, cine, film commission" />
     <meta name="author" content="Gobierno de Salta" />
@@ -126,7 +127,7 @@
               </a>
             </li>
 
-            <!-- MI CUENTA / SALIR -->
+            <!-- MI CUENTA -->
             {% if user.is_authenticated %}
               <li class="nav-item ms-3">
                 <a class="btn btn-primary btn-sm" href="{% url 'usuarios:redireccion_post_login' %}">
@@ -241,31 +242,7 @@
     <!-- ===================== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Carrusel -->
-    <script>
-      function moverCarrusel(flecha, direccion) {
-        const wrap = flecha.closest(".carrusel-wrap");
-        if (!wrap) return;
-
-        const contenedor = wrap.querySelector(".carrusel");
-        if (!contenedor) return;
-
-        const card = contenedor.querySelector(".card-area, .card-fomento");
-        if (!card) return;
-
-        const styles = window.getComputedStyle(contenedor);
-        const gap = parseInt(styles.gap || styles.columnGap || 0);
-        const cardWidth = card.offsetWidth + gap;
-
-        const maxScroll = contenedor.scrollWidth - contenedor.clientWidth + gap;
-        let destino = contenedor.scrollLeft + direccion * cardWidth;
-        destino = Math.max(0, Math.min(destino, maxScroll));
-
-        contenedor.scrollTo({ left: destino, behavior: "smooth" });
-      }
-    </script>
-
-    <!-- Offcanvas botón -->
+    <!-- Offcanvas gestión -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const offcanvas = document.getElementById("offcanvasGestion");
@@ -276,8 +253,6 @@
         offcanvas.addEventListener("hidden.bs.offcanvas", () => boton.style.display = "block");
       });
     </script>
-
-    
 
     {% block extra_js %}{% endblock %}
   </body>

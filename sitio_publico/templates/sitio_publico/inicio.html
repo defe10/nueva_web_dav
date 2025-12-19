@@ -1,30 +1,41 @@
-{% extends 'sitio_publico/base.html' %} {% load static %} {% block title%}Inicio
-— Dirección de Audiovisuales{% endblock %} {% block layout %}
+{% extends "sitio_publico/base.html" %}
+{% load static %}
 
+{% block title %}
+Inicio — Dirección de Audiovisuales
+{% endblock %}
+
+{% block layout %}
+
+<!-- ================================================== -->
 <!-- HERO -->
+<!-- ================================================== -->
 <section class="hero-section py-5">
   <div class="container">
     <div class="row g-4">
+
       <!-- CARD IZQUIERDA -->
       <div class="col-lg-3">
         <div class="hero-card-left p-4 p-lg-5 h-100">
-          <div class="d-flex flex-wrap gap-3">
-            <img
-              src="{% static 'sitio_publico/img/dav.png' %}"
-              class="d-block w-100 hero-img2"
-              alt="Imagen 1"
-            />
-          </div>
+
+          <img
+            src="{% static 'sitio_publico/img/dav.png' %}"
+            class="d-block w-100 hero-img2 mb-3"
+            alt="Dirección de Audiovisuales de Salta"
+          />
+
           <h3 class="fw-bold mb-3 text-white">
             Dirección de Audiovisuales de Salta
           </h3>
 
-          <div class="redes mb-1 mt-3">
+          <!-- REDES -->
+          <div class="redes mt-3">
             <a
               href="https://web.facebook.com/davsalta"
               target="_blank"
               rel="noopener noreferrer"
               class="mx-2 redes-icon"
+              aria-label="Facebook"
             >
               <i class="bi bi-facebook"></i>
             </a>
@@ -34,6 +45,7 @@
               target="_blank"
               rel="noopener noreferrer"
               class="mx-2 redes-icon"
+              aria-label="YouTube"
             >
               <i class="bi bi-youtube"></i>
             </a>
@@ -43,42 +55,50 @@
               target="_blank"
               rel="noopener noreferrer"
               class="mx-2 redes-icon"
+              aria-label="Instagram"
             >
               <i class="bi bi-instagram"></i>
             </a>
           </div>
+
         </div>
       </div>
 
       <!-- CARD CENTRO -->
       <div class="col-lg-3">
-        <div class="hero-card-center p-4 p-lg-5 h-100">
-          <h4 class="fw-light mb-4 text-white">
-            Conocé los programas y actividades que buscan impulsar la actividad
-            audiovisual local.
+        <div class="hero-card-center p-4 p-lg-5 h-100 d-flex flex-column justify-content-between">
+          <h4 class="fw-light text-white mb-4">
+            Conocé los programas y actividades que impulsan la actividad
+            audiovisual en la provincia.
           </h4>
+
           <div>
-            <a href="{% url 'sitio_publico:programas' %}" class="btn btn-outline-light btn-lg boton-programa">
+            <a
+              href="{% url 'sitio_publico:programas' %}"
+              class="btn btn-outline-light btn-lg boton-programa"
+            >
               Programas y actividades
             </a>
           </div>
         </div>
       </div>
 
-      <!-- CARD DERECHA (Carrusel) -->
+      <!-- CARD DERECHA · CARRUSEL -->
       <div class="col-lg-6">
         <div class="hero-card-right h-100">
+
           <div
             id="heroCarousel"
             class="carousel slide h-100"
             data-bs-ride="carousel"
           >
             <div class="carousel-inner h-100">
+
               <div class="carousel-item active h-100">
                 <img
                   src="{% static 'sitio_publico/img/cash-rebate.jpg' %}"
                   class="d-block w-100 hero-img"
-                  alt="Imagen 1"
+                  alt="Cash Rebate"
                 />
               </div>
 
@@ -86,7 +106,7 @@
                 <img
                   src="{% static 'sitio_publico/img/cinemovil.jpg' %}"
                   class="d-block w-100 hero-img"
-                  alt="Imagen 2"
+                  alt="Cine Móvil"
                 />
               </div>
 
@@ -94,7 +114,7 @@
                 <img
                   src="{% static 'sitio_publico/img/fomento.jpg' %}"
                   class="d-block w-100 hero-img"
-                  alt="Imagen 3"
+                  alt="Fomento audiovisual"
                 />
               </div>
 
@@ -102,9 +122,10 @@
                 <img
                   src="{% static 'sitio_publico/img/estudio387.jpg' %}"
                   class="d-block w-100 hero-img"
-                  alt="Imagen 4"
+                  alt="Estudio 387"
                 />
               </div>
+
             </div>
 
             <!-- CONTROLES -->
@@ -125,230 +146,77 @@
             >
               <span class="carousel-control-next-icon"></span>
             </button>
+
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </section>
 
-
-<!-- Botón lateral Gestión y Trámites -->
-{% comment %} <button
-  id="btnGestion"
-  class="offcanvas-btn-left"
-  type="button"
-  data-bs-toggle="offcanvas"
-  data-bs-target="#offcanvasGestion"
-  aria-controls="offcanvasGestion"
->
-  Gestión y Trámites
-</button>
-
-<div
-  class="offcanvas offcanvas-start"
-  tabindex="-1"
-  id="offcanvasGestion"
-  aria-labelledby="offcanvasGestionLabel"
->
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasGestionLabel">
-      Gestión y Trámites
-    </h5>
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="offcanvas"
-      aria-label="Cerrar"
-    ></button>
-  </div>
-
-  <div class="offcanvas-body">
-    <p class="text-muted small">
-      Accedé a los trámites y gestiones vinculadas al sector audiovisual.
-    </p>
-
-    <div class="list-group list-group-flush">
-      <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}" class="list-group-item list-group-item-action">
-        Inscripción en el Registro Audiovisual
-      </a>
-
-      <a href="{% url 'convocatorias:convocatorias_home' %}" class="list-group-item list-group-item-action">
-        Solicitud de Cine Móvil
-      </a>
-
-      <button
-        class="list-group-item list-group-item-action"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#infoAvales"
-        aria-expanded="false"
-        aria-controls="infoAvales"
-        >
-        Solicitud de avales
-      </button>
-
-      <div class="collapse mt-2" id="infoAvales">
-        <div class="small text-muted ps-3 pe-2">
-          <p class="mb-2">
-            La Dirección de Audiovisuales de Salta, a solicitud de quien lo requiera,
-            puede emitir avales o cartas de interés para ser presentadas ante los organismos
-            o instituciones que así lo precisen.
-          </p>
-          <p class="mb-2">
-            Para ello, deberá remitir una solicitud formal al correo audiovisuales@edusalta.gov.ar,
-            dirigida al director, Federico Casoni, adjuntando una nota en la que se detallen los motivos
-            por los cuales se requiere dicho instrumento. Se solicita que, como mínimo, este pedido se efectúe
-            con 5 días de antelación previo al cierre de la convocatoria, evento o instancia que se trate.
-          </p>
-          <p class="mb-0">
-            Asimismo, en caso de tratarse de un proyecto, se deberá adjuntar dossier o carpeta donde se despliegue la propuesta en su integralidad,
-            de manera de tomar conocimiento en su conjunto.
-          </p>
-        </div>
-      </div>
-
-
-      <button
-        class="list-group-item list-group-item-action"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#infocash"
-        aria-expanded="false"
-        aria-controls="infocash"
-        >
-        Cash Rebate
-      </button>
-
-      <div class="collapse mt-2" id="infocash">
-        <div class="small text-muted ps-3 pe-2">
-          <p class="mb-2">
-            Para acceder a la convocatoria de Cash Rebate debe ir a convocatorias abiertas/ Beneficios o dirigirse a htttps://saltaset.gob.ar/beneficios
-          </p>
-        </div>
-      </div>
-
-      <button
-        class="list-group-item list-group-item-action"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#infoexencion"
-        aria-expanded="false"
-        aria-controls="infoexencion"
-        >
-        Exención impositiva
-      </button>
-
-      <div class="collapse mt-2" id="infoexencion">
-        <div class="small text-muted ps-3 pe-2">
-          <p class="mb-2">
-            Para acceder a la convocatoria de Cash Rebate debe ir a convocatorias abiertas/ Beneficios o dirigirse a htttps://saltaset.gob.ar/beneficios
-          </p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>  {% endcomment %}
-
-
-
+<!-- ================================================== -->
+<!-- CONVOCATORIAS -->
+<!-- ================================================== -->
 <section class="py-5 bg-light">
   <div class="container">
 
-    <!-- TÍTULO -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="fw-bold mb-0">Convocatorias abiertas</h3>
-    </div>
+    <h3 class="fw-bold mb-3">Convocatorias abiertas</h3>
 
     <!-- FILTROS -->
     <div class="mb-4 d-flex flex-wrap gap-2 filtros-convocatorias">
-
-      <a href="?"
-        class="filtro {% if not request.GET.categoria %}active{% endif %}">
-        Todas
-      </a>
-
-      <a href="?categoria=CONCURSO"
-        class="filtro {% if request.GET.categoria == 'CONCURSO' %}active{% endif %}">
-        Concursos
-      </a>
-
-      <a href="?categoria=PROGRAMA"
-        class="filtro {% if request.GET.categoria == 'PROGRAMA' %}active{% endif %}">
-        Programas
-      </a>
-
-      <a href="?categoria=SUBSIDIO"
-        class="filtro {% if request.GET.categoria == 'SUBSIDIO' %}active{% endif %}">
-        Subsidios
-      </a>
-
-      <a href="?categoria=CURSO"
-        class="filtro {% if request.GET.categoria == 'CURSO' %}active{% endif %}">
-        Cursos
-      </a>
-
-      <a href="?categoria=INCENTIVO"
-        class="filtro {% if request.GET.categoria == 'INCENTIVO' %}active{% endif %}">
-        Incentivos
-      </a>
-
-      <a href="?categoria=BENEFICIO"
-        class="filtro {% if request.GET.categoria == 'BENEFICIO' %}active{% endif %}">
-        Beneficios
-      </a>
+      <a href="?" class="filtro {% if not request.GET.categoria %}active{% endif %}">Todas</a>
+      <a href="?categoria=CONCURSO" class="filtro {% if request.GET.categoria == 'CONCURSO' %}active{% endif %}">Concursos</a>
+      <a href="?categoria=PROGRAMA" class="filtro {% if request.GET.categoria == 'PROGRAMA' %}active{% endif %}">Programas</a>
+      <a href="?categoria=SUBSIDIO" class="filtro {% if request.GET.categoria == 'SUBSIDIO' %}active{% endif %}">Subsidios</a>
+      <a href="?categoria=CURSO" class="filtro {% if request.GET.categoria == 'CURSO' %}active{% endif %}">Cursos</a>
+      <a href="?categoria=INCENTIVO" class="filtro {% if request.GET.categoria == 'INCENTIVO' %}active{% endif %}">Incentivos</a>
+      <a href="?categoria=BENEFICIO" class="filtro {% if request.GET.categoria == 'BENEFICIO' %}active{% endif %}">Beneficios</a>
     </div>
 
-
-    <!-- CONTENIDO -->
     {% if vigentes %}
-    <div class="row g-3">
+      <div class="row g-3">
 
-    {% for c in vigentes %}
-    <div class="col-md-6 col-lg-3">
+        {% for c in vigentes %}
+          <div class="col-md-6 col-lg-3">
+            <a
+              href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+              class="convocatoria-card-mubi"
+            >
 
-      <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
-         class="convocatoria-card-mubi">
+              {% if c.imagen %}
+                <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+              {% else %}
+                <div class="convocatoria-placeholder"></div>
+              {% endif %}
 
-        {% if c.imagen %}
-          <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
-        {% else %}
-          <div class="convocatoria-placeholder"></div>
-        {% endif %}
+              <div class="overlay">
+                <span class="categoria">{{ c.get_categoria_display }}</span>
+                <h5 class="titulo">{{ c.titulo }}</h5>
+                <p class="fecha">
+                  Abierta hasta {{ c.fecha_fin|date:"d/m/Y" }}
+                </p>
+              </div>
 
-        <div class="overlay">
-          <span class="categoria">
-            {{ c.get_categoria_display }}
-          </span>
+            </a>
+          </div>
+        {% endfor %}
 
-          <h5 class="titulo">
-            {{ c.titulo }}
-          </h5>
-
-          <p class="fecha">
-            Abierta hasta {{ c.fecha_fin|date:"d/m/Y" }}
-          </p>
-        </div>
-
-      </a>
-
-    </div>
-    {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-light border text-muted">
+        No hay convocatorias abiertas en esta categoría en este momento.
+      </div>
+    {% endif %}
 
   </div>
-
-{% else %}
-  <!-- MENSAJE CUANDO NO HAY RESULTADOS -->
-  <div class="alert alert-light border text-muted">
-    No hay convocatorias abiertas en esta categoría en este momento.
-  </div>
-{% endif %}
-</div>
 </section>
 
+<!-- ================================================== -->
+<!-- GESTIONES Y TRÁMITES -->
+<!-- ================================================== -->
 <section class="py-5">
-  <div class="container">
+  <div class="container justify-content-center">
     <h3 class="fw-bold mb-4">Gestiones y trámites</h3>
 
     <div class="row g-3 justify-content-center">
@@ -357,7 +225,10 @@
         <div class="card h-100 text-center shadow-sm">
           <div class="card-body">
             <h6 class="fw-bold mb-3">Registro Audiovisual</h6>
-            <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}" class="btn btn-outline-primary btn-sm">
+            <a
+              href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}"
+              class="btn btn-outline-primary btn-sm"
+            >
               Iniciar registro
             </a>
           </div>
@@ -368,7 +239,10 @@
         <div class="card h-100 text-center shadow-sm">
           <div class="card-body">
             <h6 class="fw-bold mb-3">Exención impositiva</h6>
-            <a href="{% url 'exencion:iniciar' %}" class="btn btn-outline-primary btn-sm">
+            <a
+              href="http://127.0.0.1:8000/convocatorias/exencion-impositiva/"
+              class="btn btn-outline-primary btn-sm"
+            >
               Solicitar
             </a>
           </div>
@@ -379,27 +253,22 @@
         <div class="card h-100 text-center shadow-sm">
           <div class="card-body">
             <h6 class="fw-bold mb-3">Cine Móvil</h6>
-            <a href="#" class="btn btn-outline-primary btn-sm">
-              Solicitar
-            </a>
+            <a href="https://docs.google.com/forms/d/1dUELTaF8F3UWd1FT9o-lvkoofWsxZ4aF2kbB8rCAAGo/edit" class="btn btn-outline-primary btn-sm">Solicitar</a>
           </div>
         </div>
       </div>
 
-      <div class="col-sm-6 col-lg-3">
+      {% comment %} <div class="col-sm-6 col-lg-3">
         <div class="card h-100 text-center shadow-sm">
           <div class="card-body">
             <h6 class="fw-bold mb-3">Avales institucionales</h6>
-            <a href="#" class="btn btn-outline-primary btn-sm">
-              Solicitar
-            </a>
+            <a href="#" class="btn btn-outline-primary btn-sm">Solicitar</a>
           </div>
         </div>
-      </div>
+      </div> {% endcomment %}
 
     </div>
   </div>
 </section>
 
-
-{% endblock %} 
+{% endblock %}
