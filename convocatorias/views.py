@@ -152,7 +152,7 @@ def postular_convocatoria(request, convocatoria_id):
             postulacion = form.save(commit=False)
             postulacion.user = user
             postulacion.convocatoria = convocatoria
-            postulacion.estado = "ENVIADA"
+            postulacion.estado = "enviado"
             postulacion.save()
 
             return redirect(
