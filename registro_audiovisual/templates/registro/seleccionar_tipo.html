@@ -15,7 +15,7 @@
 
       <div class="dav-steps">
         <div class="step active">1. Tipo de persona</div>
-        <div class="step">2. Completar datos y enviar</div>
+        <div class="step">2. Completar datos</div>
       </div>
 
     </div>
@@ -51,20 +51,24 @@
 
         <form method="post">
           {% csrf_token %}
-          <button type="submit"
-                  class="btn btn-outline-info me-2"
-                  name="tipo"
-                  value="humana">
-            Persona Humana
-          </button>
 
-          <button type="submit"
-                  class="btn btn-outline-info"
-                  name="tipo"
-                  value="juridica">
-            Persona Jurídica
-          </button>
+          <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
+            <button type="submit"
+                    class="btn btn-outline-info w-100 w-md-auto"
+                    name="tipo"
+                    value="humana">
+              Persona Humana
+            </button>
+
+            <button type="submit"
+                    class="btn btn-outline-info w-100 w-md-auto"
+                    name="tipo"
+                    value="juridica">
+              Persona Jurídica
+            </button>
+          </div>
         </form>
+
       </div>
     </div>
 
