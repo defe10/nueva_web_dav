@@ -74,7 +74,7 @@ def inscribirse_convocatoria(request, slug):
     # --------------------------------------
     # FOMENTO + BENEFICIO → IDEA
     # --------------------------------------
-    if linea in ["fomento", "beneficio"]:
+    elif linea in ["fomento", "beneficio"]:
         return redirect(
             "convocatorias:postular_convocatoria",
             convocatoria_id=convocatoria.id
@@ -83,7 +83,7 @@ def inscribirse_convocatoria(request, slug):
     # --------------------------------------
     # INCENTIVO → EXENCIÓN
     # --------------------------------------
-    if linea == "incentivo":
+    elif linea == "incentivo":
         return redirect(
             "exencion:iniciar_convocatoria",
             convocatoria_id=convocatoria.id
@@ -96,6 +96,7 @@ def inscribirse_convocatoria(request, slug):
         "convocatorias:convocatoria_detalle",
         slug=convocatoria.slug
     )
+
 
 
 
