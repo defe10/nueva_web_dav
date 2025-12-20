@@ -278,3 +278,28 @@ body {
         text-transform: none;
     }
 }
+
+/* ============================================================
+   BOTONES – MOBILE
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    /* Contenedores de botones */
+    .d-grid.gap-3,
+    .d-grid.gap-2,
+    .botonera,
+    .acciones,
+    .acciones-panel {
+        gap: 0.75rem !important;
+    }
+
+    /* Botones apilados */
+    .btn {
+        width: 100%;
+        max-width: 320px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+}
