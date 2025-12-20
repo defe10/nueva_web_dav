@@ -46,7 +46,7 @@ def inscribirse_convocatoria(request, slug):
     linea = convocatoria.linea.lower()
 
     # --------------------------------------
-    # FORMACIÓN → postulación directa (sin formulario)
+    # FORMACIÓN → inscripción directa
     # --------------------------------------
     if linea == "formacion":
 
@@ -54,22 +54,22 @@ def inscribirse_convocatoria(request, slug):
             user=request.user,
             convocatoria=convocatoria,
             defaults={
-                "estado": "INSCRIPTA"
+                "estado": "enviado"
             }
-    )
-
-    if creada:
-        messages.success(
-            request,
-            "Su inscripción fue registrada correctamente."
-        )
-    else:
-        messages.info(
-            request,
-            "Su inscripción ya se encuentra registrada."
         )
 
-    return redirect("usuarios:panel_usuario")
+        if creada:
+            messages.success(
+                request,
+                "Tu inscripción fue registrada correctamente."
+            )
+        else:
+            messages.info(
+                request,
+                "Ya estabas inscripto/a en esta convocatoria."
+            )
+
+        return redirect("usuarios:panel_usuario")
 
     # --------------------------------------
     # FOMENTO + BENEFICIO → IDEA
@@ -90,7 +90,7 @@ def inscribirse_convocatoria(request, slug):
         )
 
     # --------------------------------------
-    # Fallback
+    # Fallback seguro
     # --------------------------------------
     return redirect(
         "convocatorias:convocatoria_detalle",
