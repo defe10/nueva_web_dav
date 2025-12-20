@@ -122,9 +122,20 @@ class Convocatoria(models.Model):
         return self.fecha_inicio <= hoy <= self.fecha_fin
 
     def save(self, *args, **kwargs):
-        if not self.slug and self.titulo:
-            self.slug = slugify(self.titulo)
+        if self._state.adding and self.titulo:
+            base_slug = slugify(self.titulo)
+            slug = base_slug
+            counter = 1
+
+            while Convocatoria.objects.filter(slug=slug).exists():
+                counter += 1
+                slug = f"{base_slug}-{counter}"
+
+            self.slug = slug
+
         super().save(*args, **kwargs)
+
+
 
     def __str__(self):
         return self.titulo
