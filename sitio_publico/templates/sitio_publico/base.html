@@ -127,31 +127,50 @@
               </a>
             </li>
 
-            <!-- MI CUENTA -->
+          
             {% if user.is_authenticated %}
-              <li class="nav-item ms-3">
-                <div class="d-flex flex-column flex-md-row gap-2 align-items-center">
-                  <a class="btn btn-primary btn-sm w-100 w-md-auto"
-                    href="{% url 'usuarios:redireccion_post_login' %}">
-                    Mi cuenta
-                  </a>
+              <li class="nav-item dropdown ms-2">
+                <a class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
 
-                  <a class="btn btn-outline-primary btn-sm w-100 w-md-auto"
-                    href="{% url 'usuarios:logout' %}">
-                    Salir
-                  </a>
-                </div>
-                </li>
+                  {% if user.first_name and user.last_name %}
+                      {{ user.first_name }} {{ user.last_name }}
+                  {% elif user.first_name %}
+                      {{ user.first_name }}
+                  {% else %}
+                      {{ user.email|default:user.username }}
+                  {% endif %}
+
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item"
+                      href="{% url 'usuarios:panel_usuario' %}">
+                      Mi cuenta
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item text-danger"
+                      href="{% url 'usuarios:logout' %}">
+                      Cerrar sesión
+                    </a>
+                  </li>
+                </ul>
+              </li>
               {% else %}
-              <li class="nav-item ms-3">
-                <div class="d-flex justify-content-center">
-                  <a class="btn btn-outline-primary btn-sm"
-                    href="{% url 'usuarios:login' %}">
-                    Mi cuenta
-                  </a>
-                </div>
-                </li>
-            {% endif %}
+              <li class="nav-item ms-2">
+                <a class="btn btn-outline-primary btn-sm"
+                  href="{% url 'usuarios:login' %}">
+                  Ingresar
+                </a>
+              </li>
+              {% endif %}
+
 
 
           </ul>
@@ -159,25 +178,7 @@
       </div>
     </nav>
 
-    <!-- ===================== -->
-    <!-- MENSAJES -->
-    <!-- ===================== -->
-    {% if messages %}
-      <div class="container mt-3">
-        {% for message in messages %}
-          <div class="alert
-            {% if message.tags == 'error' %}alert-danger
-            {% elif message.tags == 'success' %}alert-success
-            {% elif message.tags == 'warning' %}alert-warning
-            {% else %}alert-info{% endif %}
-            alert-dismissible fade show"
-            role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+  
 
     <!-- ===================== -->
     <!-- CONTENIDO -->

@@ -179,16 +179,11 @@ def activar_cuenta(request, uidb64, token):
 # REDIRECCIÓN POST LOGIN (CLAVE)
 # ============================================================
 
+
 @login_required(login_url="/usuarios/login/")
 def redireccion_post_login(request):
-    user = request.user
+    return redirect("sitio_publico:inicio")
 
-    # Jurado
-    if user.groups.filter(name="jurado").exists():
-        return redirect("usuarios:panel_jurado")
-
-    # Todos los demás (incluye admin)
-    return redirect("usuarios:panel_usuario")
 
 
 # ============================================================

@@ -119,9 +119,9 @@ def postular_convocatoria(request, convocatoria_id):
     if not (persona_humana or persona_juridica):
         messages.info(
             request,
-            "Para inscribirse en esta convocatoria, es necesario completar previamente "
-            "los datos del Registro Audiovisual. "
-            "Una vez finalizado el registro, podrá volver a esta convocatoria y completar su inscripción."
+            "Antes de inscribirte, es necesario completar el Registro Audiovisual."
+            "Una vez finalizado, podrás volver a esta convocatoria y completar tu inscripción."
+
     )
         return redirect(
             f"/registro/seleccionar-tipo/?next=/convocatorias/{convocatoria.slug}/inscribirse/"

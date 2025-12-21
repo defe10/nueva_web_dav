@@ -44,6 +44,15 @@
     <div class="col-lg-8">
       <div class="dav-card">
 
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+
         <form method="post"
               enctype="multipart/form-data"
               class="row g-3">
@@ -59,13 +68,6 @@
                    class="form-control"
                    required>
           </div>
-      {% if messages %}
-          {% for message in messages %}
-          <div class="alert alert-danger">
-          {{ message }}
-          </div>
-          {% endfor %}
-          {% endif %} 
 
           <div class="col-12 text-end mt-4">
             <button type="submit" class="btn btn-primary">
