@@ -7,10 +7,5 @@ media/
 staticfiles/
 db.sqlite3
 
-*.pdf
-*.jpg
-*.jpeg
-*.png
-
 .DS_Store
 .vscode/
