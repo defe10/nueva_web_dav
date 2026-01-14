@@ -316,6 +316,7 @@ class PersonaHumana(models.Model):
         "Sitio web / Portfolio",
         max_length=300,
         blank=True,
+        default="",
         help_text="Sitio web personal, de la productora o portfolio online (Vimeo, Behance, etc.)"
     )
 
@@ -323,6 +324,7 @@ class PersonaHumana(models.Model):
         "Canal audiovisual",
         max_length=300,
         blank=True,
+        default="",
         help_text="Canal de YouTube, Vimeo u otra plataforma de video"
     )
 
@@ -330,6 +332,7 @@ class PersonaHumana(models.Model):
         "Instagram",
         max_length=300,
         blank=True,
+        default="",
         help_text="Perfil de Instagram profesional"
     )
 
@@ -337,6 +340,7 @@ class PersonaHumana(models.Model):
         "LinkedIn",
         max_length=300,
         blank=True,
+        default="",
         help_text="Perfil de LinkedIn"
     )
 
@@ -344,6 +348,7 @@ class PersonaHumana(models.Model):
         "Trabajo destacado",
         max_length=300,
         blank=True,
+        default="",
         help_text="Link a una obra o trabajo audiovisual relevante"
     )
 
@@ -437,6 +442,7 @@ class PersonaJuridica(models.Model):
         "Sitio web / Portfolio",
         max_length=300,
         blank=True,
+        default="",
         help_text="Sitio web personal, de la productora o portfolio online (Vimeo, Behance, etc.)"
     )
 
@@ -444,6 +450,7 @@ class PersonaJuridica(models.Model):
         "Canal audiovisual",
         max_length=300,
         blank=True,
+        default="",
         help_text="Canal de YouTube, Vimeo u otra plataforma de video"
     )
 
@@ -451,6 +458,7 @@ class PersonaJuridica(models.Model):
         "Instagram",
         max_length=300,
         blank=True,
+        default="",
         help_text="Perfil de Instagram profesional"
     )
 
@@ -458,6 +466,7 @@ class PersonaJuridica(models.Model):
         "LinkedIn",
         max_length=300,
         blank=True,
+        default="",
         help_text="Perfil de LinkedIn"
     )
 
@@ -465,6 +474,7 @@ class PersonaJuridica(models.Model):
         "Trabajo destacado",
         max_length=300,
         blank=True,
+        default="",
         help_text="Link a una obra o trabajo audiovisual relevante"
     )
 
