@@ -154,6 +154,12 @@ body {
     color: #b00055;
 }
 
+.card1 {
+    background-color: #b7ccf6;
+    border-radius: 25px;
+    padding-bottom: 15px;
+}
+
 /* ============================================================
    CONVOCATORIAS – FILTROS
    ============================================================ */
@@ -210,6 +216,7 @@ body {
 
 .convocatoria-card-mubi .categoria {
     font-size: 0.7rem;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     opacity: 0.85;
@@ -268,6 +275,10 @@ body {
         height: 280px;
     }
 
+    .hero-card-right {
+        display: none;
+    }
+
     .offcanvas-btn-left {
         top: auto;
         bottom: 16px;
@@ -278,6 +289,12 @@ body {
         font-size: 0.9rem;
         text-transform: none;
     }
+
+    .Enlaces {
+        display: none;
+    }
+
+
 }
 
 /* ============================================================
@@ -303,4 +320,10 @@ body {
         margin-right: auto;
         text-align: center;
     }
+
+    .boton-programa {
+        display: none;
+    }
+
+
 }

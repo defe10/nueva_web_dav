@@ -59,22 +59,40 @@
     overflow: hidden;
 }
 
+/* Overlay */
 .convocatoria-hero-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(to top,
             rgba(0, 0, 0, 0.75),
-            rgba(0, 0, 0, 0.2));
+            rgba(0, 0, 0, 0.25));
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+    /* ← clave */
+    justify-content: flex-end;
+    gap: .5rem;
     padding: 24px;
 }
 
+/* Título */
 .convocatoria-hero-title {
+    margin: 0;
     color: #fff;
     font-weight: 800;
     font-size: 2rem;
     line-height: 1.2;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, .6);
+}
+
+/* Descripción corta */
+.convocatoria-hero-subtitle {
+    margin: 0;
+    color: rgba(255, 255, 255, .92);
+    font-size: 1.05rem;
+    line-height: 1.35;
+    max-width: 52ch;
+    /* look MUBI */
+    text-shadow: 0 2px 14px rgba(0, 0, 0, .55);
 }
 
 /* ============================================================
@@ -139,4 +157,25 @@
     height: 120px;
     object-fit: cover;
     border-radius: 70px;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .jurado-bio {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .convocatoria-hero {
+        min-height: 180px;
+    }
+
+    .convocatoria-hero-title {
+        font-size: 1.5rem;
+    }
+
+    .convocatoria-hero-subtitle {
+        font-size: .95rem;
+    }
 }

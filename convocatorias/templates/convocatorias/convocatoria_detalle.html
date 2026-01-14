@@ -24,6 +24,11 @@
           <h1 class="convocatoria-hero-title">
             {{ convocatoria.titulo }}
           </h1>
+          {% if convocatoria.descripcion_corta %}
+            <p class="convocatoria-hero-subtitle mb-0">
+              {{ convocatoria.descripcion_corta }}
+            </p>
+          {% endif %}
         </div>
       </div>
 
@@ -46,7 +51,8 @@
       </div>
 
       <!-- ================================================= -->
-      <!-- JURADOS / FORMADORES / TUTORES (SIN CAMBIOS) -->
+      <!-- JURADOS / FORMADORES / TUTORES -->
+      <!-- En móvil: SOLO FOTO + NOMBRE (sin bio) -->
       <!-- ================================================= -->
       {% if convocatoria.jurado1_nombre or convocatoria.jurado2_nombre or convocatoria.jurado3_nombre %}
       <div class="mb-5">
@@ -69,18 +75,22 @@
           {% if convocatoria.jurado1_nombre %}
           <div class="card border-0 shadow-sm p-3 jurado-card">
             <div class="row g-3">
-              <div class="col-md-3 text-center d-none d-md-block">
+
+              <!-- FOTO + NOMBRE (mobile y desktop) -->
+              <div class="col-12 col-md-3 text-center">
                 {% if convocatoria.jurado1_foto %}
                   <img src="{{ convocatoria.jurado1_foto.url }}" class="jurado-foto">
                 {% endif %}
-                <h6 class="fw-bold mt-2">{{ convocatoria.jurado1_nombre }}</h6>
+                <h6 class="fw-bold mt-2 mb-0">{{ convocatoria.jurado1_nombre }}</h6>
               </div>
-              <div class="col-12 col-md-9">
-                <h6 class="fw-bold d-md-none">{{ convocatoria.jurado1_nombre }}</h6>
-                <p class="jurado-bio">
+
+              <!-- BIO (solo desktop) -->
+              <div class="col-12 col-md-9 d-none d-md-block">
+                <p class="jurado-bio mb-0">
                   {{ convocatoria.jurado1_bio|linebreaks }}
                 </p>
               </div>
+
             </div>
           </div>
           {% endif %}
@@ -88,18 +98,22 @@
           {% if convocatoria.jurado2_nombre %}
           <div class="card border-0 shadow-sm p-3 jurado-card">
             <div class="row g-3">
-              <div class="col-md-3 text-center d-none d-md-block">
+
+              <!-- FOTO + NOMBRE (mobile y desktop) -->
+              <div class="col-12 col-md-3 text-center">
                 {% if convocatoria.jurado2_foto %}
                   <img src="{{ convocatoria.jurado2_foto.url }}" class="jurado-foto">
                 {% endif %}
-                <h6 class="fw-bold mt-2">{{ convocatoria.jurado2_nombre }}</h6>
+                <h6 class="fw-bold mt-2 mb-0">{{ convocatoria.jurado2_nombre }}</h6>
               </div>
-              <div class="col-12 col-md-9">
-                <h6 class="fw-bold d-md-none">{{ convocatoria.jurado2_nombre }}</h6>
-                <p class="jurado-bio">
+
+              <!-- BIO (solo desktop) -->
+              <div class="col-12 col-md-9 d-none d-md-block">
+                <p class="jurado-bio mb-0">
                   {{ convocatoria.jurado2_bio|linebreaks }}
                 </p>
               </div>
+
             </div>
           </div>
           {% endif %}
@@ -107,18 +121,22 @@
           {% if convocatoria.jurado3_nombre %}
           <div class="card border-0 shadow-sm p-3 jurado-card">
             <div class="row g-3">
-              <div class="col-md-3 text-center d-none d-md-block">
+
+              <!-- FOTO + NOMBRE (mobile y desktop) -->
+              <div class="col-12 col-md-3 text-center">
                 {% if convocatoria.jurado3_foto %}
                   <img src="{{ convocatoria.jurado3_foto.url }}" class="jurado-foto">
                 {% endif %}
-                <h6 class="fw-bold mt-2">{{ convocatoria.jurado3_nombre }}</h6>
+                <h6 class="fw-bold mt-2 mb-0">{{ convocatoria.jurado3_nombre }}</h6>
               </div>
-              <div class="col-12 col-md-9">
-                <h6 class="fw-bold d-md-none">{{ convocatoria.jurado3_nombre }}</h6>
-                <p class="jurado-bio">
+
+              <!-- BIO (solo desktop) -->
+              <div class="col-12 col-md-9 d-none d-md-block">
+                <p class="jurado-bio mb-0">
                   {{ convocatoria.jurado3_bio|linebreaks }}
                 </p>
               </div>
+
             </div>
           </div>
           {% endif %}
