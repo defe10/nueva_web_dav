@@ -1,15 +1,33 @@
+# exencion/models.py
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-
 from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
+from django.core.exceptions import ValidationError
 
 from convocatorias.models import Convocatoria
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 from .utils import generar_pdf_exencion
 
 
+# ============================================================
+# VALIDADORES (PDF + 5MB)
+# ============================================================
+def validar_pdf(archivo):
+    nombre = (archivo.name or "").lower()
+    if not nombre.endswith(".pdf"):
+        raise ValidationError("Solo se permiten archivos PDF.")
+
+
+def validar_tamano_5mb(archivo):
+    if archivo.size > 5 * 1024 * 1024:
+        raise ValidationError("El archivo no puede superar los 5 MB.")
+
+
+# ============================================================
+# EXENCIÓN
+# ============================================================
 ESTADOS_EXENCION = [
     ("ENVIADA", "Enviada"),
     ("APROBADA", "Aprobada"),
@@ -93,7 +111,6 @@ class Exencion(models.Model):
         NO genera PDF ni envía mails.
         """
         hoy = timezone.now().date()
-
         self.estado = "APROBADA"
         self.fecha_emision = hoy
         self.fecha_vencimiento = hoy.replace(year=hoy.year + 1)
@@ -102,7 +119,6 @@ class Exencion(models.Model):
     def aprobar_y_generar_pdf(self):
         """
         Aprueba la exención, genera el PDF y lo envía por mail.
-        (Útil si querés llamarlo desde admin o desde otra capa)
         """
         # 1) Aprobar
         self.marcar_aprobada()
@@ -133,18 +149,104 @@ class Exencion(models.Model):
             email.send()
 
 
+# ============================================================
+# OBSERVACIONES ADMIN (EXENCIÓN)
+# ============================================================
+class ObservacionAdministrativaExencion(models.Model):
+    TIPOS_DOCUMENTO = [
+        ("GENERAL", "Documentación general"),
+        ("FISCAL", "Documentación fiscal"),
+        ("IDENTIDAD", "Identidad / Personería"),
+        ("OTRO", "Otro"),
+    ]
+
+    exencion = models.ForeignKey(
+        Exencion,
+        on_delete=models.CASCADE,
+        related_name="observaciones"
+    )
+
+    tipo_documento = models.CharField(
+        max_length=20,
+        choices=TIPOS_DOCUMENTO,
+        default="GENERAL",
+        help_text="Tipo de documentación a subsanar"
+    )
+
+    descripcion = models.CharField(
+        max_length=255,
+        help_text="Ej: Falta constancia DGR, CUIT ilegible, Acta sin firma, etc."
+    )
+
+    creada_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    subsanada = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-fecha_creacion"]
+        verbose_name = "Observación administrativa (Exención)"
+        verbose_name_plural = "Observaciones administrativas (Exención)"
+
+    def __str__(self):
+        estado = "OK" if self.subsanada else "Pendiente"
+        return f"Exención {self.exencion_id} · {self.get_tipo_documento_display()} · {estado}"
+
+
+# ============================================================
+# DOCUMENTOS (EXENCIÓN)
+# ============================================================
 class ExencionDocumento(models.Model):
+    """
+    Documentos asociados a una Exención.
+    - Permite múltiples cargas.
+    - Permite borrado mientras estén pendientes.
+    - Permite "enviar" (confirmar) lote de documentos.
+    - Permite distinguir subsanación (cuando el admin observa).
+    """
+
+    ESTADOS = [
+        ("PENDIENTE", "Pendiente de envío"),
+        ("ENVIADO", "Enviado"),
+    ]
+
     exencion = models.ForeignKey(
         Exencion,
         on_delete=models.CASCADE,
         related_name="documentos"
     )
-    archivo = models.FileField(upload_to="exencion/documentos/")
+
+    archivo = models.FileField(
+        upload_to="exencion/documentos/",
+        validators=[validar_pdf, validar_tamano_5mb],
+    )
+
     fecha_subida = models.DateTimeField(auto_now_add=True)
 
+    # identifica si el documento fue subido como subsanación
+    es_subsanacion = models.BooleanField(default=False)
+
+    # estado borrador/enviado (para poder eliminar antes de confirmar)
+    estado = models.CharField(
+        max_length=10,
+        choices=ESTADOS,
+        default="PENDIENTE",
+        db_index=True,
+    )
+
+    # fecha real de confirmación/envío
+    fecha_envio = models.DateTimeField(blank=True, null=True)
+
     class Meta:
+        ordering = ["-fecha_subida"]
         verbose_name = "Documento de exención"
         verbose_name_plural = "Documentos de exención"
 
     def __str__(self):
-        return f"Documento {self.id} – Exención {self.exencion_id}"
+        suf = " (subsanación)" if self.es_subsanacion else ""
+        return f"Documento {self.id} – Exención {self.exencion_id}{suf}"

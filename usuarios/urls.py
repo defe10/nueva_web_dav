@@ -6,7 +6,6 @@ from .forms import PasswordResetEmailForm
 
 app_name = "usuarios"
 
-
 urlpatterns = [
     # ----------------------------------
     # Registro / Login / Logout
@@ -20,19 +19,13 @@ urlpatterns = [
     # ----------------------------------
     path("panel/", views.panel_usuario, name="panel_usuario"),
     path("panel-jurado/", views.panel_jurado, name="panel_jurado"),
-
     path("redireccion/", views.redireccion_post_login, name="redireccion_post_login"),
 
     # ----------------------------------
     # Activación de cuenta
     # ----------------------------------
-    path(
-        "activar/<uidb64>/<token>/",
-        views.activar_cuenta,
-        name="activar"
-    ),
+    path("activar/<uidb64>/<token>/", views.activar_cuenta, name="activar"),
 ]
-
 
 # ----------------------------------
 # Recuperación de contraseña
@@ -42,7 +35,10 @@ urlpatterns += [
         "password_reset/",
         auth_views.PasswordResetView.as_view(
             template_name="usuarios/password_reset.html",
-            email_template_name="usuarios/password_reset_email.html",
+
+            # ✅ HTML (el que querés que se vea igual al de activación)
+            # html_email_template_name="usuarios/password_reset_email.html",
+
             subject_template_name="usuarios/password_reset_subject.txt",
             form_class=PasswordResetEmailForm,
             success_url=reverse_lazy("usuarios:password_reset_done"),
@@ -72,5 +68,10 @@ urlpatterns += [
         name="password_reset_complete",
     ),
 
-    
+    path(
+    "jurado/postulacion/<int:postulacion_id>/documentacion/",
+    views.jurado_ver_documentacion,
+        name="jurado_ver_documentacion",
+    ),
+
 ]

@@ -1,13 +1,82 @@
-Hola {{ user.username }},
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Activar cuenta</title>
+  </head>
+  <body style="margin:0; padding:0; background:#f5f5f5; font-family: Arial, Helvetica, sans-serif; color:#111;">
+    <!-- wrapper -->
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f5f5; padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <!-- card -->
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px; background:#ffffff; border:1px solid #e6e6e6; border-radius:14px; overflow:hidden;">
+            <tr>
+              <td style="padding:22px 22px 10px;">
+                <div style="font-size:14px; letter-spacing:.4px; text-transform:uppercase; color:#666;">
+                  Dirección de Audiovisuales · Provincia de Salta
+                </div>
+                <h1 style="margin:10px 0 0; font-size:22px; line-height:1.25; color:#111;">
+                  Confirmación de registración
+                </h1>
+              </td>
+            </tr>
 
-Gracias por registrarte en nuestra plataforma.
+            <tr>
+              <td style="padding:0 22px 10px;">
+                <p style="margin:0 0 12px; font-size:15px; line-height:1.6;">
+                  Hola <strong>{{ user.first_name|default:user.username }}</strong>,
+                </p>
 
-Para activar tu cuenta, hacé clic en el siguiente enlace:
+                <p style="margin:0 0 14px; font-size:15px; line-height:1.6;">
+                  Gracias por registrarte en nuestra plataforma. Para activar tu cuenta, confirmá tu correo haciendo clic en el botón:
+                </p>
 
-https://{{ domain }}{% url 'usuarios:activar' uidb64=uid token=token %}
+                <!-- button -->
+                <table role="presentation" cellspacing="0" cellpadding="0" style="margin:18px 0 18px;">
+                  <tr>
+                    <td bgcolor="#7c3aed" style="border-radius:10px;">
+                      <a href="https://{{ domain }}{% url 'usuarios:activar' uidb64=uid token=token %}"
+                         style="display:inline-block; padding:12px 18px; font-size:15px; color:#fff; text-decoration:none; font-weight:bold;">
+                        Activar mi cuenta
+                      </a>
+                    </td>
+                  </tr>
+                </table>
 
-Si el enlace no funciona, copiá y pegá la siguiente dirección en tu navegador:
+                <p style="margin:0 0 10px; font-size:13px; line-height:1.6; color:#555;">
+                  Si el botón no funciona, copiá y pegá este enlace en tu navegador:
+                </p>
 
-https://{{ domain }}{% url 'usuarios:activar' uidb64=uid token=token %}
+                <p style="margin:0 0 16px; font-size:13px; line-height:1.6; word-break:break-all;">
+                  <a href="https://{{ domain }}{% url 'usuarios:activar' uidb64=uid token=token %}" style="color:#111;">
+                    https://{{ domain }}{% url 'usuarios:activar' uidb64=uid token=token %}
+                  </a>
+                </p>
 
-Si no creaste esta cuenta, simplemente ignorá este mensaje.
+                <p style="margin:0; font-size:13px; line-height:1.6; color:#666;">
+                  Si no creaste esta cuenta, simplemente ignorá este mensaje.
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:14px 22px; background:#fafafa; border-top:1px solid #eee;">
+                <p style="margin:0; font-size:12px; line-height:1.5; color:#777;">
+                  Este es un mensaje automático. Por favor, no respondas a este correo.
+                </p>
+              </td>
+            </tr>
+          </table>
+
+          <!-- footer -->
+          <div style="max-width:560px; padding:12px 6px 0; font-size:12px; color:#888; line-height:1.5;">
+            Secretaría de Cultura · Gobierno de la Provincia de Salta
+          </div>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+

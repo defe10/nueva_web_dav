@@ -214,28 +214,45 @@
 
           <div class="d-grid gap-2">
             {% if convocatoria.vigente %}
-              {% if convocatoria.url_curso %}
+
+              {# 1) Si hay URL destino, va primero y manda afuera #}
+              {% if convocatoria.url_destino %}
+                <a href="{{ convocatoria.url_destino }}"
+                  target="_blank"
+                  rel="noopener"
+                  class="btn btn-primary btn-sm">
+                  Acceder
+                </a>
+
+              {# 2) Si no hay destino, pero hay curso, manda al curso #}
+              {% elif convocatoria.url_curso %}
                 <a href="{{ convocatoria.url_curso }}"
-                   target="_blank"
-                   class="btn btn-warning btn-sm">
+                  target="_blank"
+                  rel="noopener"
+                  class="btn btn-warning btn-sm">
                   Acceder al curso
                 </a>
+
+              {# 3) Si no hay destino ni curso, inscripción normal #}
               {% else %}
                 <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}"
-                   class="btn btn-primary btn-sm">
+                  class="btn btn-primary btn-sm">
                   Inscribirme
                 </a>
               {% endif %}
+
             {% endif %}
 
-            {% if convocatoria.bases_pdf %}
-              <a href="{{ convocatoria.bases_pdf.url }}"
-                 target="_blank"
-                 class="btn btn-outline-primary btn-sm">
-                Bases y condiciones
-              </a>
-            {% endif %}
-          </div>
+  {% if convocatoria.bases_pdf %}
+    <a href="{{ convocatoria.bases_pdf.url }}"
+       target="_blank"
+       rel="noopener"
+       class="btn btn-outline-primary btn-sm">
+      Bases y condiciones
+    </a>
+  {% endif %}
+</div>
+
 
         </div>
       </div>

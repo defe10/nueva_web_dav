@@ -74,12 +74,24 @@
                 <!-- MIS CONVOCATORIAS -->
                 <p class="mb-3"><strong>Mis convocatorias:</strong></p>
 
+                {# ======================= #}
+                {# POSTULACIONES (IDEA)    #}
+                {# ======================= #}
                 {% if postulaciones %}
                     {% for p in postulaciones %}
                         <p class="mb-2">
-                            <strong>{{ p.convocatoria.titulo }}</strong><br>
+                            <strong>
+                              {% if p.convocatoria %}
+                                <a href="{% url 'convocatorias:convocatoria_detalle' p.convocatoria.slug %}">
+                                  {{ p.convocatoria.titulo }}
+                                </a>
+                              {% else %}
+                                Convocatoria eliminada
+                              {% endif %}
+                            </strong><br>
+
                             <span class="text-muted small">
-                                Proyecto: <strong>{{ p.nombre_proyecto }}</strong>
+                                Proyecto: <strong>{{ p.nombre_proyecto|default:"(Sin título)" }}</strong>
                             </span>
 
                             <span class="badge ms-2
@@ -136,11 +148,157 @@
 
                         <hr>
                     {% endfor %}
-                {% else %}
-                    <p class="text-muted small">
-                        No participaste en ninguna convocatoria.
-                    </p>
+                {% endif %}
+
+                {# ======================= #}
+                {# RENDICIONES             #}
+                {# ======================= #}
+                {% if rendiciones %}
+                    <p class="mb-3"><strong>Rendiciones:</strong></p>
+
+                    {% for r in rendiciones %}
+                        <p class="mb-2">
+                            <strong>
+                                {{ r.postulacion.convocatoria.titulo }}
+                            </strong><br>
+
+                            <span class="text-muted small">
+                                Proyecto:
+                                <strong>{{ r.postulacion.nombre_proyecto|default:"(Sin título)" }}</strong>
+                            </span>
+
+                            <span class="badge ms-2
+                                {% if r.estado == 'BORRADOR' %}
+                                    bg-secondary
+                                {% elif r.estado == 'ENVIADO' %}
+                                    bg-info
+                                {% elif r.estado == 'OBSERVADO' %}
+                                    bg-warning text-dark
+                                {% elif r.estado == 'SUBSANADO' %}
+                                    bg-primary
+                                {% elif r.estado == 'APROBADO' %}
+                                    bg-success
+                                {% elif r.estado == 'RECHAZADO' %}
+                                    bg-danger
+                                {% else %}
+                                    bg-secondary
+                                {% endif %}
+                            ">
+                                {{ r.get_estado_display }}
+                            </span>
+                        </p>
+
+                        {% if r.observaciones_admin and r.estado == "OBSERVADO" %}
+                            <div class="alert alert-warning mt-2">
+                                <strong>Observación:</strong><br>
+                                {{ r.observaciones_admin }}
+                            </div>
+                        {% endif %}
+
+                        <p class="mb-2">
+                            {% if r.link_documentacion %}
+                                <a href="{{ r.link_documentacion }}"
+                                   target="_blank"
+                                   rel="noopener"
+                                   class="btn btn-outline-primary btn-sm">
+                                    Ver link de rendición
+                                </a>
+                            {% else %}
+                                <span class="text-muted small">
+                                    Aún no cargaste el link de rendición.
+                                </span>
+                            {% endif %}
+                        </p>
+
+                        <a href="{% url 'convocatorias:rendicion_detalle' r.id %}"
+                           class="btn btn-primary btn-sm mb-3">
+                            {% if r.estado == "OBSERVADO" %}
+                                Corregir rendición
+                            {% else %}
+                                Ver / completar rendición
+                            {% endif %}
+                        </a>
+
+                        <hr>
+                    {% endfor %}
+                {% endif %}
+
+                {# ======================= #}
+                {# FORMACIÓN (INSCRIPCIONES) #}
+                {# ======================= #}
+                {% if inscripciones_formacion %}
+                    <div class="mt-2">
+                        <p class="mb-2"><strong>Formación:</strong></p>
+
+                        {% for ins in inscripciones_formacion %}
+                            <p class="mb-2">
+                                <strong>
+                                  {% if ins.convocatoria %}
+                                    <a href="{% url 'convocatorias:convocatoria_detalle' ins.convocatoria.slug %}">
+                                      {{ ins.convocatoria.titulo }}
+                                    </a>
+                                  {% else %}
+                                    Convocatoria eliminada
+                                  {% endif %}
+                                </strong>
+
+                                <span class="badge ms-2
+                                    {% if ins.estado == 'inscripto' %}
+                                        bg-secondary
+                                    {% elif ins.estado == 'admitido' %}
+                                        bg-success
+                                    {% elif ins.estado == 'no_admitido' %}
+                                        bg-danger
+                                    {% elif ins.estado == 'lista_espera' %}
+                                        bg-warning text-dark
+                                    {% else %}
+                                        bg-secondary
+                                    {% endif %}
+                                ">
+                                    {{ ins.get_estado_display }}
+                                </span>
+                            </p>
+                        {% endfor %}
+                    </div>
+
                     <hr>
+                {% endif %}
+
+                {# ======================= #}
+                {# EXENCIÓN (SUBSANACIÓN)  #}
+                {# ======================= #}
+                {% if exencion_observaciones_pendientes %}
+                <div class="alert alert-warning mt-3">
+                    <h6 class="fw-bold mb-2">
+                    Observaciones pendientes (Exención)
+                    </h6>
+
+                    <ul class="mb-2">
+                    {% for obsx in exencion_observaciones_pendientes %}
+                        <li>
+                        <strong>{{ obsx.get_tipo_documento_display }}:</strong>
+                        {{ obsx.descripcion }}
+                        </li>
+                    {% endfor %}
+                    </ul>
+
+                    {% if exencion %}
+                    <a href="{% url 'exencion:subir_documento_subsanado_exencion' exencion.id %}"
+                        class="btn btn-warning btn-sm mt-2">
+                        Subir documentación solicitada (Exención)
+                    </a>
+                    {% endif %}
+                </div>
+
+                <hr>
+                {% endif %}
+
+                {# Si no hay nada, mensaje único #}
+                {% if not postulaciones and not inscripciones_formacion and not exencion %}
+                <p class="text-muted small">
+                    No participaste en ninguna convocatoria.
+                </p>
+                <hr>
                 {% endif %}
 
                 <!-- ACCIONES -->

@@ -50,7 +50,16 @@
           <h3 class="mb-2">Datos del proyecto</h3>
           <p class="text-muted mb-3">Completá todos los campos requeridos.</p>
 
-          <form method="post" class="row g-3">
+          <!-- ✅ Mensajes (si querés mostrarlos acá; si ya los mostrás en base.html, borrá este bloque para evitar duplicados) -->
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} mb-3">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" class="row g-3" novalidate>
             {% csrf_token %}
 
             <!-- Presentante -->
@@ -84,8 +93,9 @@
             <!-- Declaración jurada -->
             <div class="col-12 mt-3">
               <div class="form-check">
+                <!-- ✅ required en frontend (igual se valida en backend por el form) -->
                 {{ form.declaracion_jurada }}
-                <label class="form-check-label ms-2 small">
+                <label class="form-check-label ms-2 small" for="{{ form.declaracion_jurada.id_for_label }}">
                   DECLARACIÓN JURADA: Confirmo que he leído las bases y condiciones
                   de <strong>{{ convocatoria.titulo }}</strong> y acepto los
                   requisitos de participación y aprobación.

@@ -21,13 +21,11 @@
 
         <h3 class="mb-3">Nueva convocatoria</h3>
         <p class="text-muted mb-4">
-          Completá todos los campos para crear una nueva convocatoria.
+          Completá los campos para crear una nueva convocatoria.
           Los datos cargados se mostrarán automáticamente en la web pública.
         </p>
 
-        <form method="post"
-              enctype="multipart/form-data"
-              class="row g-3">
+        <form method="post" enctype="multipart/form-data" class="row g-3">
           {% csrf_token %}
 
           <!-- ORDEN / CATEGORÍA / LÍNEA -->
@@ -36,12 +34,12 @@
             {{ form.orden }}
           </div>
 
-          <div class="col-md-3">
+          <div class="col-md-4">
             <label class="form-label">Categoría</label>
             {{ form.categoria }}
           </div>
 
-          <div class="col-md-3">
+          <div class="col-md-5">
             <label class="form-label">Línea</label>
             {{ form.linea }}
           </div>
@@ -78,6 +76,48 @@
           <div class="col-12">
             <label class="form-label">Beneficios</label>
             {{ form.beneficios }}
+          </div>
+
+          <!-- ARCHIVOS -->
+          <div class="col-md-6">
+            <label class="form-label">Bases y condiciones (PDF)</label>
+            {{ form.bases_pdf }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Imagen (JPG/PNG)</label>
+            {{ form.imagen }}
+          </div>
+
+          <!-- URL CURSO -->
+          <div class="col-12">
+            <label class="form-label">URL del curso asincrónico</label>
+            {{ form.url_curso }}
+            <small class="text-muted d-block">
+              Solo para convocatorias de formación con curso online.
+            </small>
+          </div>
+
+          <!-- URL DESTINO -->
+          {% if form.url_destino %}
+          <div class="col-12">
+            <label class="form-label">URL destino (opcional)</label>
+            {{ form.url_destino }}
+            <small class="text-muted d-block">
+              Si completás esta URL, el botón puede enviarte a una página externa.
+            </small>
+          </div>
+          {% endif %}
+
+          <!-- FECHAS -->
+          <div class="col-md-6">
+            <label class="form-label">Fecha de inicio</label>
+            {{ form.fecha_inicio }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Fecha de cierre</label>
+            {{ form.fecha_fin }}
           </div>
 
           <!-- BLOQUE PERSONAS -->
@@ -133,37 +173,6 @@
           <div class="col-12">
             <label class="form-label">Bio 3</label>
             {{ form.jurado3_bio }}
-          </div>
-
-          <!-- ARCHIVOS -->
-          <div class="col-md-6">
-            <label class="form-label">Bases y condiciones (PDF)</label>
-            {{ form.bases_pdf }}
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Imagen (JPG)</label>
-            {{ form.imagen }}
-          </div>
-
-          <!-- URL CURSO -->
-          <div class="col-12">
-            <label class="form-label">URL del curso asincrónico</label>
-            {{ form.url_curso }}
-            <small class="text-muted d-block">
-              Solo para convocatorias de formación con curso online.
-            </small>
-          </div>
-
-          <!-- FECHAS -->
-          <div class="col-md-6">
-            <label class="form-label">Fecha de inicio</label>
-            {{ form.fecha_inicio }}
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Fecha de cierre</label>
-            {{ form.fecha_fin }}
           </div>
 
           <!-- BOTONES -->

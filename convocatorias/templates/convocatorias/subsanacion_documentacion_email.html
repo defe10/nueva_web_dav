@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+  <body style="margin:0; padding:0; background:#f5f5f5; font-family: Arial, Helvetica, sans-serif; color:#111;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f5f5; padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                 style="max-width:560px; background:#ffffff; border:1px solid #e6e6e6; border-radius:14px; overflow:hidden;">
+            
+            <!-- HEADER -->
+            <tr>
+              <td style="padding:22px 22px 10px;">
+                <div style="font-size:12px; letter-spacing:.4px; text-transform:uppercase; color:#666;">
+                  Dirección de Audiovisuales · Secretaría de Cultura · Provincia de Salta
+                </div>
+                <h1 style="margin:10px 0 6px; font-size:20px; line-height:1.25;">
+                  Subsanación de documentación requerida
+                </h1>
+                <p style="margin:0; color:#444; font-size:14px; line-height:1.5;">
+                  Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+                  detectamos que tu postulación requiere subsanar documentación.
+                </p>
+              </td>
+            </tr>
+
+            <!-- CUERPO -->
+            <tr>
+              <td style="padding:0 22px 18px;">
+                <div style="background:#fafafa; border:1px solid #eee; border-radius:12px; padding:14px;">
+                  <p style="margin:0 0 8px; font-size:14px;">
+                    <strong>Convocatoria:</strong> {{ convocatoria_titulo|default:"—" }}
+                  </p>
+
+                  <p style="margin:0 0 8px; font-size:14px;">
+                    <strong>Documento observado:</strong>
+                    {% if observacion.get_tipo_documento_display %}
+                      {{ observacion.get_tipo_documento_display }}
+                    {% else %}
+                      {{ observacion.tipo_documento }}
+                    {% endif %}
+                  </p>
+
+                  <p style="margin:0; font-size:14px; color:#333; line-height:1.5;">
+                    <strong>Detalle:</strong><br>
+                    {{ observacion.descripcion }}
+                  </p>
+                </div>
+
+                {% if panel_url %}
+                  <div style="padding-top:16px;">
+                    <a href="{{ panel_url }}"
+                       style="display:inline-block; background:#111; color:#fff; text-decoration:none;
+                              padding:12px 16px; border-radius:10px; font-size:14px;">
+                      Ingresar al panel para subsanar
+                    </a>
+                  </div>
+
+                  <p style="margin:12px 0 0; color:#666; font-size:12px; line-height:1.4;">
+                    Si el botón no funciona, copiá y pegá este enlace en tu navegador:<br>
+                    <span style="word-break:break-all;">{{ panel_url }}</span>
+                  </p>
+                {% endif %}
+              </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td style="padding:14px 22px; background:#fcfcfc; border-top:1px solid #eee;
+                         color:#777; font-size:12px; line-height:1.4;">
+                Este es un mensaje automático. Por favor, no respondas a este correo.<br>
+                © {{ anio }} Secretaría de Cultura · Provincia de Salta
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

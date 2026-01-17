@@ -1,60 +1,165 @@
 {% extends "sitio_publico/base.html" %}
 {% load static %}
+{% load conv_archivo_utils %}
 
 {% block content %}
 
 <div class="container py-5">
 
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
 
-            <div class="p-4 shadow"
-                 style="border-radius: 16px; background: #fff;">
+      <div class="p-4 shadow" style="border-radius: 16px; background: #fff;">
 
-                <h3 class="fw-bold mb-3">
-                    Subir documentación solicitada
-                </h3>
+        <h3 class="fw-bold mb-3">Subir documentación solicitada</h3>
 
-                <p class="text-muted">
-                    Subí el documento requerido para subsanar la observación
-                    administrativa realizada sobre tu postulación.
-                </p>
+        <p class="text-muted">
+          Subí la documentación requerida para subsanar la observación administrativa realizada sobre tu postulación.
+          Podés cargar varios archivos, eliminarlos si es necesario y recién al final enviarlos.
+        </p>
 
-                <hr>
+        <hr>
 
-                <p class="mb-3">
-                    <strong>Proyecto:</strong> {{ postulacion.nombre_proyecto }}
-                </p>
+        <p class="mb-3">
+          <strong>Proyecto:</strong> {{ postulacion.nombre_proyecto }}
+        </p>
 
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
 
-                    <div class="mb-3">
-                        {{ form.archivo.label_tag }}
-                        {{ form.archivo }}
-                        {% if form.archivo.errors %}
-                            <div class="text-danger small">
-                                {{ form.archivo.errors }}
-                            </div>
-                        {% endif %}
-                    </div>
+        <!-- AGREGAR ARCHIVOS SUBSANADOS (PENDIENTE) -->
+        <form method="post"
+              action="{% url 'convocatorias:agregar_documento_subsanado' postulacion.id %}"
+              enctype="multipart/form-data"
+              class="mb-3">
+          {% csrf_token %}
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-warning">
-                            Subir documento
-                        </button>
-
-                        <a href="{% url 'usuarios:panel_usuario' %}"
-                           class="btn btn-outline-secondary">
-                            Volver al panel
-                        </a>
-                    </div>
-                </form>
-
+          <div class="mb-2">
+            <label class="form-label">Seleccionar archivos</label>
+            <input type="file"
+                   name="archivos"
+                   multiple
+                   class="form-control">
+            <div class="form-text">
+              Formato PDF · Tamaño máximo 5mb por archivo.
             </div>
+          </div>
 
-        </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-outline-warning">
+              Agregar archivos
+            </button>
+          </div>
+        </form>
+
+        <!-- PENDIENTES -->
+        <h6 class="fw-bold mb-2">Pendientes de envío</h6>
+
+        {% if documentos_pendientes %}
+          <div class="table-responsive mb-3">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Archivo</th>
+                  <th class="text-end" style="width: 120px;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for doc in documentos_pendientes %}
+                  <tr>
+                    <td>
+                      <div class="fw-semibold">
+                        {{ doc.archivo.name|nombre_original }}
+                      </div>
+                      <div class="small text-muted">
+                        Subido: {{ doc.fecha_subida|date:"d/m/Y H:i" }}
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <form method="post"
+                            action="{% url 'convocatorias:eliminar_documento_postulacion' doc.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                          Eliminar
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- CONFIRMAR ENVÍO SUBSANADO -->
+          <form method="post"
+                action="{% url 'convocatorias:confirmar_documento_subsanado' postulacion.id %}">
+            {% csrf_token %}
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-warning">
+                Enviar subsanación
+              </button>
+
+              <a href="{% url 'usuarios:panel_usuario' %}"
+                 class="btn btn-outline-secondary">
+                Volver al panel
+              </a>
+            </div>
+          </form>
+
+        {% else %}
+          <div class="alert alert-light border mb-3">
+            Todavía no agregaste archivos. Subilos con el botón <strong>Agregar archivos</strong>.
+          </div>
+
+          <div class="d-grid gap-2">
+            <a href="{% url 'usuarios:panel_usuario' %}"
+               class="btn btn-outline-secondary">
+              Volver al panel
+            </a>
+          </div>
+        {% endif %}
+
+        <!-- ENVIADOS (opcional) -->
+        {% if documentos_enviados %}
+          <hr class="my-4">
+          <h6 class="fw-bold mb-2">Ya enviados</h6>
+
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Archivo</th>
+                  <th style="width: 180px;">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for doc in documentos_enviados %}
+                  <tr>
+                    <td>
+                      <div class="fw-semibold">
+                        {{ doc.archivo.name|nombre_original }}
+                      </div>
+                      <div class="small text-muted">
+                        Subido: {{ doc.fecha_subida|date:"d/m/Y H:i" }}
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge bg-success">Enviado</span>
+                      {% if doc.fecha_envio %}
+                        <div class="small text-muted">
+                          {{ doc.fecha_envio|date:"d/m/Y H:i" }}
+                        </div>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+
+      </div>
+
     </div>
+  </div>
 
 </div>
 

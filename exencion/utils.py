@@ -36,11 +36,29 @@ def generar_pdf_exencion(exencion):
 
     return pdf
 
+# exencion/utils.py
+def _valor_valido(valor):
+    """
+    Considera incompleto si:
+    - None / "" / espacios
+    - "ninguna", "ninguno", "-", "no corresponde" (en cualquier mayúsc/minúsc)
+    """
+    if valor is None:
+        return False
+
+    v = str(valor).strip().lower()
+
+    if v in ["", "ninguna", "ninguno", "-", "no corresponde", "n/a", "na"]:
+        return False
+
+    return True
+
+
 def datos_fiscales_completos(persona):
     return all([
-        persona.situacion_iva,
-        persona.actividad_dgr,
-        persona.domicilio_fiscal,
-        persona.codigo_postal_fiscal,
-        persona.localidad_fiscal,
+        _valor_valido(getattr(persona, "situacion_iva", None)),
+        _valor_valido(getattr(persona, "actividad_dgr", None)),
+        _valor_valido(getattr(persona, "domicilio_fiscal", None)),
+        _valor_valido(getattr(persona, "codigo_postal_fiscal", None)),
+        _valor_valido(getattr(persona, "localidad_fiscal", None)),
     ])

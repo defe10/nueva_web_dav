@@ -1,5 +1,6 @@
 {% extends "sitio_publico/base.html" %}
 {% load static %}
+{% load conv_archivo_utils %}
 
 {% block content %}
 
@@ -35,55 +36,141 @@
         <p class="mb-0 small">
           Documentación del proyecto establecida en las Bases y Condiciones de la convocatoria.<br><br>
           <strong>Formato admitido:</strong> PDF.<br>
-          <strong>Tamaño máximo</strong> 5mb.
-          <strong>“Finalizar postulación”</strong>.
+          <strong>Tamaño máximo:</strong> 5mb.
+        </p>
+      </div>
+
+      <div class="dav-card mt-3">
+        <h6 class="fw-bold mb-2">Cómo funciona</h6>
+        <p class="mb-0 small text-muted">
+          Podés subir hasta 3 archivos PDFs, eliminarlos si es necesario y recién al final tocar <strong>Enviar documentación</strong>.
         </p>
       </div>
     </div>
 
-    <!-- FORMULARIO -->
+    <!-- FORMULARIO + LISTA -->
     <div class="col-lg-8">
       <div class="dav-card">
 
-        <h3 class="mb-2">Archivos del proyecto</h3>
-        <p class="text-muted mb-3">
-          Subí los documentos requeridos para completar tu postulación.
-        </p>
-
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-              {{ message }}
-            </div>
-          {% endfor %}
-        {% endif %}
-
-
+        <!-- AGREGAR ARCHIVOS -->
         <form method="post"
+              action="{% url 'convocatorias:agregar_documentacion_proyecto' postulacion.id %}"
               enctype="multipart/form-data"
               class="row g-3">
           {% csrf_token %}
 
           <div class="col-12">
-            <label class="form-label">
-              Seleccionar archivos
-            </label>
+            <label class="form-label">Seleccionar archivos</label>
             <input type="file"
                    name="archivos"
                    multiple
-                   class="form-control"
-                   required>
+                   class="form-control">
+            <div class="form-text">
+              Máximo 3 PDFs. Podés subir en una o varias tandas.
+            </div>
           </div>
 
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-outline-primary">
+              Agregar archivos
+            </button>
+          </div>
+        </form>
 
-          <!-- BOTÓN -->
-          <div class="col-12 text-end mt-4">
+        <hr class="my-4">
+
+        <!-- PENDIENTES -->
+        <h6 class="fw-bold mb-3">Pendientes de envío</h6>
+
+        {% if documentos_pendientes %}
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Archivo</th>
+                  <th class="text-end" style="width: 120px;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for doc in documentos_pendientes %}
+                  <tr>
+                    <td>
+                      <div class="fw-semibold">
+                        {{ doc.archivo.name|nombre_original }}
+                      </div>
+                      <div class="small text-muted">
+                        Subido: {{ doc.fecha_subida|date:"d/m/Y H:i" }}
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <form method="post"
+                            action="{% url 'convocatorias:eliminar_documento_postulacion' doc.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                          Eliminar
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- CONFIRMAR ENVÍO -->
+          <form method="post"
+                action="{% url 'convocatorias:confirmar_documentacion_proyecto' postulacion.id %}"
+                class="text-end mt-3">
+            {% csrf_token %}
             <button type="submit" class="btn btn-primary">
               Finalizar postulación
             </button>
-          </div>
+          </form>
 
-        </form>
+        {% else %}
+          <div class="alert alert-light border">
+            Todavía no agregaste archivos. Subilos con el botón <strong>Agregar archivos</strong>.
+          </div>
+        {% endif %}
+
+        <!-- ENVIADOS -->
+        {% if documentos_enviados %}
+          <hr class="my-4">
+          <h6 class="fw-bold mb-3">Ya enviados</h6>
+
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Archivo</th>
+                  <th style="width: 180px;">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for doc in documentos_enviados %}
+                  <tr>
+                    <td>
+                      <div class="fw-semibold">
+                        {{ doc.archivo.name|nombre_original }}
+                      </div>
+                      <div class="small text-muted">
+                        Subido: {{ doc.fecha_subida|date:"d/m/Y H:i" }}
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge bg-success">Enviado</span>
+                      {% if doc.fecha_envio %}
+                        <div class="small text-muted">
+                          {{ doc.fecha_envio|date:"d/m/Y H:i" }}
+                        </div>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
 
       </div>
     </div>

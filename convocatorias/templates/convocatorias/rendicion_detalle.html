@@ -1,0 +1,130 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container py-5">
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="p-4 shadow"
+           style="border-radius:16px; background:#fff;">
+
+        <h2 class="fw-bold mb-2">
+          Rendición de fondos
+        </h2>
+
+        <p class="text-muted mb-4">
+          Convocatoria: <strong>{{ convocatoria.titulo }}</strong><br>
+          Proyecto: <strong>{{ postulacion.nombre_proyecto|default:"(Sin título)" }}</strong>
+        </p>
+
+        <!-- ============================= -->
+        <!-- ACLARACIÓN ADMINISTRATIVA -->
+        <!-- ============================= -->
+        <div class="alert alert-info">
+          <strong>Importante:</strong><br>
+          La carga digital de esta rendición tiene carácter informativo y administrativo.
+          <u>La rendición de fondos debe presentarse también de manera física</u>,
+          conforme a lo establecido en las bases y condiciones de la convocatoria.
+        </div>
+
+        <!-- ============================= -->
+        <!-- ESTADO -->
+        <!-- ============================= -->
+        <p class="mb-3">
+          <strong>Estado de la rendición:</strong>
+          <span class="badge ms-2
+            {% if rendicion.estado == 'BORRADOR' %}
+              bg-secondary
+            {% elif rendicion.estado == 'ENVIADO' %}
+              bg-info
+            {% elif rendicion.estado == 'OBSERVADO' %}
+              bg-warning text-dark
+            {% elif rendicion.estado == 'SUBSANADO' %}
+              bg-primary
+            {% elif rendicion.estado == 'APROBADO' %}
+              bg-success
+            {% elif rendicion.estado == 'RECHAZADO' %}
+              bg-danger
+            {% else %}
+              bg-secondary
+            {% endif %}
+          ">
+            {{ rendicion.get_estado_display }}
+          </span>
+        </p>
+
+        {% if rendicion.observaciones_admin and rendicion.estado == "OBSERVADO" %}
+          <div class="alert alert-warning">
+            <strong>Observaciones del área administrativa:</strong><br>
+            {{ rendicion.observaciones_admin }}
+          </div>
+        {% endif %}
+
+        <hr>
+
+        <!-- ============================= -->
+        <!-- FORMULARIO -->
+        <!-- ============================= -->
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="link_documentacion" class="form-label fw-bold">
+              Link a la documentación de rendición
+            </label>
+            <input type="url"
+                   class="form-control"
+                   id="link_documentacion"
+                   name="link_documentacion"
+                   placeholder="https://drive.google.com/..."
+                   value="{{ rendicion.link_documentacion|default:'' }}"
+                   required>
+
+            <div class="form-text">
+              Podés usar Google Drive, OneDrive u otra plataforma similar.
+              Asegurate de que el link tenga permisos de acceso.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="observaciones_usuario" class="form-label fw-bold">
+              Observaciones
+            </label>
+            <textarea class="form-control"
+                      id="observaciones_usuario"
+                      name="observaciones_usuario"
+                      rows="4"
+                      placeholder="Aclaraciones, referencias o información adicional (opcional)">{{ rendicion.observaciones_usuario|default:'' }}</textarea>
+          </div>
+
+          <hr>
+
+          <!-- ============================= -->
+          <!-- ACCIONES -->
+          <!-- ============================= -->
+          <div class="d-flex gap-2 flex-wrap">
+
+            <button type="submit"
+                    class="btn btn-primary">
+              Enviar rendición
+            </button>
+
+            <a href="{% url 'usuarios:panel_usuario' %}"
+               class="btn btn-outline-secondary">
+              Volver al panel
+            </a>
+
+          </div>
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

@@ -5,15 +5,11 @@
 {% block content %}
 
 <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh; padding-bottom: 10vh;">
-    <div class="p-4 shadow" style="width: 100%; max-width: 420px; border-radius: 16px; background: #fff;">
+    <div class="p-4 shadow"
+         style="width: 100%; max-width: 420px; border-radius: 16px; background: #fff;">
 
         <h3 class="text-center mb-4">Ingresar</h3>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
 
         <form method="POST" novalidate>
             {% csrf_token %}
@@ -24,7 +20,11 @@
                 {{ form.honeypot }}
             </div>
 
-            {{ form.non_field_errors }}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
 
             <!-- Correo -->
             <div class="mb-3">
@@ -39,7 +39,20 @@
                 <label for="{{ form.password.id_for_label }}" class="form-label">
                     Contraseña
                 </label>
-                {{ form.password|add_class:"form-control" }}
+
+                <div class="input-group">
+                    {{ form.password|add_class:"form-control"|add_attr:"id:id_password" }}
+                    <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        id="togglePassword"
+                        aria-label="Mostrar/ocultar contraseña"
+                        aria-pressed="false"
+                        title="Mostrar/ocultar"
+                    >
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Botón -->
@@ -62,5 +75,30 @@
 
     </div>
 </div>
+
+<script>
+(function () {
+    const input = document.getElementById("id_password");
+    const btn = document.getElementById("togglePassword");
+
+    if (!input || !btn) return;
+
+    function setIcon(isVisible) {
+        btn.innerHTML = isVisible
+            ? '<i class="bi bi-eye-slash"></i>'
+            : '<i class="bi bi-eye"></i>';
+    }
+
+    // Estado inicial
+    setIcon(false);
+
+    btn.addEventListener("click", function () {
+        const isPassword = input.type === "password";
+        input.type = isPassword ? "text" : "password";
+        btn.setAttribute("aria-pressed", isPassword ? "true" : "false");
+        setIcon(isPassword);
+    });
+})();
+</script>
 
 {% endblock %}

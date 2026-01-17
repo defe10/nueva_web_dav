@@ -127,7 +127,6 @@
               </a>
             </li>
 
-          
             {% if user.is_authenticated %}
               <li class="nav-item dropdown ms-2">
                 <a class="btn btn-outline-secondary btn-sm dropdown-toggle"
@@ -149,7 +148,7 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li>
                     <a class="dropdown-item"
-                      href="{% url 'usuarios:panel_usuario' %}">
+                      href="{% url 'usuarios:redireccion_post_login' %}">
                       Mi cuenta
                     </a>
                   </li>
@@ -162,30 +161,48 @@
                   </li>
                 </ul>
               </li>
-              {% else %}
+            {% else %}
               <li class="nav-item ms-2">
                 <a class="btn btn-outline-primary btn-sm"
                   href="{% url 'usuarios:login' %}">
                   Ingresar
                 </a>
               </li>
-              {% endif %}
-
-
+            {% endif %}
 
           </ul>
         </div>
       </div>
     </nav>
 
-  
-
     <!-- ===================== -->
     <!-- CONTENIDO -->
     <!-- ===================== -->
     {% block layout %}
       <div class="container py-4">
+
+        <!-- ===================== -->
+        <!-- MENSAJES (Django messages) -->
+        <!-- ===================== -->
+        {% if messages %}
+          <div class="mb-3">
+            {% for message in messages %}
+              {# Bootstrap usa: success/info/warning/danger. Django usa: error. #}
+              {% if message.tags == "error" %}
+                <div class="alert alert-danger mb-2" role="alert">
+                  {{ message }}
+                </div>
+              {% else %}
+                <div class="alert alert-{{ message.tags }} mb-2" role="alert">
+                  {{ message }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
         {% block content %}{% endblock %}
+
       </div>
     {% endblock %}
 
@@ -215,7 +232,6 @@
         </div>
       </div>
     {% endif %}
-
 
     <!-- ===================== -->
     <!-- FOOTER -->

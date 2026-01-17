@@ -14,13 +14,7 @@
         </p>
 
         <!-- Mensajes -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
+    
 
         <form method="POST" novalidate>
             {% csrf_token %}
@@ -81,7 +75,21 @@
                 <label for="{{ form.password1.id_for_label }}" class="form-label">
                     Contraseña
                 </label>
-                {{ form.password1|add_class:"form-control" }}
+
+                <div class="input-group">
+                    {{ form.password1|add_class:"form-control"|add_attr:"id:id_password1" }}
+                    <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        id="togglePassword1"
+                        aria-label="Mostrar/ocultar contraseña"
+                        aria-pressed="false"
+                        title="Mostrar/ocultar"
+                    >
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+
                 {% if form.password1.errors %}
                     <div class="text-danger small">
                         {{ form.password1.errors.0 }}
@@ -94,7 +102,21 @@
                 <label for="{{ form.password2.id_for_label }}" class="form-label">
                     Repetir contraseña
                 </label>
-                {{ form.password2|add_class:"form-control" }}
+
+                <div class="input-group">
+                    {{ form.password2|add_class:"form-control"|add_attr:"id:id_password2" }}
+                    <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        id="togglePassword2"
+                        aria-label="Mostrar/ocultar contraseña"
+                        aria-pressed="false"
+                        title="Mostrar/ocultar"
+                    >
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+
                 {% if form.password2.errors %}
                     <div class="text-danger small">
                         {{ form.password2.errors.0 }}
@@ -115,5 +137,37 @@
 
     </div>
 </div>
+
+<script>
+(function () {
+    function setIcon(btn, isVisible) {
+        btn.innerHTML = isVisible
+            ? '<i class="bi bi-eye-slash"></i>'
+            : '<i class="bi bi-eye"></i>';
+    }
+
+    function bindToggle(inputId, btnId) {
+        const input = document.getElementById(inputId);
+        const btn = document.getElementById(btnId);
+        if (!input || !btn) return;
+
+        // Estado inicial: oculto (password) => ojo abierto
+        setIcon(btn, false);
+
+        btn.addEventListener("click", function () {
+            const isPassword = input.getAttribute("type") === "password";
+            // Si era password -> pasamos a texto (visible)
+            input.setAttribute("type", isPassword ? "text" : "password");
+
+            const isVisible = isPassword; // quedó visible si antes era password
+            btn.setAttribute("aria-pressed", isVisible ? "true" : "false");
+            setIcon(btn, isVisible);
+        });
+    }
+
+    bindToggle("id_password1", "togglePassword1");
+    bindToggle("id_password2", "togglePassword2");
+})();
+</script>
 
 {% endblock %}

@@ -1,0 +1,195 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+{% load archivo_utils %}
+
+{% block title %}
+  Subsanación · Exención
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO UNIFICADO -->
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Subsanación</h1>
+  <p class="text-white mb-0">
+    Exención impositiva
+  </p>
+</section>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+
+    <!-- INFO -->
+    <div class="col-lg-4 mb-4">
+      <div class="dav-card">
+        <h5 class="fw-bold mb-3">Subsanación</h5>
+        <p class="mb-0 small">
+          Podés subir varios archivos, eliminarlos si es necesario y recién al final tocar
+          <strong>Enviar documentación</strong>.
+          <br><br>
+          <strong>Formato admitido:</strong> PDF.<br>
+          <strong>Tamaño máximo:</strong> 5mb.
+        </p>
+      </div>
+
+      {% if observaciones_pendientes %}
+        <div class="dav-card mt-3">
+          <h6 class="fw-bold mb-2">Observaciones pendientes</h6>
+          <ul class="mb-0 small">
+            {% for obs in observaciones_pendientes %}
+              <li>
+                <strong>{{ obs.get_tipo_documento_display }}:</strong>
+                {{ obs.descripcion }}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="dav-card mt-3">
+          <h6 class="fw-bold mb-2">Observaciones</h6>
+          <p class="mb-0 small text-muted">
+            No hay observaciones pendientes registradas, pero podés adjuntar documentación si te lo solicitaron.
+          </p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- FORMULARIO + LISTA -->
+    <div class="col-lg-8">
+      <div class="dav-card">
+
+        <!-- AGREGAR ARCHIVOS (PENDIENTE) -->
+        <form method="post"
+              action="{% url 'exencion:agregar_documento_subsanado_exencion' exencion.id %}"
+              enctype="multipart/form-data"
+              class="row g-3">
+          {% csrf_token %}
+
+          <div class="col-12">
+            <label class="form-label fw-bold">Archivos (PDF)</label>
+            <input
+              type="file"
+              name="archivos"
+              class="form-control"
+              accept="application/pdf,.pdf"
+              multiple
+            >
+            <div class="form-text">
+              Podés seleccionar más de un archivo. Solo se aceptan PDF.
+            </div>
+          </div>
+
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-outline-warning">
+              Agregar archivos
+            </button>
+          </div>
+        </form>
+
+        <hr class="my-4">
+
+        <!-- PENDIENTES -->
+        <h6 class="fw-bold mb-3">Pendientes de envío</h6>
+
+        {% if documentos_pendientes %}
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Archivo</th>
+                  <th class="text-end" style="width: 120px;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for doc in documentos_pendientes %}
+                  <tr>
+                    <td>
+                      <div class="fw-semibold">{{ doc.archivo.name|nombre_original }}</div>
+                      <div class="small text-muted">
+                        Subido: {{ doc.fecha_subida|date:"d/m/Y H:i" }}
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <form method="post"
+                            action="{% url 'exencion:eliminar_documento' doc.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                          Eliminar
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- CONFIRMAR ENVÍO -->
+          <form method="post"
+                action="{% url 'exencion:confirmar_documento_subsanado_exencion' exencion.id %}"
+                class="d-flex gap-2 justify-content-end mt-3">
+            {% csrf_token %}
+            <a href="{% url 'usuarios:panel_usuario' %}" class="btn btn-outline-secondary">
+              Volver al panel
+            </a>
+            <button type="submit" class="btn btn-warning">
+              Enviar documentación
+            </button>
+          </form>
+
+        {% else %}
+          <div class="alert alert-light border">
+            Todavía no agregaste archivos. Subilos con el botón <strong>Agregar archivos</strong>.
+          </div>
+
+          <div class="d-flex gap-2 justify-content-end">
+            <a href="{% url 'usuarios:panel_usuario' %}" class="btn btn-outline-secondary">
+              Volver al panel
+            </a>
+          </div>
+        {% endif %}
+
+        <!-- ENVIADOS (opcional) -->
+        {% if documentos_enviados %}
+          <hr class="my-4">
+          <h6 class="fw-bold mb-3">Ya enviados</h6>
+
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Archivo</th>
+                  <th style="width: 180px;">Enviado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for doc in documentos_enviados %}
+                  <tr>
+                    <td>
+                      <div class="fw-semibold">{{ doc.archivo.name|nombre_original }}</div>
+                      <div class="small text-muted">
+                        Subido: {{ doc.fecha_subida|date:"d/m/Y H:i" }}
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge bg-success">Enviado</span>
+                      {% if doc.fecha_envio %}
+                        <div class="small text-muted">
+                          {{ doc.fecha_envio|date:"d/m/Y H:i" }}
+                        </div>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

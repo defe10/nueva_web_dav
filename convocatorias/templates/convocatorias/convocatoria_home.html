@@ -65,8 +65,10 @@
 
     </div>
 
-    <!-- GRID DE CARDS -->
-    {% if fomento or formacion or incentivo or beneficio %}
+    <!-- ========================================================= -->
+    <!-- GRID DE ABIERTAS -->
+    <!-- ========================================================= -->
+    {% if fomento or formacion or incentivo or beneficio or libre %}
       <div class="row g-3">
 
         {% for c in fomento %}
@@ -177,11 +179,217 @@
           {% endif %}
         {% endfor %}
 
+
+        {% for c in libre %}
+          {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
+          <div class="col-md-6 col-lg-4">
+            <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+              class="convocatoria-card-mubi">
+
+              {% if c.imagen %}
+                <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+              {% else %}
+                <div class="convocatoria-placeholder"></div>
+              {% endif %}
+
+              <div class="overlay">
+                <span class="categoria">
+                  {{ c.get_categoria_display }}
+                </span>
+                <h5 class="titulo">{{ c.titulo }}</h5>
+                <p class="fecha">
+                  Abierta hasta {{ c.fecha_fin|date:"d/m/Y" }}
+                </p>
+              </div>
+
+            </a>
+          </div>
+          {% endif %}
+        {% endfor %}
+
+
       </div>
 
     {% else %}
       <div class="alert alert-light border text-muted">
         No hay convocatorias abiertas en este momento.
+      </div>
+    {% endif %}
+
+    <!-- ========================================================= -->
+    <!-- CERRADAS / HISTÓRICO -->
+    <!-- ========================================================= -->
+    {% if fomento_cerradas or formacion_cerradas or incentivo_cerradas or beneficio_cerradas or libre_cerradas %}
+      <div class="mt-5">
+        <h3 class="fw-bold mb-0">Convocatorias cerradas</h3>
+        <p class="text-muted mb-4">
+          Se muestran como histórico hasta que sean eliminadas del sistema.
+        </p>
+
+        <div class="row g-3">
+
+          {% for c in fomento_cerradas %}
+            {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
+            <div class="col-md-6 col-lg-4">
+              <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+                 class="convocatoria-card-mubi">
+
+                {% if c.imagen %}
+                  <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+                {% else %}
+                  <div class="convocatoria-placeholder"></div>
+                {% endif %}
+
+                <div class="overlay">
+                  <span class="categoria">
+                    {{ c.get_categoria_display }}
+                  </span>
+
+                  <span class="badge bg-secondary ms-2" style="vertical-align: middle;">
+                    Cerrada
+                  </span>
+
+                  <h5 class="titulo">{{ c.titulo }}</h5>
+                  <p class="fecha">
+                    Cerró el {{ c.fecha_fin|date:"d/m/Y" }}
+                  </p>
+                </div>
+
+              </a>
+            </div>
+            {% endif %}
+          {% endfor %}
+
+          {% for c in formacion_cerradas %}
+            {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
+            <div class="col-md-6 col-lg-4">
+              <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+                 class="convocatoria-card-mubi">
+
+                {% if c.imagen %}
+                  <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+                {% else %}
+                  <div class="convocatoria-placeholder"></div>
+                {% endif %}
+
+                <div class="overlay">
+                  <span class="categoria">
+                    {{ c.get_categoria_display }}
+                  </span>
+
+                  <span class="badge bg-secondary ms-2" style="vertical-align: middle;">
+                    Cerrada
+                  </span>
+
+                  <h5 class="titulo">{{ c.titulo }}</h5>
+                  <p class="fecha">
+                    Cerró el {{ c.fecha_fin|date:"d/m/Y" }}
+                  </p>
+                </div>
+
+              </a>
+            </div>
+            {% endif %}
+          {% endfor %}
+
+          {% for c in incentivo_cerradas %}
+            {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
+            <div class="col-md-6 col-lg-4">
+              <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+                 class="convocatoria-card-mubi">
+
+                {% if c.imagen %}
+                  <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+                {% else %}
+                  <div class="convocatoria-placeholder"></div>
+                {% endif %}
+
+                <div class="overlay">
+                  <span class="categoria">
+                    {{ c.get_categoria_display }}
+                  </span>
+
+                  <span class="badge bg-secondary ms-2" style="vertical-align: middle;">
+                    Cerrada
+                  </span>
+
+                  <h5 class="titulo">{{ c.titulo }}</h5>
+                  <p class="fecha">
+                    Cerró el {{ c.fecha_fin|date:"d/m/Y" }}
+                  </p>
+                </div>
+
+              </a>
+            </div>
+            {% endif %}
+          {% endfor %}
+
+          {% for c in beneficio_cerradas %}
+            {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
+            <div class="col-md-6 col-lg-4">
+              <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+                 class="convocatoria-card-mubi">
+
+                {% if c.imagen %}
+                  <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+                {% else %}
+                  <div class="convocatoria-placeholder"></div>
+                {% endif %}
+
+                <div class="overlay">
+                  <span class="categoria">
+                    {{ c.get_categoria_display }}
+                  </span>
+
+                  <span class="badge bg-secondary ms-2" style="vertical-align: middle;">
+                    Cerrada
+                  </span>
+
+                  <h5 class="titulo">{{ c.titulo }}</h5>
+                  <p class="fecha">
+                    Cerró el {{ c.fecha_fin|date:"d/m/Y" }}
+                  </p>
+                </div>
+
+              </a>
+            </div>
+            {% endif %}
+          {% endfor %}
+
+          {% for c in libre_cerradas %}
+            {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
+            <div class="col-md-6 col-lg-4">
+              <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}"
+                class="convocatoria-card-mubi">
+
+                {% if c.imagen %}
+                  <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
+                {% else %}
+                  <div class="convocatoria-placeholder"></div>
+                {% endif %}
+
+                <div class="overlay">
+                  <span class="categoria">
+                    {{ c.get_categoria_display }}
+                  </span>
+
+                  <span class="badge bg-secondary ms-2" style="vertical-align: middle;">
+                    Cerrada
+                  </span>
+
+                  <h5 class="titulo">{{ c.titulo }}</h5>
+                  <p class="fecha">
+                    Cerró el {{ c.fecha_fin|date:"d/m/Y" }}
+                  </p>
+                </div>
+
+              </a>
+            </div>
+            {% endif %}
+          {% endfor %}
+
+
+        </div>
       </div>
     {% endif %}
 
