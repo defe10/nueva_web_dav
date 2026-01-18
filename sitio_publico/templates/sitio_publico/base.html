@@ -217,7 +217,8 @@
             Panel de administración
           </h5>
 
-          <div class="d-grid gap-3 acciones-panel">
+          <div class="d-flex flex-wrap justify-content-center gap-3 acciones-panel">
+
             <a href="{% url 'convocatorias:crear_convocatoria' %}"
               class="btn btn-primary">
               Crear nueva convocatoria
@@ -227,11 +228,24 @@
               class="btn btn-outline-secondary">
               Ver convocatorias vigentes
             </a>
+
+            <a href="{% url 'backoffice:nomina_registro' %}"
+              class="btn btn-outline-dark">
+              Nómina del Registro
+            </a>
+
+            <a href="{% url 'exencion:padron_publico_exenciones' %}"
+              class="btn btn-outline-success">
+              Exenciones impositivas
+            </a>
+
           </div>
 
         </div>
       </div>
     {% endif %}
+
+
 
     <!-- ===================== -->
     <!-- FOOTER -->

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'registro_audiovisual',
     'convocatorias',
     'exencion',
+    "backoffice",
 ]
 
 

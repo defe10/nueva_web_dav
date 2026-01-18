@@ -4,10 +4,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 
+from django.http import HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Q
+
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
+
 from convocatorias.models import Convocatoria
-from .models import Exencion, ExencionDocumento, ObservacionAdministrativaExencion
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 
+from .models import Exencion, ExencionDocumento, ObservacionAdministrativaExencion, PadronPublicoExencion
 from .utils import datos_fiscales_completos
 
 
@@ -412,3 +419,105 @@ def confirmar_documento_subsanado_exencion(request, exencion_id):
 
     messages.success(request, "Subsanación enviada correctamente.")
     return redirect("usuarios:panel_usuario")
+
+
+# ============================================================
+# PADRÓN PÚBLICO (QR) + EXCEL (interno)
+# ============================================================
+
+def padron_publico_exenciones(request):
+    """
+    Padrón público (para QR): SOLO aprobadas.
+    Sin links, sin admin, sin datos sensibles.
+    """
+    q = (request.GET.get("q") or "").strip()
+
+    qs = Exencion.objects.filter(
+        estado="APROBADA"
+    ).order_by("-fecha_emision", "-fecha_creacion")
+
+    if q:
+        qs = qs.filter(
+            Q(cuit__icontains=q) |
+            Q(nombre_razon_social__icontains=q)
+        )
+
+    rows = []
+    for ex in qs:
+        rows.append({
+            "id": ex.id,
+            "nombre_razon_social": ex.nombre_razon_social or "",
+            "cuit": ex.cuit or "",
+            "fecha_emision": ex.fecha_emision,
+            "fecha_vencimiento": ex.fecha_vencimiento,
+            "estado": ex.estado or "",
+        })
+
+    return render(request, "exencion/padron_publico_exenciones.html", {
+        "q": q,
+        "rows": rows,
+    })
+
+
+@staff_member_required
+def padron_exenciones_excel(request):
+    """
+    Excel COMPLETO (interno) con TODOS los campos del modelo Exencion.
+    Exporta SOLO aprobadas.
+    """
+    q = (request.GET.get("q") or "").strip()
+
+    qs = Exencion.objects.filter(
+        estado="APROBADA"
+    ).order_by("-fecha_emision", "-fecha_creacion")
+
+    if q:
+        qs = qs.filter(
+            Q(cuit__icontains=q) |
+            Q(nombre_razon_social__icontains=q)
+        )
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Exenciones Aprobadas"
+
+    def fmt_value(v):
+        if v is None:
+            return ""
+        try:
+            return timezone.localtime(v).strftime("%d/%m/%Y %H:%M")
+        except Exception:
+            pass
+        try:
+            return v.strftime("%d/%m/%Y")
+        except Exception:
+            pass
+        try:
+            if hasattr(v, "name"):  # FileField
+                return v.name or ""
+        except Exception:
+            pass
+        return str(v)
+
+    field_names = [getattr(f, "attname", f.name) for f in Exencion._meta.fields]
+    ws.append(field_names)
+
+    for obj in qs:
+        ws.append([fmt_value(getattr(obj, n, "")) for n in field_names])
+
+    for col_idx, h in enumerate(field_names, start=1):
+        ws.column_dimensions[get_column_letter(col_idx)].width = min(max(len(str(h)) + 2, 14), 45)
+
+    filename = "padron_exenciones_aprobadas_completo.xlsx"
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    wb.save(response)
+    return response
+
+
+@staff_member_required
+def ir_a_padron_publico_exenciones(request):
+    padron = get_object_or_404(PadronPublicoExencion, activo=True)
+    return redirect("exencion:padron_publico_exenciones", token=padron.token)

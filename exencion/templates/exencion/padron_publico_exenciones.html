@@ -1,0 +1,73 @@
+{% extends "sitio_publico/base.html" %}
+
+{% block title %}
+Padrón · Exención impositiva
+{% endblock %}
+
+{% block content %}
+
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Padrón de exenciones aprobadas</h1>
+  <p class="text-white mb-0">
+    Verificación pública de constancias
+  </p>
+</section>
+
+<div class="container py-4">
+
+  <div class="dav-card mb-3">
+    <form method="get" class="row g-2 align-items-center justify-content-center">
+      <div class="col-12 col-lg-6">
+        <input type="text"
+               name="q"
+               value="{{ q }}"
+               class="form-control"
+               placeholder="Buscar por CUIT o Razón social">
+      </div>
+      <div class="col-12 col-lg-auto">
+        <button type="submit" class="btn btn-dark w-100">Buscar</button>
+      </div>
+      <div class="col-12 col-lg-auto">
+        <a href="." class="btn btn-outline-secondary w-100">Limpiar</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="dav-card">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th style="width:90px;">ID</th>
+            <th>Razón social</th>
+            <th style="width:170px;">CUIT</th>
+            <th style="width:170px;">Emisión</th>
+            <th style="width:170px;">Vencimiento</th>
+            <th style="width:150px;">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              <td class="text-muted">#{{ r.id }}</td>
+              <td class="fw-semibold">{{ r.nombre_razon_social }}</td>
+              <td>{{ r.cuit }}</td>
+              <td>{% if r.fecha_emision %}{{ r.fecha_emision|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+              <td>{% if r.fecha_vencimiento %}{{ r.fecha_vencimiento|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+              <td>{{ r.estado }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">
+                No hay exenciones aprobadas para mostrar.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

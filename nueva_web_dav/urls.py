@@ -21,6 +21,9 @@ urlpatterns = [
 
     # Exención
     path("exencion/", include("exencion.urls")),
+
+    # Backoffice
+    path("backoffice/", include("backoffice.urls")),
 ]
 
 if settings.DEBUG:

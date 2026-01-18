@@ -9,6 +9,8 @@ from django.core.exceptions import ValidationError
 from convocatorias.models import Convocatoria
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 from .utils import generar_pdf_exencion
+import uuid
+
 
 
 # ============================================================
@@ -250,3 +252,21 @@ class ExencionDocumento(models.Model):
     def __str__(self):
         suf = " (subsanación)" if self.es_subsanacion else ""
         return f"Documento {self.id} – Exención {self.exencion_id}{suf}"
+
+
+class PadronPublicoExencion(models.Model):
+    """
+    Habilita un padrón público (no listado) para verificación por QR.
+    Si se filtra el link, podés rotar el token creando otro y desactivando este.
+    """
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    activo = models.BooleanField(default=True)
+    creado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Padrón público de exención"
+        verbose_name_plural = "Padrón público de exención"
+
+    def __str__(self):
+        estado = "activo" if self.activo else "inactivo"
+        return f"Padrón público ({estado}) · {self.token}"
