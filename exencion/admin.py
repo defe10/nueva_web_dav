@@ -19,7 +19,7 @@ class ExencionAdmin(admin.ModelAdmin):
         "id",
         "fecha_creacion",
         "estado",
-        "nombre_razon_social",
+        "presentante",          # ✅ clickable (en vez de nombre_razon_social)
         "cuit",
         "email",
         "convocatoria",
@@ -39,6 +39,11 @@ class ExencionAdmin(admin.ModelAdmin):
         "fecha_emision",
         "fecha_vencimiento",
         "certificado_pdf",
+
+        # ✅ presentante como en Postulación
+        "presentante",
+
+        # Datos congelados / visibles
         "nombre_razon_social",
         "cuit",
         "domicilio_fiscal",
@@ -49,7 +54,8 @@ class ExencionAdmin(admin.ModelAdmin):
         "persona_humana",
         "persona_juridica",
         "convocatoria",
-        "documentacion_resumen",   # ✅ acá
+
+        "documentacion_resumen",
     )
 
     fieldsets = (
@@ -66,6 +72,7 @@ class ExencionAdmin(admin.ModelAdmin):
         }),
         ("Datos del solicitante", {
             "fields": (
+                "presentante",       # ✅ clickable
                 "nombre_razon_social",
                 "cuit",
                 "email",
@@ -86,6 +93,40 @@ class ExencionAdmin(admin.ModelAdmin):
             "description": "Se muestra acá para control interno. No existe el modelo 'Documentos de exención' en el menú."
         }),
     )
+
+    # -------------------------------------------------
+    # PRESENTANTE (LINK AL REGISTRO) ✅
+    # -------------------------------------------------
+    def presentante(self, obj):
+        """
+        Muestra el Nombre/Razón social como link al 'registro' (admin change)
+        de PersonaHumana o PersonaJuridica, como tu presentante en Postulación.
+        """
+        ph = getattr(obj, "persona_humana", None)
+        pj = getattr(obj, "persona_juridica", None)
+
+        # Texto visible (lo que se cliquea)
+        label = (getattr(obj, "nombre_razon_social", "") or "—").strip()
+
+        # Si no hay registro asociado, devolvemos solo texto
+        if not ph and not pj:
+            return label
+
+        # Elegimos a cuál linkear
+        target = ph or pj
+
+        url = reverse(
+            f"admin:{target._meta.app_label}_{target._meta.model_name}_change",
+            args=[target.pk],
+        )
+
+        # Si querés agregar ID en el texto:
+        # return format_html('<a href="{}">{} (ID {})</a>', url, label, target.pk)
+
+        return format_html('<a href="{}">{}</a>', url, label)
+
+    presentante.short_description = "Presentante"
+    presentante.admin_order_field = "nombre_razon_social"
 
     # -------------------------------------------------
     # RESUMEN DE DOCUMENTACIÓN (HTML REAL, no texto)
@@ -135,7 +176,7 @@ class ExencionAdmin(admin.ModelAdmin):
             filas
         )
 
-
+    documentacion_resumen.short_description = "Documentación"
 
     # -------------------------------------------------
     # ACCIÓN ADMINISTRATIVA
@@ -197,6 +238,7 @@ class ExencionAdmin(admin.ModelAdmin):
             f"{procesadas} exención/es aprobada/s y procesadas. {saltadas} saltada/s (no estaban ENVIADAS).",
             level=messages.SUCCESS
         )
+
 
 
 # ============================================================

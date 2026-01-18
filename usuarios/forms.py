@@ -9,7 +9,7 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 class LoginForm(AuthenticationForm):
 
     # Campo honeypot (invisible al usuario)
-    honeypot = forms.CharField(required=False, widget=forms.HiddenInput)
+    honeypot = forms.CharField(required=False, widget=forms.HiddenInput())
 
     username = forms.CharField(
         label="Correo electrónico",
@@ -35,7 +35,7 @@ class LoginForm(AuthenticationForm):
 class RegistroUsuarioForm(forms.ModelForm):
 
     # Campo honeypot (invisible al usuario)
-    honeypot = forms.CharField(required=False, widget=forms.HiddenInput)
+    honeypot = forms.CharField(required=False, widget=forms.HiddenInput())
 
     first_name = forms.CharField(
         label="Nombre",
@@ -116,7 +116,7 @@ class RegistroUsuarioForm(forms.ModelForm):
 class PasswordResetEmailForm(PasswordResetForm):
 
     # Campo honeypot invisible
-    honeypot = forms.CharField(required=False, widget=forms.HiddenInput)
+    honeypot = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def clean_honeypot(self):
         """
