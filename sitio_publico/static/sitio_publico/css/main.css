@@ -150,6 +150,7 @@ body {
     transition: 0.25s;
 }
 
+
 .card-area:hover .card-plus i {
     color: #b00055;
 }
@@ -159,6 +160,13 @@ body {
     border-radius: 25px;
     padding-bottom: 15px;
 }
+
+.card2 {
+    background-color: #cfe0f7;
+    border-radius: 5px;
+
+}
+
 
 /* ============================================================
    CONVOCATORIAS – FILTROS

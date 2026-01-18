@@ -211,8 +211,9 @@ def panel_usuario(request):
         .filter(user=user)
         .select_related("convocatoria")
         .prefetch_related("observaciones")
-        .order_by("-fecha_envio")
+        .order_by("-fecha_creacion")  
     )
+
 
     rendiciones = (
         Rendicion.objects
@@ -269,7 +270,7 @@ def panel_jurado(request):
             convocatoria_id__in=convocatorias_asignadas
         )
         .select_related("convocatoria", "user")
-        .order_by("-fecha_envio")
+        .order_by("-fecha_envio", "-id")
     )
 
     return render(

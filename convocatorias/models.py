@@ -195,9 +195,13 @@ class Postulacion(models.Model):
     genero = models.CharField(max_length=50, choices=GENERO, blank=True)
 
     declaracion_jurada = models.BooleanField(default=False)
-    fecha_envio = models.DateTimeField(auto_now_add=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)  # NUEVO
+
+    # ✅ ESTA es la fecha real de “clic final”
+    fecha_envio = models.DateTimeField(blank=True, null=True)  # CAMBIAR (antes auto_now_add)
 
     ESTADOS = [
+        ("borrador", "Borrador"),
         ("enviado", "Enviado"),
         ("revision_admin", "En revisión administrativa"),
         ("observado", "Observado (requiere subsanación)"),
@@ -211,11 +215,11 @@ class Postulacion(models.Model):
     estado = models.CharField(
         max_length=30,
         choices=ESTADOS,
-        default="enviado"
+        default="borrador" 
     )
 
     class Meta:
-        ordering = ["-fecha_envio"]
+        ordering = ["-fecha_creacion"]
         verbose_name = "Postulación"
         verbose_name_plural = "Postulaciones"
 

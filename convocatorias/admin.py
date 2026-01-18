@@ -81,8 +81,9 @@ class PostulacionDocumentoInline(admin.TabularInline):
     extra = 0
     can_delete = False
 
-    fields = ("tipo", "subtipo_subsanado", "estado", "archivo", "fecha_subida")
-    readonly_fields = ("archivo", "fecha_subida")
+    fields = ("tipo", "subtipo_subsanado", "estado", "archivo", "fecha_subida", "fecha_envio")
+    readonly_fields = ("archivo", "fecha_subida", "fecha_envio")
+
 
     def get_formset(self, request, obj=None, **kwargs):
         """
@@ -811,39 +812,105 @@ class AsignacionJuradoConvocatoriaAdmin(admin.ModelAdmin):
 # ============================================================
 @admin.register(Rendicion)
 class RendicionAdmin(admin.ModelAdmin):
-    pass
 
-
-@admin.register(DocumentoPostulacion)
-class DocumentoPostulacionAdmin(admin.ModelAdmin):
     list_display = (
-        "postulacion",
-        "tipo",
-        "subtipo_subsanado",
-        "estado",
-        "fecha_subida",
+        "id",
+        "presentante",
+        "convocatoria_link",
+        "nombre_proyecto",
+        "estado_postulacion",
+        "fecha_creacion",
     )
-    list_filter = ("tipo", "subtipo_subsanado", "estado")
-    search_fields = (
-        "postulacion__id",
-        "postulacion__nombre_proyecto",
-        "postulacion__user__username",
-        "postulacion__user__email",
-    )
-    ordering = ("-fecha_subida",)
 
-    def save_model(self, request, obj, form, change):
-        # Si no es SUBSANADO, el subtipo no debe quedar seteado
-        if obj.tipo != "SUBSANADO":
-            obj.subtipo_subsanado = None
+    ordering = ("-fecha_creacion",)
 
-        # Si es SUBSANADO, forzamos que tenga subtipo (para que jurado vea lo correcto)
-        if obj.tipo == "SUBSANADO" and not obj.subtipo_subsanado:
-            messages.error(
-                request,
-                "⚠️ Si el tipo es SUBSANADO, debés seleccionar Subtipo (PROYECTO o ADMIN)."
-            )
-            return  # corta el guardado
+    # =========================
+    # LINKS Y CAMPOS CALCULADOS
+    # =========================
 
-        super().save_model(request, obj, form, change)
+    def nombre_proyecto(self, obj):
+        postulacion = obj.postulacion
+        if not postulacion:
+            return "—"
+
+        url = reverse("admin:convocatorias_postulacion_change", args=[postulacion.id])
+        nombre = postulacion.nombre_proyecto or "(Sin título)"
+        return format_html('<a href="{}">{}</a>', url, nombre)
+
+    nombre_proyecto.short_description = "Proyecto"
+
+    def convocatoria_link(self, obj):
+        postulacion = obj.postulacion
+        if not postulacion or not postulacion.convocatoria:
+            return "—"
+
+        conv = postulacion.convocatoria
+        url = reverse("admin:convocatorias_convocatoria_change", args=[conv.id])
+        return format_html('<a href="{}">{}</a>', url, conv.titulo)
+
+    convocatoria_link.short_description = "Convocatoria"
+
+    def presentante(self, obj):
+        postulacion = obj.postulacion
+        if not postulacion:
+            return "—"
+
+        user = postulacion.user
+        ph = PersonaHumana.objects.filter(user=user).first()
+        pj = PersonaJuridica.objects.filter(user=user).first()
+
+        if ph:
+            url = reverse("admin:registro_audiovisual_personahumana_change", args=[ph.id])
+            return format_html('<a href="{}">{}</a>', url, ph.nombre_completo)
+
+        if pj:
+            url = reverse("admin:registro_audiovisual_personajuridica_change", args=[pj.id])
+            return format_html('<a href="{}">{}</a>', url, pj.razon_social)
+
+        return user.username
+
+    presentante.short_description = "Presentante"
+
+    def estado_postulacion(self, obj):
+        if not obj.postulacion:
+            return "—"
+        return obj.postulacion.get_estado_display()
+
+    estado_postulacion.short_description = "Estado"
+
+
+
+
+# @admin.register(DocumentoPostulacion)
+# class DocumentoPostulacionAdmin(admin.ModelAdmin):
+#     list_display = (
+#         "postulacion",
+#         "tipo",
+#         "subtipo_subsanado",
+#         "estado",
+#         "fecha_subida",
+#     )
+#     list_filter = ("tipo", "subtipo_subsanado", "estado")
+#     search_fields = (
+#         "postulacion__id",
+#         "postulacion__nombre_proyecto",
+#         "postulacion__user__username",
+#         "postulacion__user__email",
+#     )
+#     ordering = ("-fecha_subida",)
+
+#     def save_model(self, request, obj, form, change):
+#         # Si no es SUBSANADO, el subtipo no debe quedar seteado
+#         if obj.tipo != "SUBSANADO":
+#             obj.subtipo_subsanado = None
+
+#         # Si es SUBSANADO, forzamos que tenga subtipo (para que jurado vea lo correcto)
+#         if obj.tipo == "SUBSANADO" and not obj.subtipo_subsanado:
+#             messages.error(
+#                 request,
+#                 "⚠️ Si el tipo es SUBSANADO, debés seleccionar Subtipo (PROYECTO o ADMIN)."
+#             )
+#             return  # corta el guardado
+
+#         super().save_model(request, obj, form, change)
 

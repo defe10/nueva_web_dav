@@ -194,7 +194,7 @@ def inscribirse_convocatoria(request, slug):
         postulacion, creada = Postulacion.objects.get_or_create(
             user=request.user,
             convocatoria=convocatoria,
-            defaults={"estado": "enviado"}
+            defaults={"estado": "borrador"}
         )
 
         if creada:
@@ -263,7 +263,7 @@ def postular_convocatoria(request, convocatoria_id):
 
         if form.is_valid():
             postulacion = form.save(commit=False)
-            postulacion.estado = "enviado"
+            postulacion.estado = "borrador"
             postulacion.save()
 
             return redirect(
@@ -433,33 +433,36 @@ def confirmar_documentacion_personal(request, postulacion_id):
 # DOCUMENTACIÓN DEL PROYECTO (pantalla)
 # ============================================================
 @login_required(login_url="/usuarios/login/")
-def subir_documentacion_proyecto(request, postulacion_id):
+def confirmar_documentacion_proyecto(request, postulacion_id):
     postulacion = get_object_or_404(Postulacion, id=postulacion_id)
 
     if postulacion.user != request.user:
         return redirect("convocatorias:convocatorias_home")
 
-    documentos_pendientes = DocumentoPostulacion.objects.filter(
+    if request.method != "POST":
+        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
+
+    qs = DocumentoPostulacion.objects.filter(
         postulacion=postulacion,
         tipo="PROYECTO",
         estado="PENDIENTE",
-    ).order_by("-fecha_subida")
-
-    documentos_enviados = DocumentoPostulacion.objects.filter(
-        postulacion=postulacion,
-        tipo="PROYECTO",
-        estado="ENVIADO",
-    ).order_by("-fecha_envio", "-fecha_subida")
-
-    return render(
-        request,
-        "convocatorias/documentacion_proyecto.html",
-        {
-            "postulacion": postulacion,
-            "documentos_pendientes": documentos_pendientes,
-            "documentos_enviados": documentos_enviados,
-        },
     )
+
+    if not qs.exists():
+        messages.error(request, "No tenés documentos pendientes para enviar.")
+        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
+
+    ahora = timezone.now()
+    qs.update(estado="ENVIADO", fecha_envio=ahora)
+
+    # ✅ FINAL REAL: acá recién se considera “enviada” la postulación
+    postulacion.estado = "enviado"
+    postulacion.fecha_envio = ahora
+    postulacion.save(update_fields=["estado", "fecha_envio"])
+
+    messages.success(request, "Documentación del proyecto enviada correctamente.")
+    return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
+
 
 
 # ============================================================
@@ -753,3 +756,35 @@ def rendicion_detalle(request, rendicion_id):
             "convocatoria": convocatoria,
         },
     )
+
+
+
+@login_required(login_url="/usuarios/login/")
+def subir_documentacion_proyecto(request, postulacion_id):
+    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
+
+    if postulacion.user != request.user:
+        return redirect("convocatorias:convocatorias_home")
+
+    documentos_pendientes = DocumentoPostulacion.objects.filter(
+        postulacion=postulacion,
+        tipo="PROYECTO",
+        estado="PENDIENTE",
+    ).order_by("-fecha_subida")
+
+    documentos_enviados = DocumentoPostulacion.objects.filter(
+        postulacion=postulacion,
+        tipo="PROYECTO",
+        estado="ENVIADO",
+    ).order_by("-fecha_envio", "-fecha_subida")
+
+    return render(
+        request,
+        "convocatorias/documentacion_proyecto.html",
+        {
+            "postulacion": postulacion,
+            "documentos_pendientes": documentos_pendientes,
+            "documentos_enviados": documentos_enviados,
+        },
+    )
+
