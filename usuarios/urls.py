@@ -36,8 +36,11 @@ urlpatterns += [
         auth_views.PasswordResetView.as_view(
             template_name="usuarios/password_reset.html",
 
-            # ✅ HTML (el que querés que se vea igual al de activación)
-            # html_email_template_name="usuarios/password_reset_email.html",
+            # ✅ ESTE ES EL QUE Django estaba usando por defecto (y te rompía).
+            email_template_name="usuarios/password_reset_email.html",
+
+            # ✅ Si querés que llegue como HTML real (recomendado):
+            html_email_template_name="usuarios/password_reset_email.html",
 
             subject_template_name="usuarios/password_reset_subject.txt",
             form_class=PasswordResetEmailForm,

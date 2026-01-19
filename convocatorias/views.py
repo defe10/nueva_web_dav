@@ -436,12 +436,18 @@ def confirmar_documentacion_personal(request, postulacion_id):
 def confirmar_documentacion_proyecto(request, postulacion_id):
     postulacion = get_object_or_404(Postulacion, id=postulacion_id)
 
+    # Seguridad: solo el dueño
     if postulacion.user != request.user:
         return redirect("convocatorias:convocatorias_home")
 
+    # Solo por POST
     if request.method != "POST":
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
+        return redirect(
+            "convocatorias:subir_documentacion_proyecto",
+            postulacion_id=postulacion.id
+        )
 
+    # Documentos pendientes del proyecto
     qs = DocumentoPostulacion.objects.filter(
         postulacion=postulacion,
         tipo="PROYECTO",
@@ -450,18 +456,32 @@ def confirmar_documentacion_proyecto(request, postulacion_id):
 
     if not qs.exists():
         messages.error(request, "No tenés documentos pendientes para enviar.")
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
+        return redirect(
+            "convocatorias:subir_documentacion_proyecto",
+            postulacion_id=postulacion.id
+        )
 
+    # Marcar documentos como enviados
     ahora = timezone.now()
-    qs.update(estado="ENVIADO", fecha_envio=ahora)
+    qs.update(
+        estado="ENVIADO",
+        fecha_envio=ahora,
+    )
 
-    # ✅ FINAL REAL: acá recién se considera “enviada” la postulación
+    # ✅ FINAL REAL DE LA POSTULACIÓN
     postulacion.estado = "enviado"
     postulacion.fecha_envio = ahora
     postulacion.save(update_fields=["estado", "fecha_envio"])
 
-    messages.success(request, "Documentación del proyecto enviada correctamente.")
-    return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
+    messages.success(
+        request,
+        "Documentación del proyecto enviada correctamente. Tu postulación quedó registrada."
+    )
+
+    return redirect(
+        "convocatorias:postulacion_confirmada",
+        postulacion_id=postulacion.id
+    )
 
 
 
@@ -506,34 +526,7 @@ def agregar_documentacion_proyecto(request, postulacion_id):
     return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
 
 
-# ============================================================
-# DOCUMENTACIÓN DEL PROYECTO (confirmar envío)
-# ============================================================
-@login_required(login_url="/usuarios/login/")
-def confirmar_documentacion_proyecto(request, postulacion_id):
-    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
 
-    if postulacion.user != request.user:
-        return redirect("convocatorias:convocatorias_home")
-
-    if request.method != "POST":
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
-
-    qs = DocumentoPostulacion.objects.filter(
-        postulacion=postulacion,
-        tipo="PROYECTO",
-        estado="PENDIENTE",
-    )
-
-    if not qs.exists():
-        messages.error(request, "No tenés documentos pendientes para enviar.")
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
-
-    ahora = timezone.now()
-    qs.update(estado="ENVIADO", fecha_envio=ahora)
-
-    messages.success(request, "Documentación del proyecto enviada correctamente.")
-    return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
 
 
 # ============================================================
