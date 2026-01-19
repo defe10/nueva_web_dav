@@ -263,7 +263,13 @@ def postular_convocatoria(request, convocatoria_id):
 
         if form.is_valid():
             postulacion = form.save(commit=False)
+
             postulacion.estado = "borrador"
+
+            # ✅ BLINDAJE: evita NULL siempre (PA tiene NOT NULL en DB)
+            if not postulacion.fecha_envio:
+                postulacion.fecha_envio = timezone.now()
+
             postulacion.save()
 
             return redirect(
