@@ -4,11 +4,13 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import format_html
 
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
+from convocatorias.models import Postulacion, InscripcionFormacion
 
 
 def _admin_change_url_for(obj):
@@ -190,3 +192,87 @@ def nomina_registro_excel(request):
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     wb.save(response)
     return response
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils.html import format_html
+
+from convocatorias.models import Postulacion, InscripcionFormacion
+
+
+@staff_member_required
+def backoffice_convocatorias(request):
+    # =========================
+    # POSTULACIONES
+    # =========================
+    postulaciones = (
+        Postulacion.objects
+        .select_related("convocatoria", "user")
+        .order_by("-fecha_envio")
+    )
+
+    rows_postulaciones = []
+    for p in postulaciones:
+        # Link a Postulación (Nombre proyecto)
+        url_post = reverse("admin:convocatorias_postulacion_change", args=[p.id])
+        link_proyecto = format_html('<a href="{}">{}</a>', url_post, p.nombre_proyecto)
+
+        # Presentante (admin PersonaHumana / PersonaJuridica) desde p.user
+        link_presentante = "—"
+        ph = PersonaHumana.objects.filter(user=p.user).only("id").first()
+        if ph:
+            url_ph = reverse("admin:registro_audiovisual_personahumana_change", args=[ph.id])
+            label = getattr(ph, "nombre_completo", None) or str(ph)
+            link_presentante = format_html('<a href="{}">{}</a>', url_ph, label)
+        else:
+            pj = PersonaJuridica.objects.filter(user=p.user).only("id").first()
+            if pj:
+                url_pj = reverse("admin:registro_audiovisual_personajuridica_change", args=[pj.id])
+                label = getattr(pj, "razon_social", None) or str(pj)
+                link_presentante = format_html('<a href="{}">{}</a>', url_pj, label)
+            else:
+                link_presentante = getattr(p.user, "email", None) or str(p.user)
+
+        convocatoria = p.convocatoria.titulo if p.convocatoria_id else "—"
+        linea = getattr(p.convocatoria, "linea", None) if p.convocatoria_id else None
+        linea = linea or "—"
+
+        rows_postulaciones.append({
+            "id": p.id,
+            "presentante": link_presentante,
+            "proyecto": link_proyecto,
+            "convocatoria": convocatoria,
+            "linea": linea,
+            "fecha_envio": p.fecha_envio,
+            "estado": p.estado,
+        })
+
+
+    # =========================
+    # INSCRIPCIONES A FORMACIÓN
+    # =========================
+    inscripciones = (
+        InscripcionFormacion.objects
+        .select_related("convocatoria", "user", "persona_humana", "persona_juridica")
+        .order_by("-fecha")
+    )
+
+
+    rows_formacion = []
+    for i in inscripciones:
+        # Link al admin de InscripcionFormacion
+        url_insc = reverse("admin:convocatorias_inscripcionformacion_change", args=[i.id])
+        link_id = format_html('<a href="{}">#{}</a>', url_insc, i.id)
+
+        rows_formacion.append({
+            "id": link_id,
+            "convocatoria": i.convocatoria.titulo if i.convocatoria_id else "—",
+            "fecha": i.fecha,
+            "estado": getattr(i, "estado", "—"),
+        })
+
+    return render(request, "backoffice/convocatorias.html", {
+        "rows_postulaciones": rows_postulaciones,
+        "rows_formacion": rows_formacion,
+    })

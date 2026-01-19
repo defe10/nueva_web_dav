@@ -1,0 +1,80 @@
+{% extends "sitio_publico/base.html" %}
+{% block content %}
+
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Backoffice · Convocatorias</h1>
+  <p class="text-white mb-0">Nómina de postulaciones e inscripciones</p>
+</section>
+
+<div class="container py-4">
+
+  <!-- POSTULACIONES -->
+  <div class="dav-card mb-4">
+    <h4 class="fw-bold mb-3">Postulaciones</h4>
+
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Presentante</th>
+            <th>Nombre proyecto</th>
+            <th>Convocatoria</th>
+            <th>Línea</th>
+            <th>Fecha envío</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows_postulaciones %}
+          <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.presentante|safe }}</td>
+            <td>{{ r.proyecto|safe }}</td>
+            <td>{{ r.convocatoria }}</td>
+            <td>{{ r.linea }}</td>
+            <td>{{ r.fecha_envio|date:"d/m/Y" }}</td>
+            <td>{{ r.estado }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7">No hay postulaciones.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FORMACIÓN -->
+  <div class="dav-card">
+    <h4 class="fw-bold mb-3">Inscripciones a formación</h4>
+
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Convocatoria</th>
+            <th>Fecha envío</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows_formacion %}
+          <tr>
+            <td>{{ r.id|safe }}</td>
+            <td>{{ r.convocatoria }}</td>
+            <td>{{ r.fecha|date:"d/m/Y" }}</td>
+            <td>{{ r.estado }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">No hay inscripciones.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
