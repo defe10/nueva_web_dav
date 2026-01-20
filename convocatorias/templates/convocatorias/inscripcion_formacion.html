@@ -126,15 +126,21 @@
             {% if form.declaracion_jurada.errors %}<div class="text-danger small">{{ form.declaracion_jurada.errors }}</div>{% endif %}
           </div>
 
-          <div class="col-12 text-end mt-2">
-            <button type="submit" class="btn btn-primary">
-              Enviar inscripción
-            </button>
-            <a href="{% url 'convocatorias:convocatoria_detalle' convocatoria.slug %}"
-               class="btn btn-outline-secondary ms-2">
-              Volver
-            </a>
+          <div class="col-12 mt-4">
+            <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end gap-3">
+              
+              <button type="submit" class="btn btn-primary">
+                Enviar inscripción
+              </button>
+
+              <a href="{% url 'convocatorias:convocatoria_detalle' convocatoria.slug %}"
+                class="btn btn-outline-secondary">
+                Volver
+              </a>
+
+            </div>
           </div>
+
 
         </form>
       </div>

@@ -682,15 +682,63 @@ class InscripcionFormacionAdmin(admin.ModelAdmin):
 @admin.register(ObservacionAdministrativa)
 class ObservacionAdministrativaAdmin(admin.ModelAdmin):
     list_display = (
-        "postulacion",
+        "proyecto_link",
+        "presentante_link",
         "tipo_documento",
         "descripcion",
         "subsanada",
         "fecha_creacion",
     )
     list_filter = ("subsanada", "tipo_documento")
-    search_fields = ("descripcion",)
+    search_fields = ("descripcion", "postulacion__nombre_proyecto", "postulacion__id")
 
+    # -------------------------
+    # LINKS EN LISTADO
+    # -------------------------
+    def proyecto_link(self, obj):
+        """
+        Proyecto (link a Postulación).
+        Si no hay nombre_proyecto, muestra (Sin título).
+        """
+        p = getattr(obj, "postulacion", None)
+        if not p:
+            return "—"
+
+        url = reverse("admin:convocatorias_postulacion_change", args=[p.id])
+        nombre = getattr(p, "nombre_proyecto", None) or "(Sin título)"
+        return format_html('<a href="{}">{}</a>', url, nombre)
+
+    proyecto_link.short_description = "Proyecto"
+    proyecto_link.admin_order_field = "postulacion__nombre_proyecto"
+
+    def presentante_link(self, obj):
+        """
+        Presentante (link al Registro: PersonaHumana o PersonaJuridica).
+        """
+        p = getattr(obj, "postulacion", None)
+        if not p or not getattr(p, "user", None):
+            return "—"
+
+        user = p.user
+        ph = PersonaHumana.objects.filter(user=user).first()
+        pj = PersonaJuridica.objects.filter(user=user).first()
+
+        if ph:
+            url = reverse("admin:registro_audiovisual_personahumana_change", args=[ph.id])
+            return format_html('<a href="{}">{}</a>', url, ph.nombre_completo)
+
+        if pj:
+            url = reverse("admin:registro_audiovisual_personajuridica_change", args=[pj.id])
+            return format_html('<a href="{}">{}</a>', url, pj.razon_social)
+
+        # fallback: si no tiene registro, mostramos username sin link
+        return user.username or "—"
+
+    presentante_link.short_description = "Presentante"
+
+    # -------------------------
+    # TU save_model QUEDA IGUAL
+    # -------------------------
     def save_model(self, request, obj, form, change):
         """
         Envía email cuando:
@@ -731,26 +779,18 @@ class ObservacionAdministrativaAdmin(admin.ModelAdmin):
         if getattr(postulacion, "convocatoria", None):
             convocatoria_titulo = postulacion.convocatoria.titulo or ""
 
-        # ==================================================
-        # Link al panel (con fallback para que SIEMPRE exista)
-        # Ajustá el último fallback si tu ruta no es /convocatorias/
-        # ==================================================
         panel_url = None
-
-        # Panel real
         try:
             panel_url = request.build_absolute_uri(reverse("usuarios:panel_usuario"))
         except Exception:
             panel_url = None
 
-        # Fallback razonable: home de convocatorias (si existe)
         if not panel_url:
             try:
                 panel_url = request.build_absolute_uri(reverse("convocatorias:convocatorias_home"))
             except Exception:
                 panel_url = None
 
-        # Último fallback (hardcodeado) — con barra final
         if not panel_url:
             panel_url = request.build_absolute_uri("/usuarios/panel/")
 
@@ -795,6 +835,7 @@ class ObservacionAdministrativaAdmin(admin.ModelAdmin):
             messages.success(request, f"Email de subsanación enviado a {destinatario}.")
         except Exception as e:
             messages.error(request, f"No se pudo enviar el email de subsanación: {e}")
+
 
 
 # ============================================================

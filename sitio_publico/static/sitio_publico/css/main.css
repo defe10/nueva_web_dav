@@ -336,5 +336,31 @@ body {
         display: none;
     }
 
+    .hero-section {
+        padding-bottom: 2rem !important;
+    }
+
+    .py-5 {
+        padding-top: 2rem !important;
+    }
+
+
+}
+
+@media (max-width: 991px) {
+
+    .boton-programa {
+        display: none;
+    }
+
+}
+
+
+@media (max-width: 1400px) {
+
+
+    .hero-card-left {
+        padding: 3rem 2rem !important;
+    }
 
 }

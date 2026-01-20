@@ -176,14 +176,19 @@
           </div>
 
           <!-- BOTONES -->
-          <div class="col-12 text-end mt-4">
-            <button type="submit" class="btn btn-primary">
-              Crear convocatoria
-            </button>
-            <a href="{% url 'convocatorias:convocatorias_home' %}"
-               class="btn btn-outline-secondary ms-2">
-              Volver
-            </a>
+          <div class="col-12 mt-4">
+            <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end gap-3">
+              
+              <button type="submit" class="btn btn-primary">
+                Crear convocatoria
+              </button>
+
+              <a href="{% url 'convocatorias:convocatorias_home' %}"
+                class="btn btn-outline-secondary">
+                Volver
+              </a>
+
+            </div>
           </div>
 
         </form>
