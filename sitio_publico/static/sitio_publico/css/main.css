@@ -162,11 +162,41 @@ body {
 }
 
 .card2 {
-    background-color: #cfe0f7;
-    border-radius: 5px;
+    background-color: transparent;
+    border: 1.5px solid #2f354a;
+    border-radius: 8px;
+    transition: box-shadow .2s ease, transform .2s ease;
+    color: #2f354a;
 
 }
 
+.card2:hover {
+
+    transform: translateY(-2px);
+}
+
+/* .gestiones {
+    background-color: #2f354a;
+} */
+
+.gyt {
+    color: white !important;
+}
+
+#convocatorias {
+    scroll-margin-top: 120px;
+    /* ajustá según altura del hero/navbar */
+}
+
+
+.tooltip-inner {
+    background-color: #2f354a;
+    font-size: 0.85rem;
+}
+
+.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #2f354a;
+}
 
 /* ============================================================
    CONVOCATORIAS – FILTROS
@@ -337,7 +367,7 @@ body {
     }
 
     .hero-section {
-        padding-bottom: 2rem !important;
+        padding-bottom: 1rem !important;
     }
 
     .py-5 {
