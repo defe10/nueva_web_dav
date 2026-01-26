@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 
 
-from .validators import validar_pdf, validar_tamano_archivo
+from .validators import validar_documento_admitido, validar_tamano_archivo
 
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 
@@ -87,7 +87,9 @@ class Convocatoria(models.Model):
     bases_pdf = models.FileField(
         upload_to="convocatorias/bases/",
         blank=True,
-        null=True
+        null=True,
+        validators=[validar_documento_admitido, validar_tamano_archivo],
+        verbose_name="Bases (PDF / Excel / Planilla)"
     )
 
     imagen = models.ImageField(
@@ -296,8 +298,9 @@ class DocumentoPostulacion(models.Model):
 
     archivo = models.FileField(
         upload_to="postulaciones/documentos/",
-        validators=[validar_pdf, validar_tamano_archivo],
+        validators=[validar_documento_admitido, validar_tamano_archivo],
     )
+
 
     fecha_subida = models.DateTimeField(auto_now_add=True)
 
@@ -546,9 +549,11 @@ class ArchivoPostulacion(models.Model):
 
     archivo = models.FileField(
         upload_to="convocatorias/archivos/",
-        validators=[validar_pdf, validar_tamano_archivo],
-        verbose_name="Archivo del proyecto (PDF)"
+        validators=[validar_documento_admitido, validar_tamano_archivo],
+        verbose_name="Archivo del proyecto (PDF / Excel / Planilla)"
     )
+
+
 
     def __str__(self):
         return self.archivo.name or "ArchivoPostulacion"

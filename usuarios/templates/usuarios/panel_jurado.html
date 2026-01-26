@@ -5,81 +5,174 @@
 {% block content %}
 
 <div class="container py-5">
+  <h1 class="fw-bold mb-4 text-center">Panel de Jurado</h1>
 
-    <h1 class="fw-bold mb-4 text-center">Panel de Jurado</h1>
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-9">
 
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
+      <!-- PANEL (igual al de usuario) -->
+      <div class="panel-box p-4 shadow">
 
-            <!-- PANEL -->
-            <div class="p-4 shadow"
-                 style="border-radius: 16px; background: #fff;">
+        <h4 class="fw-bold mb-2">
+          Bienvenido, {{ user.first_name|default:user.username }}!
+        </h4>
 
-                <h4 class="fw-bold mb-3">
-                    Bienvenido, {{ user.username }}
-                </h4>
+        <p class="text-muted mb-4">
+          Desde aquí podés acceder a los proyectos asignados para su evaluación como jurado.
+        </p>
 
-                <p class="text-muted">
-                    Desde aquí podés acceder a los proyectos asignados
-                    para su evaluación como jurado.
-                </p>
-
-                <hr>
-
-                <p><strong>Rol:</strong> {{ user|rol_usuario }}</p>
-
-                <div class="alert alert-info mt-3">
-                    <strong>Función:</strong> Evaluación de proyectos audiovisuales
-                </div>
-
-                <hr>
-                
-                <!-- PROYECTOS ASIGNADOS -->
-                <p class="mb-3"><strong>Proyectos en evaluación:</strong></p>
-
-                {% if postulaciones %}
-                    {% for p in postulaciones %}
-                        <p class="mb-2">
-                            <strong>{{ p.nombre_proyecto }}</strong><br>
-
-                            <span class="text-muted small">
-                                Convocatoria: <strong>{{ p.convocatoria.titulo }}</strong>
-                            </span>
-
-                            <span class="badge bg-primary ms-2">
-                                En evaluación
-                            </span>
-                        </p>
-
-                        <a href="{% url 'usuarios:jurado_ver_documentacion' p.id %}"
-                            class="btn btn-outline-primary btn-sm mb-3">
-                            Ver documentación del proyecto
-                        </a>
-
-                        <hr>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-muted small">
-                        No tenés proyectos asignados para evaluar.
-                    </p>
-                    <hr>
-                {% endif %}
-
-                <!-- ACCIONES -->
-                <div class="d-grid gap-3 mt-4">
-
-                    <a href="{% url 'usuarios:logout' %}"
-                       class="btn btn-outline-danger">
-                        Cerrar sesión
-                    </a>
-
-                </div>
-
+        <!-- ========================= -->
+        <!-- ROL -->
+        <!-- ========================= -->
+        <div class="panel-section">
+          <div class="panel-section-title">
+            <span class="panel-ico"><i class="bi bi-person-badge"></i></span>
+            <div>
+              <h6 class="mb-0">Rol</h6>
+              <div class="panel-subtitle">Perfil de acceso</div>
             </div>
-            <!-- /PANEL -->
+          </div>
 
+          <div class="panel-row panel-row-compact">
+            <div class="panel-row-left">
+              <div class="panel-row-title">Rol actual</div>
+              <div class="panel-row-sub text-muted">Acceso según permisos asignados</div>
+            </div>
+            <div class="panel-row-right">
+              <span class="badge bg-dark">{{ user|rol_usuario }}</span>
+            </div>
+          </div>
         </div>
+
+        <!-- ========================= -->
+        <!-- FUNCIÓN -->
+        <!-- ========================= -->
+        <div class="panel-section">
+          <div class="panel-section-title">
+            <span class="panel-ico"><i class="bi bi-clipboard2-check"></i></span>
+            <div>
+              <h6 class="mb-0">Función</h6>
+              <div class="panel-subtitle">Tarea asignada</div>
+            </div>
+          </div>
+
+          <div class="panel-row panel-row-compact">
+            <div class="panel-row-left">
+              <div class="panel-row-title">Evaluación de proyectos</div>
+              <div class="panel-row-sub text-muted">
+                Accedé a la documentación y completá la evaluación según corresponda.
+              </div>
+            </div>
+            <div class="panel-row-right">
+              <span class="badge bg-info text-dark">Jurado</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- PROYECTOS ASIGNADOS (GRILLA) -->
+        <!-- ========================= -->
+        <div class="panel-section">
+          <div class="panel-section-title">
+            <span class="panel-ico"><i class="bi bi-folder2-open"></i></span>
+            <div>
+              <h6 class="mb-0">Proyectos asignados</h6>
+              <div class="panel-subtitle">Documentación para evaluación</div>
+            </div>
+          </div>
+
+          <div class="panel-card">
+
+            <!-- Head -->
+            <div class="panel-grid-head panel-grid-4">
+              <div class="panel-head-left">Proyecto</div>
+
+              {# ✅ MISMO CRITERIO: columna centrada, texto alineado a la izquierda #}
+              <div class="panel-head-center panel-head-center-left">
+                <span>Convocatoria</span>
+              </div>
+
+              <div class="panel-head-right">Estado</div>
+              <div class="panel-head-right">Acción</div>
+            </div>
+
+            {% if postulaciones %}
+              {% for p in postulaciones %}
+
+                <div class="panel-grid-row panel-grid-4">
+
+                  <!-- Proyecto -->
+                  <div class="panel-cell panel-cell-left">
+                    <div class="panel-primary panel-clamp-2">
+                      {{ p.nombre_proyecto|default:"(Sin título)" }}
+                    </div>
+                  </div>
+
+                  <!-- Convocatoria (centrada como columna / texto a la izquierda dentro) -->
+                  <div class="panel-cell panel-cell-center panel-cell-center-left">
+                    {% if p.convocatoria %}
+                      <div class="panel-secondary panel-clamp-2">
+                        {{ p.convocatoria.titulo }}
+                      </div>
+                    {% else %}
+                      <div class="panel-secondary panel-clamp-2 text-muted">
+                        Convocatoria eliminada
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Estado -->
+                  <div class="panel-cell panel-cell-right">
+                    <span class="badge bg-primary">En evaluación</span>
+                  </div>
+
+                  <!-- Acción -->
+                  <div class="panel-cell panel-cell-right">
+                    <a href="{% url 'usuarios:jurado_ver_documentacion' p.id %}"
+                       class="btn btn-outline-primary btn-sm btn-pill">
+                      Abrir
+                    </a>
+                  </div>
+
+                </div>
+
+              {% endfor %}
+            {% else %}
+              <div class="panel-empty">
+                <p class="text-muted small mb-0">
+                  No tenés proyectos asignados para evaluar.
+                </p>
+              </div>
+            {% endif %}
+
+          </div>
+        </div>
+
+        <!-- ========================= -->
+        <!-- ACCIONES -->
+        <!-- ========================= -->
+        <div class="panel-section">
+          <div class="panel-section-title">
+            <span class="panel-ico"><i class="bi bi-lightning-charge"></i></span>
+            <div>
+              <h6 class="mb-0">Acciones</h6>
+              <div class="panel-subtitle">Atajos</div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-3 mt-3">
+            <a href="{% url 'usuarios:logout' %}"
+               class="btn btn-outline-danger">
+              Cerrar sesión
+            </a>
+          </div>
+        </div>
+
+      </div>
+      <!-- /PANEL -->
+
     </div>
+  </div>
 </div>
 
 {% endblock %}

@@ -5,359 +5,482 @@
 {% block content %}
 
 <div class="container py-5">
+  <h1 class="fw-bold mb-4 text-center">Mi Panel</h1>
 
-    <h1 class="fw-bold mb-4 text-center">Mi Panel</h1>
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-9">
 
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
+      <div class="panel-box p-4 shadow">
 
-            <!-- PANEL -->
-            <div class="p-4 shadow"
-                 style="border-radius: 16px; background: #fff;">
+        <h4 class="fw-bold mb-2">
+          Hola, {{ user.first_name|default:user.username }}!
+        </h4>
 
-                <h4 class="fw-bold mb-3">
-                    Hola, {{ user.first_name|default:user.username }}!
-                </h4>
+        <p class="text-muted mb-4">
+          Desde aquí podés consultar el estado de tu registro audiovisual
+          y acceder a las convocatorias disponibles.
+        </p>
 
-                <p class="text-muted">
-                    Desde aquí podés consultar el estado de tu registro audiovisual
-                    y acceder a las convocatorias disponibles.
-                </p>
+        <!-- ========================= -->
+        <!-- ROL (SIEMPRE) -->
+        <!-- ========================= -->
+        <div class="panel-section">
+          <div class="panel-section-title">
+            <span class="panel-ico"><i class="bi bi-person-badge"></i></span>
+            <div>
+              <h6 class="mb-0">Rol</h6>
+              <div class="panel-subtitle">Perfil de acceso</div>
+            </div>
+          </div>
 
-                <hr>
+          <div class="panel-row panel-row-compact">
+            <div class="panel-row-left">
+              <div class="panel-row-title">Rol actual</div>
+              <div class="panel-row-sub text-muted">Acceso según permisos asignados</div>
+            </div>
+            <div class="panel-row-right">
+              <span class="badge bg-dark">{{ user|rol_usuario }}</span>
+            </div>
+          </div>
 
-                <p><strong>Rol:</strong> {{ user|rol_usuario }}</p>
+          {% if user|rol_usuario == "Administrador" %}
+            <div class="panel-actions mt-3">
+              <a href="/admin/" class="btn btn-dark w-100">Ir al panel de administración</a>
+            </div>
+          {% endif %}
+        </div>
 
-                {% if user|rol_usuario == "Administrador" %}
-                    <a href="/admin/"
-                       class="btn btn-dark w-100 mt-3">
-                        Ir al panel de administración
-                    </a>
-                {% endif %}
+        {% if user|rol_usuario != "Administrador" %}
 
-                {# ===================================================== #}
-                {# TODO LO SIGUIENTE SOLO PARA NO ADMINISTRADORES       #}
-                {# ===================================================== #}
-                {% if user|rol_usuario != "Administrador" %}
+          <!-- ========================= -->
+          <!-- REGISTRO (SIEMPRE) -->
+          <!-- ========================= -->
+          <div class="panel-section">
+            <div class="panel-section-title">
+              <span class="panel-ico"><i class="bi bi-clipboard-check"></i></span>
+              <div>
+                <h6 class="mb-0">Registro Provincial</h6>
+                <div class="panel-subtitle">Estado y tipo de inscripción</div>
+              </div>
+            </div>
 
-                <hr>
+            <div class="panel-row panel-row-compact">
+              <div class="panel-row-left">
+                <div class="panel-row-title">Registro audiovisual</div>
+                <div class="panel-row-sub text-muted">
+                  {% if persona_humana %}Persona Humana{% endif %}
+                  {% if persona_humana and persona_juridica %} · {% endif %}
+                  {% if persona_juridica %}Persona Jurídica{% endif %}
+                  {% if not persona_humana and not persona_juridica %}Para postularte, completá tu registro.{% endif %}
+                </div>
+              </div>
 
-                <!-- ESTADO DEL REGISTRO -->
+              <div class="panel-row-right">
                 {% if persona_humana or persona_juridica %}
-                    <p class="mb-2">
-                        <strong>Estado del registro audiovisual:</strong>
-                        <span class="badge bg-success ms-2">Completado</span>
-                    </p>
-
-                    {% if persona_humana %}
-                        <p class="text-muted small mb-1">
-                            Registrado como <strong>Persona Humana</strong>.
-                        </p>
-                    {% endif %}
-
-                    {% if persona_juridica %}
-                        <p class="text-muted small mb-1">
-                            Registrado como <strong>Persona Jurídica</strong>.
-                        </p>
-                    {% endif %}
+                  <span class="badge bg-success">Completado</span>
                 {% else %}
-                    <p class="mb-2">
-                        <strong>Estado del registro audiovisual:</strong>
-                        <span class="badge bg-warning text-dark ms-2">
-                            Pendiente
-                        </span>
-                    </p>
+                  <span class="badge bg-warning text-dark">Pendiente</span>
                 {% endif %}
+              </div>
+            </div>
 
-                <hr>
+            <div class="panel-actions panel-actions-inline mt-3">
+              {% if persona_humana %}
+                <a href="{% url 'registro_audiovisual:editar_persona_humana' %}"
+                   class="btn btn-outline-primary btn-sm btn-pill">
+                  Editar Persona Humana
+                </a>
+              {% endif %}
 
-                <!-- MIS CONVOCATORIAS -->
-                <p class="mb-3"><strong>Mis convocatorias:</strong></p>
+              {% if persona_juridica %}
+                <a href="{% url 'registro_audiovisual:editar_persona_juridica' %}"
+                   class="btn btn-outline-primary btn-sm btn-pill">
+                  Editar Persona Jurídica
+                </a>
+              {% endif %}
 
-                {# ======================= #}
-                {# POSTULACIONES (IDEA)    #}
-                {# ======================= #}
-                {% if postulaciones %}
-                    {% for p in postulaciones %}
-                        <p class="mb-2">
-                            <strong>
-                              {% if p.convocatoria %}
-                                <a href="{% url 'convocatorias:convocatoria_detalle' p.convocatoria.slug %}">
-                                  {{ p.convocatoria.titulo }}
-                                </a>
-                              {% else %}
-                                Convocatoria eliminada
-                              {% endif %}
-                            </strong><br>
+              {% if not persona_humana and not persona_juridica %}
+                <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}"
+                   class="btn btn-warning btn-sm btn-pill">
+                  Completar registro
+                </a>
+              {% endif %}
+            </div>
+          </div>
 
-                            <span class="text-muted small">
-                                Proyecto: <strong>{{ p.nombre_proyecto|default:"(Sin título)" }}</strong>
-                            </span>
+          <!-- ========================= -->
+          <!-- CONVOCATORIAS (GRILLA 4 COL) -->
+          <!-- ========================= -->
+          <div class="panel-section">
+            <div class="panel-section-title">
+              <span class="panel-ico"><i class="bi bi-megaphone"></i></span>
+              <div>
+                <h6 class="mb-0">Convocatorias</h6>
+                <div class="panel-subtitle">Tus postulaciones</div>
+              </div>
+            </div>
 
-                            <span class="badge ms-2
-                                {% if p.estado == 'enviado' %}
-                                    bg-secondary
-                                {% elif p.estado == 'revision_admin' %}
-                                    bg-info
-                                {% elif p.estado == 'observado' %}
-                                    bg-warning text-dark
-                                {% elif p.estado == 'admitido' %}
-                                    bg-primary
-                                {% elif p.estado == 'evaluacion_jurado' %}
-                                    bg-primary
-                                {% elif p.estado == 'seleccionado' %}
-                                    bg-success
-                                {% elif p.estado == 'no_seleccionado' %}
-                                    bg-danger
-                                {% elif p.estado == 'finalizado' %}
-                                    bg-success
-                                {% else %}
-                                    bg-secondary
-                                {% endif %}
-                            ">
-                                {{ p.get_estado_display }}
-                            </span>
-                        </p>
+            <div class="panel-card">
+              <div class="panel-grid-head panel-grid-4">
+                <div class="panel-head-left">Proyecto</div>
+                <div class="panel-head-center panel-head-center-left"><span>Convocatoria</span></div>
+                <div class="panel-head-right">Estado</div>
+                <div class="panel-head-right">Acción</div>
+              </div>
 
-                        {# ============================= #}
-                        {# OBSERVACIONES / SUBSANACIÓN  #}
-                        {# ============================= #}
-                        {% if p.estado == "observado" %}
-                            <div class="alert alert-warning mt-3">
-                                <h6 class="fw-bold mb-2">
-                                    Observaciones pendientes
-                                </h6>
-
-                                <ul class="mb-2">
-                                    {% for obs in p.observaciones.all %}
-                                        {% if not obs.subsanada %}
-                                            <li>
-                                                <strong>{{ obs.get_tipo_documento_display }}:</strong>
-                                                {{ obs.descripcion }}
-                                            </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
-
-                                <a href="{% url 'convocatorias:subir_documento_subsanado' p.id %}"
-                                   class="btn btn-warning btn-sm mt-2">
-                                    Subir documentación solicitada
-                                </a>
-                            </div>
-                        {% endif %}
-
-                        <hr>
-                    {% endfor %}
-                {% endif %}
-
-                {# ======================= #}
-                {# RENDICIONES             #}
-                {# ======================= #}
-                {% if rendiciones %}
-                    <p class="mb-3"><strong>Rendiciones:</strong></p>
-
-                    {% for r in rendiciones %}
-                        <p class="mb-2">
-                            <strong>
-                                {{ r.postulacion.convocatoria.titulo }}
-                            </strong><br>
-
-                            <span class="text-muted small">
-                                Proyecto:
-                                <strong>{{ r.postulacion.nombre_proyecto|default:"(Sin título)" }}</strong>
-                            </span>
-
-                            <span class="badge ms-2
-                                {% if r.estado == 'BORRADOR' %}
-                                    bg-secondary
-                                {% elif r.estado == 'ENVIADO' %}
-                                    bg-info
-                                {% elif r.estado == 'OBSERVADO' %}
-                                    bg-warning text-dark
-                                {% elif r.estado == 'SUBSANADO' %}
-                                    bg-primary
-                                {% elif r.estado == 'APROBADO' %}
-                                    bg-success
-                                {% elif r.estado == 'RECHAZADO' %}
-                                    bg-danger
-                                {% else %}
-                                    bg-secondary
-                                {% endif %}
-                            ">
-                                {{ r.get_estado_display }}
-                            </span>
-                        </p>
-
-                        {% if r.observaciones_admin and r.estado == "OBSERVADO" %}
-                            <div class="alert alert-warning mt-2">
-                                <strong>Observación:</strong><br>
-                                {{ r.observaciones_admin }}
-                            </div>
-                        {% endif %}
-
-                        <p class="mb-2">
-                            {% if r.link_documentacion %}
-                                <a href="{{ r.link_documentacion }}"
-                                   target="_blank"
-                                   rel="noopener"
-                                   class="btn btn-outline-primary btn-sm">
-                                    Ver link de rendición
-                                </a>
-                            {% else %}
-                                <span class="text-muted small">
-                                    Aún no cargaste el link de rendición.
-                                </span>
-                            {% endif %}
-                        </p>
-
-                        <a href="{% url 'convocatorias:rendicion_detalle' r.id %}"
-                           class="btn btn-primary btn-sm mb-3">
-                            {% if r.estado == "OBSERVADO" %}
-                                Corregir rendición
-                            {% else %}
-                                Ver / completar rendición
-                            {% endif %}
-                        </a>
-
-                        <hr>
-                    {% endfor %}
-                {% endif %}
-
-                {# ======================= #}
-                {# FORMACIÓN (INSCRIPCIONES) #}
-                {# ======================= #}
-                {% if inscripciones_formacion %}
-                    <div class="mt-2">
-                        <p class="mb-2"><strong>Formación:</strong></p>
-
-                        {% for ins in inscripciones_formacion %}
-                            <p class="mb-2">
-                                <strong>
-                                  {% if ins.convocatoria %}
-                                    <a href="{% url 'convocatorias:convocatoria_detalle' ins.convocatoria.slug %}">
-                                      {{ ins.convocatoria.titulo }}
-                                    </a>
-                                  {% else %}
-                                    Convocatoria eliminada
-                                  {% endif %}
-                                </strong>
-
-                                <span class="badge ms-2
-                                    {% if ins.estado == 'inscripto' %}
-                                        bg-secondary
-                                    {% elif ins.estado == 'admitido' %}
-                                        bg-success
-                                    {% elif ins.estado == 'no_admitido' %}
-                                        bg-danger
-                                    {% elif ins.estado == 'lista_espera' %}
-                                        bg-warning text-dark
-                                    {% else %}
-                                        bg-secondary
-                                    {% endif %}
-                                ">
-                                    {{ ins.get_estado_display }}
-                                </span>
-                            </p>
-                        {% endfor %}
+              {% if postulaciones %}
+                {% for p in postulaciones %}
+                  <div class="panel-grid-row panel-grid-4">
+                    <div class="panel-cell panel-cell-left">
+                      <div class="panel-primary panel-clamp-2">
+                        {{ p.nombre_proyecto|default:"(Sin título)" }}
+                      </div>
                     </div>
 
-                    <hr>
-                {% endif %}
+                    <!-- ✅ Convocatoria: centrado como columna, texto a la izquierda, SIN link -->
+                    <div class="panel-cell panel-cell-center">
+                      {% if p.convocatoria %}
+                        <div class="panel-secondary panel-clamp-2 panel-center-text">
+                          {{ p.convocatoria.titulo }}
+                        </div>
+                      {% else %}
+                        <div class="panel-secondary panel-clamp-2 text-muted panel-center-text">
+                          Convocatoria eliminada
+                        </div>
+                      {% endif %}
+                    </div>
 
-                {# ======================= #}
-                {# EXENCIÓN (SUBSANACIÓN)  #}
-                {# ======================= #}
-                {% if exencion_observaciones_pendientes %}
-                <div class="alert alert-warning mt-3">
-                    <h6 class="fw-bold mb-2">
-                    Observaciones pendientes (Exención)
-                    </h6>
-
-                    <ul class="mb-2">
-                    {% for obsx in exencion_observaciones_pendientes %}
-                        <li>
-                        <strong>{{ obsx.get_tipo_documento_display }}:</strong>
-                        {{ obsx.descripcion }}
-                        </li>
-                    {% endfor %}
-                    </ul>
-
-                    {% if exencion %}
-                    <a href="{% url 'exencion:subir_documento_subsanado_exencion' exencion.id %}"
-                        class="btn btn-warning btn-sm mt-2">
-                        Subir documentación solicitada (Exención)
-                    </a>
-                    {% endif %}
-                </div>
-
-                <hr>
-                {% endif %}
-
-                {# Si no hay nada, mensaje único #}
-                {% if not postulaciones and not inscripciones_formacion and not exencion %}
-                <p class="text-muted small">
-                    No participaste en ninguna convocatoria.
-                </p>
-                <hr>
-                {% endif %}
-
-                <!-- ACCIONES -->
-                <div class="d-grid gap-3 mt-4">
-
-                    {% if persona_humana %}
-                        <a href="{% url 'registro_audiovisual:editar_persona_humana' %}"
-                           class="btn btn-primary">
-                            Editar mis datos (Persona Humana)
-                        </a>
-                    {% endif %}
-
-                    {% if persona_juridica %}
-                        <a href="{% url 'registro_audiovisual:editar_persona_juridica' %}"
-                           class="btn btn-primary">
-                            Editar mis datos (Persona Jurídica)
-                        </a>
-                    {% endif %}
-
-                    {% if not persona_humana and not persona_juridica %}
-                        <a href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}"
-                           class="btn btn-warning">
-                            Completar Registro Audiovisual
-                        </a>
-                    {% endif %}
-
-                    <a href="{% url 'convocatorias:convocatorias_home' %}"
-                       class="btn btn-outline-primary">
-                        Ver Convocatorias Disponibles
-                    </a>
-
-                    {% if exencion %}
-                        {% if exencion.certificado_pdf %}
-                            <a href="{{ exencion.certificado_pdf.url }}"
-                               class="btn btn-info"
-                               download>
-                                Descargar constancia de exención impositiva
-                            </a>
-                        {% else %}
-                            <button class="btn btn-outline-secondary" disabled>
-                                Exención impositiva en revisión
-                            </button>
+                    <div class="panel-cell panel-cell-right">
+                      <span class="badge
+                        {% if p.estado == 'enviado' %} bg-secondary
+                        {% elif p.estado == 'revision_admin' %} bg-info
+                        {% elif p.estado == 'observado' %} bg-warning text-dark
+                        {% elif p.estado == 'admitido' %} bg-primary
+                        {% elif p.estado == 'evaluacion_jurado' %} bg-primary
+                        {% elif p.estado == 'seleccionado' %} bg-success
+                        {% elif p.estado == 'no_seleccionado' %} bg-danger
+                        {% elif p.estado == 'finalizado' %} bg-success
+                        {% else %} bg-secondary
                         {% endif %}
-                    {% endif %}
+                      ">
+                        {{ p.get_estado_display }}
+                      </span>
+                    </div>
 
+                    <div class="panel-cell panel-cell-right">
+                      {% if p.estado == "observado" %}
+                        <a href="{% url 'convocatorias:subir_documento_subsanado' p.id %}"
+                           class="btn btn-warning btn-sm btn-pill">
+                          Subir docs
+                        </a>
+                      {% else %}
+                        {% if p.convocatoria %}
+                          <a href="{% url 'convocatorias:convocatoria_detalle' p.convocatoria.slug %}"
+                             class="btn btn-outline-primary btn-sm btn-pill">
+                            Abrir
+                          </a>
+                        {% else %}
+                          <button class="btn btn-outline-secondary btn-sm btn-pill" disabled>—</button>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  {% if p.estado == "observado" %}
+                    <div class="panel-note alert alert-warning mt-2 mb-0">
+                      <div class="fw-bold mb-2">Observaciones pendientes</div>
+                      <ul class="mb-0">
+                        {% for obs in p.observaciones.all %}
+                          {% if not obs.subsanada %}
+                            <li>
+                              <strong>{{ obs.get_tipo_documento_display }}:</strong>
+                              {{ obs.descripcion }}
+                            </li>
+                          {% endif %}
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <div class="panel-empty">
+                  <p class="text-muted small mb-0">Aún no participaste en convocatorias.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- ========================= -->
+          <!-- FORMACIÓN (DEBAJO DE CONVOCATORIAS) -->
+          <!-- ========================= -->
+          <div class="panel-section">
+            <div class="panel-section-title">
+              <span class="panel-ico"><i class="bi bi-mortarboard"></i></span>
+              <div>
+                <h6 class="mb-0">Formación</h6>
+                <div class="panel-subtitle">Inscripciones y estado</div>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-grid-head panel-grid-4">
+                <div class="panel-head-left">Inscripción</div>
+                <div class="panel-head-center panel-head-center-left"><span>Convocatoria</span></div>
+                <div class="panel-head-right">Estado</div>
+                <div class="panel-head-right">Acción</div>
+              </div>
+
+              {% if inscripciones_formacion %}
+                {% for ins in inscripciones_formacion %}
+                  <div class="panel-grid-row panel-grid-4">
+                    <div class="panel-cell panel-cell-left">
+                      <div class="panel-primary panel-clamp-2">
+                        {% if ins.convocatoria %}{{ ins.convocatoria.titulo }}{% else %}Convocatoria eliminada{% endif %}
+                      </div>
+                    </div>
+
+                    <div class="panel-cell panel-cell-center">
+                      {% if ins.convocatoria %}
+                        <div class="panel-secondary panel-clamp-2 panel-center-text">
+                          {{ ins.convocatoria.titulo }}
+                        </div>
+                      {% else %}
+                        <div class="panel-secondary panel-clamp-2 text-muted panel-center-text">—</div>
+                      {% endif %}
+                    </div>
+
+                    <div class="panel-cell panel-cell-right">
+                      <span class="badge
+                        {% if ins.estado == 'inscripto' %} bg-secondary
+                        {% elif ins.estado == 'admitido' %} bg-success
+                        {% elif ins.estado == 'no_admitido' %} bg-danger
+                        {% elif ins.estado == 'lista_espera' %} bg-warning text-dark
+                        {% else %} bg-secondary
+                        {% endif %}
+                      ">
+                        {{ ins.get_estado_display }}
+                      </span>
+                    </div>
+
+                    <div class="panel-cell panel-cell-right">
+                      {% if ins.convocatoria %}
+                        <a href="{% url 'convocatorias:convocatoria_detalle' ins.convocatoria.slug %}"
+                           class="btn btn-outline-primary btn-sm btn-pill">
+                          Abrir
+                        </a>
+                      {% else %}
+                        <button class="btn btn-outline-secondary btn-sm btn-pill" disabled>—</button>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="panel-empty">
+                  <p class="text-muted small mb-0">No registrás inscripciones a formación.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- ========================= -->
+          <!-- RENDICIONES (MISMA GRILLA 4 COL) -->
+          <!-- ========================= -->
+          <div class="panel-section">
+            <div class="panel-section-title">
+              <span class="panel-ico"><i class="bi bi-receipt"></i></span>
+              <div>
+                <h6 class="mb-0">Rendiciones</h6>
+                <div class="panel-subtitle">Seguimiento y correcciones</div>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-grid-head panel-grid-4">
+                <div class="panel-head-left">Proyecto</div>
+                <div class="panel-head-center panel-head-center-left"><span>Convocatoria</span></div>
+                <div class="panel-head-right">Estado</div>
+                <div class="panel-head-right">Acción</div>
+              </div>
+
+              {% if rendiciones %}
+                {% for r in rendiciones %}
+                  <div class="panel-grid-row panel-grid-4">
+                    <div class="panel-cell panel-cell-left">
+                      <div class="panel-primary panel-clamp-2">
+                        {{ r.postulacion.nombre_proyecto|default:"(Sin título)" }}
+                      </div>
+                    </div>
+
+                    <div class="panel-cell panel-cell-center">
+                      <div class="panel-secondary panel-clamp-2 panel-center-text">
+                        {{ r.postulacion.convocatoria.titulo }}
+                      </div>
+                    </div>
+
+                    <div class="panel-cell panel-cell-right">
+                      <span class="badge
+                        {% if r.estado == 'BORRADOR' %} bg-secondary
+                        {% elif r.estado == 'ENVIADO' %} bg-info
+                        {% elif r.estado == 'OBSERVADO' %} bg-warning text-dark
+                        {% elif r.estado == 'SUBSANADO' %} bg-primary
+                        {% elif r.estado == 'APROBADO' %} bg-success
+                        {% elif r.estado == 'RECHAZADO' %} bg-danger
+                        {% else %} bg-secondary
+                        {% endif %}
+                      ">
+                        {{ r.get_estado_display }}
+                      </span>
+                    </div>
+
+                    <div class="panel-cell panel-cell-right">
+                      <div class="panel-actions panel-actions-inline justify-content-end">
+                        {% if r.link_documentacion %}
+                          <a href="{{ r.link_documentacion }}" target="_blank" rel="noopener"
+                             class="btn btn-outline-primary btn-sm btn-pill">
+                            Ver link
+                          </a>
+                        {% endif %}
+                        <a href="{% url 'convocatorias:rendicion_detalle' r.id %}"
+                           class="btn btn-outline-primary btn-sm btn-pill">
+                          Abrir
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  {% if r.observaciones_admin and r.estado == "OBSERVADO" %}
+                    <div class="panel-note alert alert-warning mt-2 mb-0">
+                      <strong>Observación:</strong><br>
+                      {{ r.observaciones_admin }}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <div class="panel-empty">
+                  <p class="text-muted small mb-0">No tenés rendiciones asignadas.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- ========================= -->
+          <!-- EXENCIÓN (MISMA GRILLA 4 COL) -->
+          <!-- ========================= -->
+          <div class="panel-section">
+            <div class="panel-section-title">
+              <span class="panel-ico"><i class="bi bi-file-earmark-check"></i></span>
+              <div>
+                <h6 class="mb-0">Exención impositiva</h6>
+                <div class="panel-subtitle">Solicitud y certificado</div>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-grid-head panel-grid-4">
+                <div class="panel-head-left">Solicitud</div>
+                <div class="panel-head-center">Detalle</div>
+                <div class="panel-head-right">Estado</div>
+                <div class="panel-head-right">Acción</div>
+              </div>
+
+              {% if exencion or exencion_observaciones_pendientes %}
+                <div class="panel-grid-row panel-grid-4">
+                  <div class="panel-cell panel-cell-left">
+                    <div class="panel-primary panel-clamp-2">Certificado de exención</div>
+                  </div>
+
+                  <div class="panel-cell panel-cell-center">
+                    <div class="panel-secondary panel-clamp-2 panel-center-text">
+                      Beneficio fiscal para actividades audiovisuales
+                    </div>
+                  </div>
+
+                  <div class="panel-cell panel-cell-right">
+                    {% if exencion and exencion.certificado_pdf %}
+                      <span class="badge bg-success">Aprobada</span>
+                    {% elif exencion_observaciones_pendientes %}
+                      <span class="badge bg-warning text-dark">Observada</span>
+                    {% else %}
+                      <span class="badge bg-info">En revisión</span>
+                    {% endif %}
+                  </div>
+
+                  <div class="panel-cell panel-cell-right">
+                    <div class="panel-actions panel-actions-inline justify-content-end">
+                      {% if exencion_observaciones_pendientes and exencion %}
+                        <a href="{% url 'exencion:subir_documento_subsanado_exencion' exencion.id %}"
+                           class="btn btn-warning btn-sm btn-pill">
+                          Subir docs
+                        </a>
+                      {% endif %}
+
+                      {% if exencion and exencion.certificado_pdf %}
+                        <a href="{{ exencion.certificado_pdf.url }}"
+                           class="btn btn-info btn-sm btn-pill"
+                           download>
+                          Descargar
+                        </a>
+                      {% endif %}
+                    </div>
+                  </div>
                 </div>
 
-                {% endif %} {# /no administrador #}
+                {% if exencion_observaciones_pendientes %}
+                  <div class="panel-note alert alert-warning mt-2 mb-0">
+                    <div class="fw-bold mb-2">Observaciones pendientes</div>
+                    <ul class="mb-0">
+                      {% for obsx in exencion_observaciones_pendientes %}
+                        <li>
+                          <strong>{{ obsx.get_tipo_documento_display }}:</strong>
+                          {{ obsx.descripcion }}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
 
-                <a href="{% url 'usuarios:logout' %}"
-                   class="btn btn-outline-danger mt-4 w-100">
-                    Cerrar sesión
-                </a>
-
+              {% else %}
+                <div class="panel-empty">
+                  <p class="text-muted small mb-0">Aún no registrás solicitud de exención.</p>
+                </div>
+              {% endif %}
             </div>
-            <!-- /PANEL -->
+          </div>
 
+          <!-- ========================= -->
+          <!-- ACCIONES -->
+          <!-- ========================= -->
+          <div class="panel-section">
+            <div class="panel-section-title">
+              <span class="panel-ico"><i class="bi bi-lightning-charge"></i></span>
+              <div>
+                <h6 class="mb-0">Acciones</h6>
+                <div class="panel-subtitle">Atajos</div>
+              </div>
+            </div>
+
+            <div class="d-grid gap-3 mt-3">
+              <a href="{% url 'convocatorias:convocatorias_home' %}"
+                 class="btn btn-outline-primary">
+                Ver Convocatorias Disponibles
+              </a>
+            </div>
+          </div>
+
+        {% endif %}
+
+        <!-- CERRAR SESIÓN (SIEMPRE) -->
+        <div class="mt-4">
+          <a href="{% url 'usuarios:logout' %}"
+             class="btn btn-outline-danger w-100">
+            Cerrar sesión
+          </a>
         </div>
+
+      </div>
+
     </div>
+  </div>
 </div>
 
 {% endblock %}

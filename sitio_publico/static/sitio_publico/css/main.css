@@ -307,90 +307,266 @@ body {
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
 
-/* ============================================================
-   MOBILE
-   ============================================================ */
-
-@media (max-width: 768px) {
-    .hero-card-right {
-        height: 280px;
-    }
-
-    .hero-card-right {
-        display: none;
-    }
-
-    .offcanvas-btn-left {
-        top: auto;
-        bottom: 16px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-radius: 24px;
-        padding: 12px 20px;
-        font-size: 0.9rem;
-        text-transform: none;
-    }
-
-    .Enlaces {
-        display: none;
-    }
-
-
+/* =========================
+   PANEL (look & feel)
+   ========================= */
+.panel-box {
+    border-radius: 16px;
+    background: #fff;
 }
 
-/* ============================================================
-   BOTONES – MOBILE
-   ============================================================ */
+/* Sección */
+.panel-section {
+    border-top: 1px solid rgba(0, 0, 0, .08);
+    padding-top: 14px;
+    margin-top: 14px;
+}
 
-@media (max-width: 768px) {
+.panel-section:first-of-type {
+    border-top: 0;
+    padding-top: 0;
+    margin-top: 0;
+}
 
-    /* Contenedores de botones */
-    .d-grid.gap-3,
-    .d-grid.gap-2,
-    .botonera,
-    .acciones,
-    .acciones-panel {
-        gap: 0.75rem !important;
+.panel-section-title {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    margin-bottom: .75rem;
+}
+
+.panel-ico {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(47, 53, 74, .08);
+    color: #2f354a;
+    flex-shrink: 0;
+}
+
+.panel-subtitle {
+    font-size: .82rem;
+    color: rgba(47, 53, 74, .65);
+    margin-top: 2px;
+}
+
+/* Registro: fila compacta */
+.panel-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .85rem 1rem;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, .03);
+}
+
+.panel-row-compact {
+    padding: .75rem .9rem;
+}
+
+.panel-row-left {
+    min-width: 0;
+}
+
+.panel-row-title {
+    font-weight: 600;
+    color: #2f354a;
+    line-height: 1.1;
+}
+
+.panel-row-sub {
+    font-size: .85rem;
+    margin-top: .25rem;
+}
+
+.panel-row-right {
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+
+/* Botones pill */
+.btn-pill {
+    border-radius: 999px !important;
+    padding: .35rem .7rem !important;
+    font-weight: 600;
+}
+
+/* Acciones inline */
+.panel-actions-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+/* =========================
+   PANEL – GRILLA INVISIBLE HOMOGÉNEA (4 COL)
+   ========================= */
+
+.panel-card {
+    background: rgba(0, 0, 0, .03);
+    border-radius: 12px;
+    padding: .75rem .9rem;
+}
+
+/* ✅ 4 columnas estables:
+   - 2 primeras fluidas (no expanden por contenido)
+   - Estado / Acción fijas
+*/
+.panel-grid-4 {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.2fr) minmax(0, 1.8fr) 120px 120px;
+    column-gap: 18px;
+    align-items: center;
+}
+
+/* encabezado */
+.panel-grid-head {
+    padding: 0 0 .45rem 0;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: rgba(47, 53, 74, .6);
+}
+
+.panel-head-left {
+    text-align: left;
+}
+
+.panel-head-center {
+    text-align: center;
+}
+
+.panel-head-right {
+    text-align: right;
+}
+
+
+.panel-head-center-left {
+    display: flex;
+    justify-content: center;
+}
+
+.panel-head-center-left>span {
+    width: 100%;
+    text-align: left;
+}
+
+
+
+
+
+/* filas */
+.panel-grid-row {
+    padding: .75rem 0;
+}
+
+.panel-grid-row+.panel-grid-row {
+    border-top: 1px solid rgba(0, 0, 0, .08);
+}
+
+/* ✅ CLAVE: permitir encogerse (si no, el contenido “manda”) */
+.panel-cell,
+.panel-cell * {
+    min-width: 0;
+}
+
+/* celdas */
+.panel-cell-left {
+    text-align: left;
+}
+
+/* ✅ Convocatoria:
+   - la COLUMNA queda centrada (bloque dentro de la columna)
+   - el TEXTO va alineado a la izquierda
+*/
+.panel-cell-center {
+    display: flex;
+    justify-content: center;
+    /* centra el bloque en la columna */
+    align-items: center;
+}
+
+.panel-center-text {
+    width: 100%;
+    /* ocupa el track completo */
+    text-align: left;
+    /* texto alineado a la izquierda */
+}
+
+/* derecha: Estado/Acción */
+.panel-cell-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .5rem;
+    white-space: nowrap;
+}
+
+/* Tipos */
+.panel-primary {
+    font-weight: 600;
+    color: #2f354a;
+    line-height: 1.15;
+}
+
+.panel-secondary {
+    font-size: .85rem;
+    color: rgba(47, 53, 74, .75);
+    line-height: 1.15;
+}
+
+/* Notas */
+.panel-note {
+    border-radius: 12px;
+}
+
+/* Clamp 2 líneas (sin warnings y con fallback) */
+.panel-clamp-2 {
+    line-height: 1.15;
+    min-height: 2.3em;
+    overflow: hidden;
+}
+
+@supports (-webkit-line-clamp: 2) {
+    .panel-clamp-2 {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+}
+
+@supports not (-webkit-line-clamp: 2) {
+    .panel-clamp-2 {
+        display: block;
+        max-height: 2.3em;
+    }
+}
+
+/* Mobile */
+@media (max-width: 575px) {
+    .panel-grid-head {
+        display: none;
     }
 
-    /* Botones apilados */
-    .btn {
-        width: 100%;
-        max-width: 320px;
-        margin-left: auto;
-        margin-right: auto;
+    .panel-grid-4 {
+        grid-template-columns: 1fr;
+        row-gap: 8px;
+    }
+
+    .panel-cell-left,
+    .panel-cell-center,
+    .panel-cell-right {
+        justify-content: center;
         text-align: center;
     }
 
-    .boton-programa {
-        display: none;
+    .panel-center-text {
+        text-align: center;
+        /* en mobile sí centra para que se vea prolijo */
     }
-
-    .hero-section {
-        padding-bottom: 1rem !important;
-    }
-
-    .py-5 {
-        padding-top: 2rem !important;
-    }
-
-
-}
-
-@media (max-width: 991px) {
-
-    .boton-programa {
-        display: none;
-    }
-
-}
-
-
-@media (max-width: 1400px) {
-
-
-    .hero-card-left {
-        padding: 3rem 2rem !important;
-    }
-
 }
