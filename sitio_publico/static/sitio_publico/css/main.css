@@ -548,39 +548,38 @@ body {
 }
 
 /* ============================================================
-   BADGES – centrado perfecto del texto
+   BADGES – ancho según texto + centrado perfecto
    ============================================================ */
 
 .panel-box .badge {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    /* ajuste fino visual */
-    line-height: 1 !important;
-    padding: .35rem .6rem !important;
-
-    /* opcional (queda más prolijo) */
-    border-radius: 999px;
+    padding: .32rem .6rem;
+    line-height: 1.1;
     font-weight: 600;
+
+    width: auto;
+    /* 🔑 clave */
+    max-width: 100%;
+    white-space: nowrap;
+
+    border-radius: 999px;
     vertical-align: middle;
 }
 
-/* si algún badge se “aplana” demasiado */
-.panel-box .badge.bg-info,
-.panel-box .badge.bg-primary,
-.panel-box .badge.bg-success,
-.panel-box .badge.bg-warning,
-.panel-box .badge.bg-secondary,
-.panel-box .badge.bg-danger {
-    min-height: 28px;
-    /* asegura alto uniforme */
+/* Evita que el grid/flex lo estire */
+.panel-cell-right .badge {
+    flex: 0 0 auto;
+    /* 🔑 importantísimo */
 }
 
-/* cuando el texto es largo, que no se rompa raro */
+/* opcional: altura mínima homogénea */
 .panel-box .badge {
-    white-space: nowrap;
+    min-height: 26px;
 }
+
 
 /* Mobile */
 @media (max-width: 575px) {
