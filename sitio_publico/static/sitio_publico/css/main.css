@@ -547,27 +547,22 @@ body {
     }
 }
 
-/* ============================================================
-   BADGES – ancho según texto + centrado perfecto
-   ============================================================ */
+/* =========================
+   BADGE ESTADO – MULTILÍNEA
+   ========================= */
 
-.panel-box .badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: .32rem .6rem;
-    line-height: 1.1;
-    font-weight: 600;
-
-    width: auto;
-    /* 🔑 clave */
-    max-width: 100%;
-    white-space: nowrap;
-
-    border-radius: 999px;
-    vertical-align: middle;
+.badge-multiline {
+    white-space: normal !important;
+    /* permite salto de línea */
+    text-align: center;
+    line-height: 1.15;
+    padding: .4em .6em;
+    /* más aire vertical */
+    max-width: 180px;
+    /* controla el ancho */
+    display: inline-block;
 }
+
 
 /* Evita que el grid/flex lo estire */
 .panel-cell-right .badge {
