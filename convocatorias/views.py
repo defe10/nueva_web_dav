@@ -245,7 +245,7 @@ def postular_convocatoria(request, convocatoria_id):
     persona_juridica = PersonaJuridica.objects.filter(user=user).first()
 
     if not (persona_humana or persona_juridica):
-        messages.info(request, "Antes de inscribirte es necesario completar el Registro Audiovisual.")
+        messages.error(request, "Antes de inscribirte es necesario completar el Registro Audiovisual.")
         return redirect(f"/registro/seleccionar-tipo/?next=/convocatorias/{convocatoria.slug}/inscribirse/")
 
     persona_nombre = (

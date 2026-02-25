@@ -682,6 +682,7 @@ class InscripcionFormacionAdmin(admin.ModelAdmin):
 @admin.register(ObservacionAdministrativa)
 class ObservacionAdministrativaAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "proyecto_link",
         "presentante_link",
         "tipo_documento",
