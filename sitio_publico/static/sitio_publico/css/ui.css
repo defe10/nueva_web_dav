@@ -10,8 +10,22 @@
     margin-bottom: 35px;
 }
 
+.fomento-hero2 {
+    background: #e0007a;
+    color: #2f354a;
+    border-radius: 12px;
+    padding: 60px 35px;
+    margin-bottom: 35px;
+}
+
 @media (max-width: 576px) {
     .fomento-hero {
+        padding: 45px 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .fomento-hero2 {
         padding: 45px 20px;
     }
 }

@@ -42,13 +42,13 @@
           3. Constancia de inscripción en ARCA con actividad audiovisual declarada.
         </p>
 
-        <h5 class="fw-bold mt-4 mb-3">Cómo funciona</h5>
+        {% comment %} <h5 class="fw-bold mt-4 mb-3">Cómo funciona</h5>
         <p class="small mb-0">
           • Subí los archivos requeridos.<br>
           • Podés agregar o eliminar documentos antes de enviarlos.<br>
           • Cuando esté todo listo, hacé clic en <strong>Enviar documentación</strong>.<br>
           • La solicitud quedará en revisión administrativa.
-        </p>
+        </p> {% endcomment %}
 
       </div>
     </div>
@@ -74,6 +74,13 @@
                    multiple
                    class="form-control">
             <div class="form-text">
+              <br>
+              1. Primero debes <strong>Elegir archivos</strong> requeridos.<br>
+              2. Luego debes <strong>Agregar archivos.</strong><br>
+              3. Cuando tengas agregados todos los archivos, debes <strong>Enviar documentación.</strong><br>
+              Antes de enviarlos puedes eliminarlos y volver a agregar otros. <br>
+              4. Una vez enviados, podrás ver la lista de archivos <strong>Ya enviados</strong><br><br>
+              
               Podés subir uno o varios archivos en formato PDF.
             </div>
           </div>
@@ -111,11 +118,9 @@
                       </div>
                     </td>
                     <td class="text-end">
-                      <form method="post"
-                            action="{% url 'exencion:eliminar_documento' doc.id %}">
+                      <form method="post" action="{% url 'exencion:eliminar_documento' doc.id %}">
                         {% csrf_token %}
-                        <button type="submit"
-                                class="btn btn-sm btn-outline-danger">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
                           Eliminar
                         </button>
                       </form>
@@ -135,6 +140,15 @@
               Enviar documentación
             </button>
           </form>
+
+        {% elif documentos_enviados %}
+          <div class="alert alert-success d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Tu documentación ya fue enviada.</strong><br>
+              Podés verla en la sección <strong>Ya enviados</strong>.
+            </div>
+            <span class="badge bg-success">Enviado</span>
+          </div>
 
         {% else %}
           <div class="alert alert-light border">

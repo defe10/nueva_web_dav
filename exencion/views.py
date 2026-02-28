@@ -219,18 +219,27 @@ def confirmar_documentacion(request, exencion_id):
     if request.method != "POST":
         return redirect("exencion:documentacion", exencion_id=exencion.id)
 
-    qs = ExencionDocumento.objects.filter(
+    # ✅ NUEVO: exigir que exista al menos 1 documento cargado (pendiente o enviado)
+    if not ExencionDocumento.objects.filter(
+        exencion=exencion,
+        es_subsanacion=False,
+    ).exists():
+        messages.error(request, "Debés subir al menos un archivo PDF antes de enviar la documentación.")
+        return redirect("exencion:documentacion", exencion_id=exencion.id)
+
+    qs_pendientes = ExencionDocumento.objects.filter(
         exencion=exencion,
         es_subsanacion=False,
         estado="PENDIENTE",
     )
 
-    if not qs.exists():
-        messages.error(request, "No hay documentación pendiente para enviar.")
-        return redirect("exencion:documentacion", exencion_id=exencion.id)
+    # Si no hay pendientes pero ya hay enviados, no vuelvas a “enviar”: redirigí a completada
+    if not qs_pendientes.exists():
+        messages.info(request, "Tu documentación ya fue enviada.")
+        return redirect("exencion:completada", exencion_id=exencion.id)
 
     ahora = timezone.now()
-    qs.update(estado="ENVIADO", fecha_envio=ahora)
+    qs_pendientes.update(estado="ENVIADO", fecha_envio=ahora)
 
     exencion.estado = "ENVIADA"
     exencion.save(update_fields=["estado"])
@@ -397,18 +406,34 @@ def confirmar_documento_subsanado_exencion(request, exencion_id):
     if request.method != "POST":
         return redirect("exencion:subir_documento_subsanado_exencion", exencion_id=exencion.id)
 
-    qs = ExencionDocumento.objects.filter(
+    # ✅ NUEVO: bloquear si no hay observaciones pendientes
+    if not ObservacionAdministrativaExencion.objects.filter(
+        exencion=exencion,
+        subsanada=False
+    ).exists():
+        messages.error(request, "No tenés observaciones pendientes para subsanar.")
+        return redirect("usuarios:panel_usuario")
+
+    # ✅ NUEVO: exigir al menos 1 documento de subsanación cargado
+    if not ExencionDocumento.objects.filter(
+        exencion=exencion,
+        es_subsanacion=True,
+    ).exists():
+        messages.error(request, "Debés subir al menos un archivo PDF de subsanación antes de enviar.")
+        return redirect("exencion:subir_documento_subsanado_exencion", exencion_id=exencion.id)
+
+    qs_pendientes = ExencionDocumento.objects.filter(
         exencion=exencion,
         es_subsanacion=True,
         estado="PENDIENTE",
     )
 
-    if not qs.exists():
-        messages.error(request, "No hay documentación pendiente para enviar.")
-        return redirect("exencion:subir_documento_subsanado_exencion", exencion_id=exencion.id)
+    if not qs_pendientes.exists():
+        messages.info(request, "Tu subsanación ya fue enviada.")
+        return redirect("usuarios:panel_usuario")
 
     ahora = timezone.now()
-    qs.update(estado="ENVIADO", fecha_envio=ahora)
+    qs_pendientes.update(estado="ENVIADO", fecha_envio=ahora)
 
     ObservacionAdministrativaExencion.objects.filter(
         exencion=exencion, subsanada=False

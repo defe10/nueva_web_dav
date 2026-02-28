@@ -110,8 +110,7 @@
                       </div>
                     </td>
                     <td class="text-end">
-                      <form method="post"
-                            action="{% url 'exencion:eliminar_documento' doc.id %}">
+                      <form method="post" action="{% url 'exencion:eliminar_documento' doc.id %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm btn-outline-danger">
                           Eliminar
@@ -136,6 +135,21 @@
               Enviar documentación
             </button>
           </form>
+
+        {% elif documentos_enviados %}
+          <div class="alert alert-success border d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Tu subsanación ya fue enviada.</strong><br>
+              Podés verla en la sección <strong>Ya enviados</strong>.
+            </div>
+            <span class="badge bg-success">Enviado</span>
+          </div>
+
+          <div class="d-flex gap-2 justify-content-end">
+            <a href="{% url 'usuarios:panel_usuario' %}" class="btn btn-outline-secondary">
+              Volver al panel
+            </a>
+          </div>
 
         {% else %}
           <div class="alert alert-light border">

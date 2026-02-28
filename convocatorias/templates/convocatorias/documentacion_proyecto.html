@@ -5,9 +5,9 @@
 {% block content %}
 
 <!-- HERO UNIFICADO -->
-<section class="fomento-hero text-center">
-  <h1 class="fw-bold mb-2">Documentación del proyecto</h1>
-  <p class="text-white mb-0">
+<section class="fomento-hero2 text-center">
+  <h1 class="fw-bold text-white mb-2">Documentación del proyecto</h1>
+  <p class="mb-0">
     {{ postulacion.nombre_proyecto }}
   </p>
 </section>
@@ -66,7 +66,13 @@
                    multiple
                    class="form-control">
             <div class="form-text">
-              Máximo 3 PDFs. Podés subir en una o varias tandas.
+               <br>
+              1. Primero debes <strong>Seleccionar archivos</strong> requeridos.<br>
+              2. Luego debes <strong>Agregar archivos.</strong><br>
+              3. Cuando tengas agregados <strong>todos</strong> los archivos, debes <strong>Finalizar postulación.</strong><br>
+              Antes de enviarlos puedes eliminarlos y volver a agregar otros. <br>
+              
+            Podés subir uno o varios archivos en formato PDF.
             </div>
           </div>
 
@@ -103,8 +109,7 @@
                       </div>
                     </td>
                     <td class="text-end">
-                      <form method="post"
-                            action="{% url 'convocatorias:eliminar_documento_postulacion' doc.id %}">
+                      <form method="post" action="{% url 'convocatorias:eliminar_documento_postulacion' doc.id %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm btn-outline-danger">
                           Eliminar
@@ -126,6 +131,15 @@
               Finalizar postulación
             </button>
           </form>
+
+        {% elif documentos_enviados %}
+          <div class="alert alert-success border d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Tu postulación ya fue finalizada.</strong><br>
+              La documentación del proyecto ya fue enviada.
+            </div>
+            <span class="badge bg-success">Enviado</span>
+          </div>
 
         {% else %}
           <div class="alert alert-light border">

@@ -418,18 +418,27 @@ def confirmar_documentacion_personal(request, postulacion_id):
     if request.method != "POST":
         return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion.id)
 
-    qs = DocumentoPostulacion.objects.filter(
+    # ✅ NUEVO: exigir que exista al menos 1 documento cargado (pendiente o enviado)
+    if not DocumentoPostulacion.objects.filter(
+        postulacion=postulacion,
+        tipo="PERSONAL",
+    ).exists():
+        messages.error(request, "Debés subir al menos un archivo antes de enviar la documentación personal.")
+        return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion.id)
+
+    qs_pendientes = DocumentoPostulacion.objects.filter(
         postulacion=postulacion,
         tipo="PERSONAL",
         estado="PENDIENTE",
     )
 
-    if not qs.exists():
-        messages.error(request, "No tenés documentos pendientes para enviar.")
-        return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion.id)
+    # Si no hay pendientes pero ya hay enviados, no reenviar
+    if not qs_pendientes.exists():
+        messages.info(request, "Tu documentación personal ya fue enviada.")
+        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
 
     ahora = timezone.now()
-    qs.update(estado="ENVIADO", fecha_envio=ahora)
+    qs_pendientes.update(estado="ENVIADO", fecha_envio=ahora)
 
     messages.success(request, "Documentación personal enviada correctamente.")
     return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
@@ -442,52 +451,39 @@ def confirmar_documentacion_personal(request, postulacion_id):
 def confirmar_documentacion_proyecto(request, postulacion_id):
     postulacion = get_object_or_404(Postulacion, id=postulacion_id)
 
-    # Seguridad: solo el dueño
     if postulacion.user != request.user:
         return redirect("convocatorias:convocatorias_home")
 
-    # Solo por POST
     if request.method != "POST":
-        return redirect(
-            "convocatorias:subir_documentacion_proyecto",
-            postulacion_id=postulacion.id
-        )
+        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
 
-    # Documentos pendientes del proyecto
-    qs = DocumentoPostulacion.objects.filter(
+    # ✅ NUEVO: exigir al menos 1 documento cargado (pendiente o enviado)
+    if not DocumentoPostulacion.objects.filter(
+        postulacion=postulacion,
+        tipo="PROYECTO",
+    ).exists():
+        messages.error(request, "Debés subir al menos un archivo antes de enviar la documentación del proyecto.")
+        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
+
+    qs_pendientes = DocumentoPostulacion.objects.filter(
         postulacion=postulacion,
         tipo="PROYECTO",
         estado="PENDIENTE",
     )
 
-    if not qs.exists():
-        messages.error(request, "No tenés documentos pendientes para enviar.")
-        return redirect(
-            "convocatorias:subir_documentacion_proyecto",
-            postulacion_id=postulacion.id
-        )
+    if not qs_pendientes.exists():
+        messages.info(request, "Tu documentación del proyecto ya fue enviada.")
+        return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
 
-    # Marcar documentos como enviados
     ahora = timezone.now()
-    qs.update(
-        estado="ENVIADO",
-        fecha_envio=ahora,
-    )
+    qs_pendientes.update(estado="ENVIADO", fecha_envio=ahora)
 
-    # ✅ FINAL REAL DE LA POSTULACIÓN
     postulacion.estado = "enviado"
     postulacion.fecha_envio = ahora
     postulacion.save(update_fields=["estado", "fecha_envio"])
 
-    messages.success(
-        request,
-        "Documentación del proyecto enviada correctamente. Tu postulación quedó registrada."
-    )
-
-    return redirect(
-        "convocatorias:postulacion_confirmada",
-        postulacion_id=postulacion.id
-    )
+    messages.success(request, "Documentación del proyecto enviada correctamente. Tu postulación quedó registrada.")
+    return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
 
 
 
@@ -660,30 +656,34 @@ def agregar_documento_subsanado(request, postulacion_id):
 # ============================================================
 @login_required
 def confirmar_documento_subsanado(request, postulacion_id):
-    postulacion = get_object_or_404(
-        Postulacion,
-        id=postulacion_id,
-        user=request.user,
-    )
+    postulacion = get_object_or_404(Postulacion, id=postulacion_id, user=request.user)
 
     if request.method != "POST":
         return redirect("convocatorias:subir_documento_subsanado", postulacion_id=postulacion.id)
 
-    qs = DocumentoPostulacion.objects.filter(
+    # ✅ NUEVO: exigir al menos 1 doc subsanado cargado (pendiente o enviado)
+    if not DocumentoPostulacion.objects.filter(
+        postulacion=postulacion,
+        tipo="SUBSANADO",
+    ).exists():
+        messages.error(request, "Debés subir al menos un archivo antes de enviar la subsanación.")
+        return redirect("convocatorias:subir_documento_subsanado", postulacion_id=postulacion.id)
+
+    qs_pendientes = DocumentoPostulacion.objects.filter(
         postulacion=postulacion,
         tipo="SUBSANADO",
         estado="PENDIENTE",
     )
 
-    if not qs.exists():
-        messages.error(request, "No tenés documentos pendientes para enviar.")
-        return redirect("convocatorias:subir_documento_subsanado", postulacion_id=postulacion.id)
+    if not qs_pendientes.exists():
+        messages.info(request, "Tu documentación subsanada ya fue enviada.")
+        return redirect("usuarios:panel_usuario")
 
     ahora = timezone.now()
-    qs.update(estado="ENVIADO", fecha_envio=ahora)
+    qs_pendientes.update(estado="ENVIADO", fecha_envio=ahora)
 
     postulacion.estado = "revision_admin"
-    postulacion.save()
+    postulacion.save(update_fields=["estado"])
 
     messages.success(request, "La documentación subsanada fue enviada correctamente.")
     return redirect("usuarios:panel_usuario")
