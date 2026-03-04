@@ -92,6 +92,28 @@ def iniciar_solicitud(request, convocatoria_id=None):
         }
     )
 
+    # ✅ SIEMPRE sincronizar (creada o no)
+    exencion.persona_humana = persona_humana
+    exencion.persona_juridica = persona_juridica
+    exencion.nombre_razon_social = (
+        getattr(persona, "nombre_completo", None)
+        or getattr(persona, "razon_social", "")
+        or ""
+    )
+    exencion.email = getattr(persona, "email", "") or user.email or ""
+    exencion.cuit = getattr(persona, "cuil_cuit", "") or ""
+    exencion.domicilio_fiscal = getattr(persona, "domicilio_fiscal", "") or ""
+    exencion.localidad_fiscal = getattr(persona, "localidad_fiscal", "") or ""
+    exencion.codigo_postal_fiscal = getattr(persona, "codigo_postal_fiscal", "") or ""
+    exencion.actividad_dgr = getattr(persona, "actividad_dgr", "") or ""
+
+    exencion.save(update_fields=[
+        "persona_humana", "persona_juridica",
+        "nombre_razon_social", "email", "cuit",
+        "domicilio_fiscal", "localidad_fiscal", "codigo_postal_fiscal",
+        "actividad_dgr",
+    ])
+
     return redirect("exencion:documentacion", exencion_id=exencion.id)
 
 

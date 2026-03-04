@@ -65,9 +65,11 @@
       <div class="fila-label">Domicilio fiscal:</div>
       <div class="fila-valor">
         {{ exencion.domicilio_fiscal }}
-        {% if exencion.localidad_fiscal %}
-          – {{ exencion.get_localidad_fiscal_display }}
+
+        {% if exencion.localidad_fiscal_label %}
+          – {{ exencion.localidad_fiscal_label }}
         {% endif %}
+
         {% if exencion.codigo_postal_fiscal %}
           (CP {{ exencion.codigo_postal_fiscal }})
         {% endif %}

@@ -7,7 +7,7 @@ from django.core.mail import EmailMessage
 from django.core.exceptions import ValidationError
 
 from convocatorias.models import Convocatoria
-from registro_audiovisual.models import PersonaHumana, PersonaJuridica
+from registro_audiovisual.models import PersonaHumana, PersonaJuridica, LUGARES_RESIDENCIA
 from .utils import generar_pdf_exencion
 import uuid
 
@@ -94,6 +94,10 @@ class Exencion(models.Model):
         blank=True,
         null=True
     )
+
+    @property
+    def localidad_fiscal_label(self):
+        return dict(LUGARES_RESIDENCIA).get(self.localidad_fiscal, self.localidad_fiscal)
 
     class Meta:
         ordering = ["-fecha_creacion"]

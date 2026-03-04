@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 LUGARES_RESIDENCIA = [
     ('', '- Seleccionar -'),
-    ('SC', 'Salta Capital'),
+    ('SAL', 'Salta Capital'),
     ("otro", "Otro"),
     ('Ag', 'Aguaray'),
     ('AB', 'Aguas Blancas'),
