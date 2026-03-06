@@ -31,6 +31,7 @@ def validar_tamano_5mb(archivo):
 # EXENCIÓN
 # ============================================================
 ESTADOS_EXENCION = [
+    ("BORRADOR", "Borrador"),
     ("ENVIADA", "Enviada"),
     ("APROBADA", "Aprobada"),
     ("RECHAZADA", "Rechazada"),
@@ -80,7 +81,7 @@ class Exencion(models.Model):
     estado = models.CharField(
         max_length=20,
         choices=ESTADOS_EXENCION,
-        default="ENVIADA"
+        default="BORRADOR"
     )
 
     # Fechas

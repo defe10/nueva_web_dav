@@ -1,20 +1,28 @@
-from django.db import migrations, connection
+from django.db import migrations
+
 
 def fix_fecha_creacion(apps, schema_editor):
-    with connection.cursor() as cursor:
-        cursor.execute("PRAGMA table_info(convocatorias_postulacion);")
-        cols = [row[1] for row in cursor.fetchall()]
+    # Esta migración fue creada para SQLite (usa PRAGMA).
+    # En PostgreSQL (y otros motores) se saltea.
+    if schema_editor.connection.vendor != "sqlite":
+        return
 
-    if "fecha_creacion" not in cols:
-        schema_editor.execute(
-            "ALTER TABLE convocatorias_postulacion ADD COLUMN fecha_creacion datetime;"
-        )
-        # Completar existentes para que no queden null
-        schema_editor.execute(
-            "UPDATE convocatorias_postulacion "
-            "SET fecha_creacion = COALESCE(fecha_envio, CURRENT_TIMESTAMP) "
-            "WHERE fecha_creacion IS NULL;"
-        )
+    with schema_editor.connection.cursor() as cursor:
+        cursor.execute("PRAGMA table_info(convocatorias_postulacion);")
+        columns = [row[1] for row in cursor.fetchall()]  # nombre de columna
+
+        # Si no existe la columna fecha_creacion, no hacemos nada
+        if "fecha_creacion" not in columns:
+            return
+
+        # Si existe, aseguramos que no sea NULL (según tu lógica original)
+        # Ajustá esto si tu migración original hacía otra cosa específica.
+        cursor.execute("""
+            UPDATE convocatorias_postulacion
+            SET fecha_creacion = fecha
+            WHERE fecha_creacion IS NULL;
+        """)
+
 
 class Migration(migrations.Migration):
 
@@ -23,5 +31,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(fix_fecha_creacion, migrations.RunPython.noop),
+        migrations.RunPython(fix_fecha_creacion, reverse_code=migrations.RunPython.noop),
     ]

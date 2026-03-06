@@ -11,17 +11,47 @@ from .secrets import (
 # ======================================================
 
 DEBUG = False
+# ============================
+# SECURITY HEADERS / COOKIES
+# (safe even if site is HTTP)
+# ============================
+
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     "172.17.40.137",
+    "45.235.88.45",
+    "audiovisuales.salta.gob.ar",
 ]
 
-CSRF_TRUSTED_ORIGINS = []
+
+CSRF_TRUSTED_ORIGINS = [
+    #"http://audiovisuales.salta.gob.ar",
+    "https://audiovisuales.salta.gob.ar"
+]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_HOST = False
+
+# ======================================================
+# SEGURIDAD (TRANSICIÓN: sin SSL todavía)
+# ======================================================
+# Cuando tengamos HTTPS real en Apache (Certbot), pasamos estos 3 a True
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# HSTS: apagado hasta confirmar HTTPS estable
+SECURE_HSTS_SECONDS = 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
 
 
 # ======================================================

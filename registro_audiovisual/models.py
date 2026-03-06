@@ -51,7 +51,7 @@ LUGARES_RESIDENCIA = [
     ('RBN', 'Rivadavia Banda Norte'),
     ('RBS', 'Rivadavia Banda Sur'),
     ('SAC', 'San Antonio de los Cobres'),
-    ('SC', 'San Carlos'),
+    ('SCa', 'San Carlos'),
     ('SJM', 'San José de Metán'),
     ('SL', 'San Lorenzo'),
     ('Or', 'San Ramón de la Nueva Orán'),
