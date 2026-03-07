@@ -76,8 +76,8 @@ def convocatorias_home(request):
 
         vigentes = base.filter(fecha_inicio__lte=hoy, fecha_fin__gte=hoy)
 
-        # "cerradas" = terminó o todavía no empezó (futuras)
-        cerradas = base.filter(Q(fecha_fin__lt=hoy) | Q(fecha_inicio__gt=hoy))
+        # solo las que ya terminaron
+        cerradas = base.filter(fecha_fin__lt=hoy)
 
         return vigentes, cerradas
 
@@ -113,6 +113,16 @@ def convocatorias_home(request):
 def inscribirse_convocatoria(request, slug):
     convocatoria = get_object_or_404(Convocatoria, slug=slug)
     linea = (convocatoria.linea or "").lower()
+    hoy = timezone.now().date()
+
+    # ✅ bloqueo por fechas
+    if hoy < convocatoria.fecha_inicio:
+        messages.error(request, "La convocatoria todavía no se encuentra abierta.")
+        return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
+
+    if hoy > convocatoria.fecha_fin:
+        messages.error(request, "La convocatoria ya finalizó.")
+        return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
 
     # ========================================================
     # FORMACIÓN — inscripción sin obligar Registro Audiovisual
@@ -134,14 +144,12 @@ def inscribirse_convocatoria(request, slug):
                 persona_juridica=persona_juridica,
             )
 
-            # ✅ CLAVE: setear FK antes del is_valid()
             form.instance.user = request.user
             form.instance.convocatoria = convocatoria
 
             if form.is_valid():
                 obj = form.save(commit=False)
 
-                # ✅ vincular registro si existe
                 if persona_humana:
                     obj.persona_humana = persona_humana
                     obj.persona_juridica = None
@@ -149,7 +157,6 @@ def inscribirse_convocatoria(request, slug):
                     obj.persona_juridica = persona_juridica
                     obj.persona_humana = None
 
-                # ✅ si hay registro: forzar datos desde registro (aunque estén ocultos)
                 persona = persona_humana or persona_juridica
                 if persona:
                     obj.email = getattr(persona, "email", "") or obj.email or request.user.email or ""
@@ -235,6 +242,16 @@ def inscribirse_convocatoria(request, slug):
 def postular_convocatoria(request, convocatoria_id):
     convocatoria = get_object_or_404(Convocatoria, id=convocatoria_id)
     user = request.user
+    hoy = timezone.now().date()
+
+    # ✅ bloqueo por fechas
+    if hoy < convocatoria.fecha_inicio:
+        messages.error(request, "La convocatoria todavía no se encuentra abierta.")
+        return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
+
+    if hoy > convocatoria.fecha_fin:
+        messages.error(request, "La convocatoria ya finalizó.")
+        return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
 
     # seguridad: solo IDEA
     if (convocatoria.linea or "").lower() not in ["fomento", "beneficio"]:
@@ -257,7 +274,6 @@ def postular_convocatoria(request, convocatoria_id):
     if request.method == "POST":
         form = PostulacionForm(request.POST)
 
-        # ✅ CLAVE: setear FK antes del is_valid()
         form.instance.user = user
         form.instance.convocatoria = convocatoria
 
@@ -266,7 +282,7 @@ def postular_convocatoria(request, convocatoria_id):
 
             postulacion.estado = "borrador"
 
-            # ✅ BLINDAJE: evita NULL siempre (PA tiene NOT NULL en DB)
+            # ⚠️ esto hoy te funciona, pero conceptualmente no es ideal
             if not postulacion.fecha_envio:
                 postulacion.fecha_envio = timezone.now()
 
@@ -277,7 +293,6 @@ def postular_convocatoria(request, convocatoria_id):
                 postulacion_id=postulacion.id,
             )
         else:
-            # ✅ Para que se vea el error de "declaracion_jurada" en el template si no tilda
             messages.error(request, "Revisá los campos marcados. La declaración jurada es obligatoria.")
     else:
         form = PostulacionForm()
