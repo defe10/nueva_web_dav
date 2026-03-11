@@ -3,9 +3,8 @@ from django.contrib.auth.models import User
 
 
 LUGARES_RESIDENCIA = [
-    ('', '- Seleccionar -'),
-    ('SAL', 'Salta Capital'),
-    ("otro", "Otro"),
+    ('SC', 'Salta Capital'),
+    ('otro', 'Otro'),
     ('Ag', 'Aguaray'),
     ('AB', 'Aguas Blancas'),
     ('An', 'Angastaco'),
@@ -28,14 +27,14 @@ LUGARES_RESIDENCIA = [
     ('ET', 'El Tala'),
     ('Em', 'Embarcación'),
     ('GG', 'General Güemes'),
-    ('GP', 'General Pizzarro'),
+    ('GP', 'General Pizarro'),
     ('GM', 'General Mosconi'),
     ('GB', 'General Ballivián'),
     ('Gu', 'Guachipas'),
     ('HI', 'Hipólito Yrigoyen'),
     ('Ir', 'Iruya'),
     ('IC', 'Isla de Cañas'),
-    ('JVG', 'Joaquín V. Gonzalez'),
+    ('JVG', 'Joaquín V. González'),
     ('LC', 'La Caldera'),
     ('LCa', 'La Candelaria'),
     ('LM', 'La Merced'),
@@ -64,137 +63,144 @@ LUGARES_RESIDENCIA = [
     ('Va', 'Vaqueros'),
 ]
 
-SITUACION_IVA = [('', '- Seleccionar -'),
-        ('N', 'Ninguna'),
-        ('EX', 'Exento'),
-        ('M', 'Monotributista'),
-        ('RI', 'Responsable Inscripto'),
-        ('O', 'Otra'),
-
+SITUACION_IVA = [
+    ('N', 'Ninguna'),
+    ('EX', 'Exento'),
+    ('M', 'Monotributista'),
+    ('RI', 'Responsable Inscripto'),
+    ('O', 'Otra'),
 ]
 
 ACTIVIDAD_DGR = [
-    ('', '- Seleccionar -'),
     ('591110', '591110 - Producción de filmes y videocintas'),
     ('591120', '591120 - Postproducción de filmes y videocintas'),
     ('O', 'Otra'),
     ('N', 'Ninguna'),
-
 ]
 
 AREA_DESEMPENO_1 = [
-        ('', '- Seleccionar -'),
-        ('Productor', 'Productor/a'),
-        ('Jefe_prod', 'Jefe/a de producción'),
-        ('Asist_prod', 'Asistente de producción'),
-        ('Jefe_loc', 'Jefe/a de locaciones'), #continuar
-        ('Director', 'Director/a'),
-        ('Asist_Dir', 'Asistente de dirección'),
-        ('Dir_Cast', 'Director/a de casting'),
-        ('Dir_Foto', 'Director/a de fotografía'),
-        ('Camara', 'Camarógrafo/a'),
-        ('Key_Grip', 'Key Grip'),
-        ('Video Asist_DIT', 'Video Asist / DIT<'),
-        ('Gaffer', 'Gaffer'),
-        ('Guionista', 'Guionista'),
-        ('Reflec', 'Reflectorista'),
-        ('Dir_Arte', 'Dirección de Arte'),
-        ('Escnog', 'Escenógrafo/a'),
-        ('Vest', 'Vestuarista'),
-        ('Maqui', 'Jefe/a de Maquillaje'),
-        ('Dir_Son', 'Dirección de Sonido'),
-        ('Ayu_Son', 'Ayudante de Sonido '),
-        ('Dir_Son_Post', 'Dirección de Sonido Post / Mezclador/a'),
-        ('Post_Prod', 'Postproductor/a'),
-        ('Editor', 'Editor/a'),
-        ('Color', 'Colorista'),
-        ('Animam', 'Animador/a'),
-        ('Realizador', 'Realizador/a integral'),
-        ('Game_Design', 'Game Designer'),
-        ('Game_Artist', 'Game Artist'),
-        ('otro', 'Otro'),
-    ]
+    ('Productor', 'Productor/a'),
+    ('Jefe_prod', 'Jefe/a de producción'),
+    ('Asist_prod', 'Asistente de producción'),
+    ('Jefe_loc', 'Jefe/a de locaciones'),
+    ('Director', 'Director/a'),
+    ('Asist_Dir', 'Asistente de dirección'),
+    ('Dir_Cast', 'Director/a de casting'),
+    ('Dir_Foto', 'Director/a de fotografía'),
+    ('Camara', 'Camarógrafo/a'),
+    ('Key_Grip', 'Key Grip'),
+    ('Video_Asist_DIT', 'Video Asist / DIT'),
+    ('Gaffer', 'Gaffer'),
+    ('Guionista', 'Guionista'),
+    ('Reflec', 'Reflectorista'),
+    ('Dir_Arte', 'Dirección de Arte'),
+    ('Escnog', 'Escenógrafo/a'),
+    ('Vest', 'Vestuarista'),
+    ('Maqui', 'Jefe/a de Maquillaje'),
+    ('Dir_Son', 'Dirección de Sonido'),
+    ('Ayu_Son', 'Ayudante de Sonido'),
+    ('Dir_Son_Post', 'Dirección de Sonido Post / Mezclador/a'),
+    ('Post_Prod', 'Postproductor/a'),
+    ('Editor', 'Editor/a'),
+    ('Color', 'Colorista'),
+    ('Animam', 'Animador/a'),
+    ('Realizador', 'Realizador/a integral'),
+    ('Game_Design', 'Game Designer'),
+    ('Game_Artist', 'Game Artist'),
+    ('otro', 'Otro'),
+]
 
 AREA_DESEMPENO_2 = [
-        ('', '- Seleccionar -'),
-        ('Productor', 'Productor/a'),
-        ('Jefe_prod', 'Jefe/a de producción'),
-        ('Asist_prod', 'Asistente de producción'),
-        ('Jefe_loc', 'Jefe/a de locaciones'), #continuar
-        ('Director', 'Director/a'),
-        ('Asist_Dir', 'Asistente de dirección'),
-        ('Dir_Cast', 'Director/a de casting'),
-        ('Dir_Foto', 'Director/a de fotografía'),
-        ('Camara', 'Camarógrafo/a'),
-        ('Key_Grip', 'Key Grip'),
-        ('Video Asist_DIT', 'Video Asist / DIT<'),
-        ('Gaffer', 'Gaffer'),
-        ('Guionista', 'Guionista'),
-        ('Reflec', 'Reflectorista'),
-        ('Dir_Arte', 'Dirección de Arte'),
-        ('Escnog', 'Escenógrafo/a'),
-        ('Vest', 'Vestuarista'),
-        ('Maqui', 'Jefe/a de Maquillaje'),
-        ('Dir_Son', 'Dirección de Sonido'),
-        ('Ayu_Son', 'Ayudante de Sonido '),
-        ('Dir_Son_Post', 'Dirección de Sonido Post / Mezclador/a'),
-        ('Post_Prod', 'Postproductor/a'),
-        ('Editor', 'Editor/a'),
-        ('Color', 'Colorista'),
-        ('Animam', 'Animador/a'),
-        ('Realizador', 'Realizador/a integral'),
-        ('Game_Design', 'Game Designer'),
-        ('Game_Artist', 'Game Artist'),
-        ('otro', 'Otro'),
-    ]
+    ('Productor', 'Productor/a'),
+    ('Jefe_prod', 'Jefe/a de producción'),
+    ('Asist_prod', 'Asistente de producción'),
+    ('Jefe_loc', 'Jefe/a de locaciones'),
+    ('Director', 'Director/a'),
+    ('Asist_Dir', 'Asistente de dirección'),
+    ('Dir_Cast', 'Director/a de casting'),
+    ('Dir_Foto', 'Director/a de fotografía'),
+    ('Camara', 'Camarógrafo/a'),
+    ('Key_Grip', 'Key Grip'),
+    ('Video_Asist_DIT', 'Video Asist / DIT'),
+    ('Gaffer', 'Gaffer'),
+    ('Guionista', 'Guionista'),
+    ('Reflec', 'Reflectorista'),
+    ('Dir_Arte', 'Dirección de Arte'),
+    ('Escnog', 'Escenógrafo/a'),
+    ('Vest', 'Vestuarista'),
+    ('Maqui', 'Jefe/a de Maquillaje'),
+    ('Dir_Son', 'Dirección de Sonido'),
+    ('Ayu_Son', 'Ayudante de Sonido'),
+    ('Dir_Son_Post', 'Dirección de Sonido Post / Mezclador/a'),
+    ('Post_Prod', 'Postproductor/a'),
+    ('Editor', 'Editor/a'),
+    ('Color', 'Colorista'),
+    ('Animam', 'Animador/a'),
+    ('Realizador', 'Realizador/a integral'),
+    ('Game_Design', 'Game Designer'),
+    ('Game_Artist', 'Game Artist'),
+    ('otro', 'Otro'),
+]
 
 AREA_DESEMPENO_PPJJ_1 = [
-        ('', '- Seleccionar -'),
-        ('', '- Empresas -'),
-        ('Productora', 'Empresa de producción'),
-        ('PostProd', 'Empresa de postproducción'),
-        ('Serv_Prod', 'Empresa de servicios para la producción'),
-        ('', '- Personas Jurídicas s/fines de lucro -'),
-        ('PPJJ_Espec', 'Específica Audiovisual '),
-        ('PPJJ_Cult', 'Cultural'),
-        ('otro', 'Otro'),
-    ]
+    ('Productora', 'Empresa de producción'),
+    ('PostProd', 'Empresa de postproducción'),
+    ('Serv_Prod', 'Empresa de servicios para la producción'),
+    ('PPJJ_Espec', 'Persona jurídica específica audiovisual'),
+    ('PPJJ_Cult', 'Persona jurídica cultural'),
+    ('otro', 'Otro'),
+]
 
 AREA_DESEMPENO_PPJJ_2 = [
-        ('', '- Seleccionar -'),
-        ('', '- Empresas -'),
-        ('Productora', 'Empresa de producción'),
-        ('PostProd', 'Empresa de postproducción'),
-        ('Serv_Prod', 'Empresa de servicios para la producción'),
-        ('', '- Personas Jurídicas s/fines de lucro -'),
-        ('PPJJ_Espec', 'Específica Audiovisual '),
-        ('PPJJ_Cult', 'Cultural'),
-        ('otro', 'Otro'),
-    ]
+    ('Productora', 'Empresa de producción'),
+    ('PostProd', 'Empresa de postproducción'),
+    ('Serv_Prod', 'Empresa de servicios para la producción'),
+    ('PPJJ_Espec', 'Persona jurídica específica audiovisual'),
+    ('PPJJ_Cult', 'Persona jurídica cultural'),
+    ('otro', 'Otro'),
+]
 
 AREA_CULTURAL = [
-        ('', '- Seleccionar -'),
-        ('Actor', 'Actror / Actríz'),
-        ('musica', 'Música'),
-        ('danza', 'Danza'),
-        ('literatura', 'Literatura'),
-        ('visuales', 'Artes Visuales'),
-        ('comunicacion', 'Comunicación'),
-        ('locutor', 'Locutor/a'),
-        ('educacion', 'Educación'),
-        ('ninguna', 'Ninguna'),
-        ('otro', 'Otro'),
-    ]
+    ('Actor', 'Actor / Actriz'),
+    ('musica', 'Música'),
+    ('danza', 'Danza'),
+    ('literatura', 'Literatura'),
+    ('visuales', 'Artes Visuales'),
+    ('comunicacion', 'Comunicación'),
+    ('locutor', 'Locutor/a'),
+    ('educacion', 'Educación'),
+    ('ninguna', 'Ninguna'),
+    ('otro', 'Otro'),
+]
+
+GENERO_CHOICES = [
+    ('M', 'Masculino'),
+    ('F', 'Femenino'),
+    ('NB', 'No binario'),
+    ('O', 'Otro'),
+]
+
+NIVEL_EDUCATIVO_CHOICES = [
+    ('Pc', 'Primario completo'),
+    ('Sc', 'Secundario completo'),
+    ('Tc', 'Terciario completo'),
+    ('Uc', 'Universitario completo'),
+    ('Pos', 'Posgrado completo'),
+]
+
+TIPO_PERSONA_JURIDICA_CHOICES = [
+    ('asociacion', 'Asociación Civil'),
+    ('fundacion', 'Fundación'),
+    ('empresa', 'Empresa'),
+    ('cooperativa', 'Cooperativa'),
+]
+
 
 # -------------------------------
 # PERSONA HUMANA
 # -------------------------------
 
 class PersonaHumana(models.Model):
-
-    # ------------------
-    # Datos personales
-    # ------------------
     nombre_completo = models.CharField(max_length=200)
     cuil_cuit = models.CharField(max_length=20)
     fecha_nacimiento = models.DateField()
@@ -202,31 +208,15 @@ class PersonaHumana(models.Model):
 
     genero = models.CharField(
         max_length=10,
-        choices=[
-            ('', '- Seleccionar -'),
-            ('M', 'Masculino'),
-            ('F', 'Femenino'),
-            ('NB', 'No binario'),
-            ('O', 'Otro'),
-        ]
+        choices=GENERO_CHOICES
     )
 
     nivel_educativo = models.CharField(
         max_length=50,
-        choices=[
-            ('', '- Seleccionar -'),
-            ('Pc', 'Primario completo'),
-            ('Sc', 'Secundario completo'),
-            ('Tc', 'Terciario completo'),
-            ('Uc', 'Universitario completo'),
-            ('Pos', 'Posgrado completo'),
-        ],
+        choices=NIVEL_EDUCATIVO_CHOICES,
         verbose_name="Nivel educativo alcanzado"
     )
 
-    # ------------------
-    # Domicilio real (OBLIGATORIO)
-    # ------------------
     lugar_residencia = models.CharField(
         max_length=100,
         choices=LUGARES_RESIDENCIA
@@ -244,7 +234,6 @@ class PersonaHumana(models.Model):
     telefono = models.CharField(max_length=50)
     email = models.EmailField()
 
-    # Relación con usuario
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -253,9 +242,6 @@ class PersonaHumana(models.Model):
         blank=True
     )
 
-    # ------------------
-    # Datos fiscales (NO obligatorios en registro)
-    # ------------------
     situacion_iva = models.CharField(
         max_length=5,
         choices=SITUACION_IVA,
@@ -289,9 +275,6 @@ class PersonaHumana(models.Model):
         null=True
     )
 
-    # ------------------
-    # Datos profesionales
-    # ------------------
     area_desempeno_1 = models.CharField(
         max_length=50,
         choices=AREA_DESEMPENO_1,
@@ -352,12 +335,10 @@ class PersonaHumana(models.Model):
         help_text="Link a una obra o trabajo audiovisual relevante"
     )
 
-
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nombre_completo
-
 
 
 # -------------------------------
@@ -365,15 +346,9 @@ class PersonaHumana(models.Model):
 # -------------------------------
 
 class PersonaJuridica(models.Model):
-
     tipo_persona_juridica = models.CharField(
         max_length=100,
-        choices=[
-            ("asociacion", "Asociación Civil"),
-            ("fundacion", "Fundación"),
-            ("empresa", "Empresa"),
-            ("cooperativa", "Cooperativa"),
-        ]
+        choices=TIPO_PERSONA_JURIDICA_CHOICES
     )
 
     cuil_cuit = models.CharField(max_length=20)
@@ -384,9 +359,6 @@ class PersonaJuridica(models.Model):
         null=True
     )
 
-    # ------------------
-    # Datos fiscales (OBLIGATORIOS)
-    # ------------------
     domicilio_fiscal = models.CharField(max_length=250)
 
     localidad_fiscal = models.CharField(
@@ -406,9 +378,6 @@ class PersonaJuridica(models.Model):
         choices=ACTIVIDAD_DGR
     )
 
-    # ------------------
-    # Datos institucionales
-    # ------------------
     fecha_constitucion = models.DateField()
     antiguedad = models.PositiveIntegerField()
 
@@ -423,9 +392,6 @@ class PersonaJuridica(models.Model):
         blank=True
     )
 
-    # ------------------
-    # Datos profesionales
-    # ------------------
     area_desempeno_JJPP_1 = models.CharField(
         max_length=50,
         choices=AREA_DESEMPENO_PPJJ_1,
@@ -482,4 +448,3 @@ class PersonaJuridica(models.Model):
 
     def __str__(self):
         return self.razon_social
-
