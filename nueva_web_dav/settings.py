@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'convocatorias',
     'exencion',
     "backoffice",
+    'chatbot',
 ]
 
 

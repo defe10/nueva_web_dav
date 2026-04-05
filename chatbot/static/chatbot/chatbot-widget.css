@@ -1,0 +1,63 @@
+#dav-launcher {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 9999;
+}
+
+#dav-toggle {
+    width: 64px;
+    height: 64px;
+    border: none;
+    border-radius: 50%;
+    background: #e0007a;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+#dav-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 95px;
+    width: 380px;
+    height: 680px;
+    max-height: calc(100vh - 120px);
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    z-index: 9998;
+}
+
+#dav-panel.dav-hidden {
+    display: none;
+}
+
+#dav-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #fff;
+}
+
+@media (max-width: 768px) {
+    #dav-panel {
+        right: 10px;
+        left: 10px;
+        bottom: 85px;
+        width: auto;
+        height: 75vh;
+    }
+
+    #dav-launcher {
+        right: 15px;
+        bottom: 15px;
+    }
+
+    #dav-toggle {
+        width: 58px;
+        height: 58px;
+    }
+}

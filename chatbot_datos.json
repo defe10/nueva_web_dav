@@ -1,0 +1,2483 @@
+[
+{
+  "model": "chatbot.nodo",
+  "pk": 1,
+  "fields": {
+    "nombre": "Menú principal",
+    "slug": "menu-principal",
+    "mensaje": "<p><strong>Hola, soy DAV.</strong><br>\r\nPuedo brindarte información y orientación sobre convocatorias, exención impositiva, cursos de formación, cash rebate, registro audiovisual y otros servicios.<br><br>\r\n\r\nSeleccioná una opción para continuar.</p>",
+    "es_inicio": true,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 2,
+  "fields": {
+    "nombre": "Convocatorias / Plan IDEA",
+    "slug": "convocatorias-plan-idea",
+    "mensaje": "<p>Puedo brindarte información y orientación sobre el proceso de inscripción a las líneas de fomento del <strong>Plan de Fomento IDEA</strong>, así como sobre los requisitos, la documentación y el estado de tu postulación.<br><br>\r\n\r\nSeleccioná una opción para continuar.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 3,
+  "fields": {
+    "nombre": "Exención impositiva",
+    "slug": "exencion-impositiva",
+    "mensaje": "<p>Para acceder a la exención impositiva, primero debés tramitar la Constancia de Inscripción FRC-35 en esta plataforma. Luego deberás presentarla ante la Dirección General de Rentas de Salta.</p>\r\n\r\n<p>Pueden inscribirse personas humanas y personas jurídicas.</p>\r\n\r\n<a href=\"/convocatorias/?categoria=INCENTIVO\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Ir a Exención impositiva\r\n</a>\r\n\r\n<p class=\"mt-3\">Si necesitás asistencia con la solicitud, seleccioná una opción para continuar.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 4,
+  "fields": {
+    "nombre": "Formación",
+    "slug": "formacion",
+    "mensaje": "<p>En la sección <strong>Convocatorias</strong> podés consultar los cursos de formación disponibles. Podrás encontrar cursos gratuitos en modalidad online y también convocatorias para las que deberás inscribirte.</p>\r\n\r\n<a href=\"/convocatorias/?categoria=CURSO\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Ir a cursos\r\n</a><br><br>\r\n\r\n<p>Seleccioná una opción y leé atentamente la descripción.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 5,
+  "fields": {
+    "nombre": "Cash Rebate",
+    "slug": "cash-rebate",
+    "mensaje": "<p><strong>Salta Cash Rebate</strong> es un programa de reembolso a inversiones de producciones nacionales e internacionales que filmen en la provincia de Salta.</p>\r\n\r\n<p>Para ir a la convocatoria:</p>\r\n<a href=\"/convocatorias/?categoria=BENEFICIO\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Ir a cash rebate\r\n</a><br><br>\r\n\r\n<p>Puedo ayudarte en el proceso de inscripción así como sobre los requisitos, la documentación y el estado de tu postulación.</p>\r\n\r\n<p>Seleccioná una opción para continuar.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 6,
+  "fields": {
+    "nombre": "Registro Audiovisual",
+    "slug": "registro-audiovisual",
+    "mensaje": "<p>El <strong>Registro Provincial Audiovisual</strong> permite contar con información actualizada para el diseño e implementación de políticas públicas específicas.</p>\r\n\r\n<p>La inscripción es un requisito para acceder a convocatorias, programas e incentivos.</p>\r\n\r\n<p>Podés registrarte en el siguiente enlace:</p>\r\n\r\n<a href=\"/registro/seleccionar-tipo/\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n Ir a registro\r\n</a><br><br>\r\n<p>Para más información, seleccioná una opción:</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 7,
+  "fields": {
+    "nombre": "Solicitud de Cine Móvil",
+    "slug": "solicitud-de-cine-movil",
+    "mensaje": "<p>El <strong>Cine Móvil</strong> es un vehículo equipado para realizar proyecciones de cine nacional en las localidades de la provincia de Salta. Pueden solicitarlo <u>instituciones públicas o privadas.</u><br><br>\r\nPara solicitar Cine Móvil:<br><br>\r\n<a href=\"https://docs.google.com/forms/d/1dUELTaF8F3UWd1FT9o-lvkoofWsxZ4aF2kbB8rCAAGo/edit\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Solicitar Cine Móvil\r\n</a><br> <br>\r\n¿Querés conocer los requerimientos para pedirlo?\r\n</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 8,
+  "fields": {
+    "nombre": "Las Escuelas van al Cine",
+    "slug": "las-escuelas-van-al-cine",
+    "mensaje": "<p><strong>Las escuelas van al cine</strong> es un programa de formación de audiencias infantiles y juveniles.</p>\r\n<p>Las instituciones educativas de la provincia de Salta, públicas o privadas, pueden reservar función en <strong>lasescuelasvanalcinesalta@gmail.com</strong>l, indicando:\r\n<ul>\r\n<li>Nombre de la institución</li>\r\n<li>Curso / división</li>\r\n<li>Cantidad de estudiantes</li>\r\n</ul>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 9,
+  "fields": {
+    "nombre": "Solicitud de avales",
+    "slug": "solicitud-de-avales",
+    "mensaje": "<p>Podés solicitar avales institucionales de la Dirección de Audiovisuales de Salta.</p>\r\n\r\n<p>Para hacerlo, escribí a <strong>audiovisuales@edusalta.gov.ar</strong> con el asunto <strong>“Solicitud de aval institucional”</strong>.</p>\r\n\r\n<p>En el correo, indicá el motivo de la solicitud y adjuntá la nota modelo con la información correspondiente.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 10,
+  "fields": {
+    "nombre": "Información institucional",
+    "slug": "informacion-institucional",
+    "mensaje": "<p>Podés consultar toda la información institucional en el siguiente enlace:</p>\r\n\r\n<a href=\"/institucional/\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n Institucional\r\n</a>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 11,
+  "fields": {
+    "nombre": "Ver convocatorias",
+    "slug": "ver-convocatorias",
+    "mensaje": "<p>Las convocatorias del Plan IDEA se organizan en tres categorías:</p>\r\n<ul>\r\n  <li><strong>Concursos</strong> </li>\r\n  <li><strong>Programas</strong></li>\r\n  <li><strong>Subsidios</strong></li>\r\n</ul>\r\n\r\n<p>Podés consultar el listado completo de convocatorias:</p>\r\n\r\n<a href=\"/convocatorias/\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Ir a convocatorias\r\n</a><br><br>\r\n\r\n<p class=\"mt-3\">O seleccioná una opción si quieres saber más:</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 12,
+  "fields": {
+    "nombre": "Proceso de inscripción",
+    "slug": "proceso-de-inscripcion",
+    "mensaje": "<p>Para inscribirte a una convocatoria tenés que seguir estos pasos:</p>\r\n<ol>\r\n<li>Crear usuario</li>\r\n<li>Completar el Registro Audiovisual</li>\r\n<li>Iniciar la postulación</li>\r\n<li>Completar los datos del proyecto</li>\r\n<li>Subir la documentación</li>\r\n<li>Enviar la postulación</li>\r\n</ol>\r\n\r\n<p>¿En que paso estás?</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 13,
+  "fields": {
+    "nombre": "Requisitos de convocatorias",
+    "slug": "requisitos-de-convocatorias",
+    "mensaje": "<p>Los requisitos para inscribirte a una convocatoria varían según la opción elegida. Antes de iniciar la inscripción, es importante que:</p>\r\n\r\n<ol>\r\n  <li>Leas atentamente las Bases y Condiciones.</li>\r\n  <li>Revises los procedimientos de inscripción.</li>\r\n  <li>Cuentes con toda la información y documentación requerida.</li>\r\n</ol>\r\n\r\n<p>¿Cómo querés continuar?</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 14,
+  "fields": {
+    "nombre": "Documentación de convocatorias",
+    "slug": "documentacion-de-convocatorias",
+    "mensaje": "<p>La documentación para una convocatoria se divide en dos grupos:<br>\r\n<ol>\r\n<li>Documentación personal</li>\r\n<li>Documentación del proyecto</li>\r\n</ol>\r\nTené en cuenta que la documentación requerida cambia según la convocatoria elegida. Antes de subirla, lee atentamente las Bases y condiciones.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 15,
+  "fields": {
+    "nombre": "Estado de mi postulación",
+    "slug": "estado-de-mi-postulacion",
+    "mensaje": "<p>Tu postulación pasa por distintas etapas dentro del proceso.</p>\r\n\r\n<p>Podés consultar el significado de cada estado para saber en qué situación se encuentra tu proyecto.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 16,
+  "fields": {
+    "nombre": "Concursos",
+    "slug": "concursos",
+    "mensaje": "<p>La categoría <strong>Concursos</strong> está conformada por líneas de fomento que realizan una selección competitiva de proyectos mediante un jurado especializado. Los proyectos seleccionados reciben financiamiento del 100% para su realización.</p>\r\n\r\n<p>Para ver los concursos abiertos:</p>\r\n\r\n<a href=\"/convocatorias/?categoria=CURSO\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Ir a concursos\r\n</a><br><br>\r\n\r\n<p>¿Necesitás ayuda con la inscripción?</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 17,
+  "fields": {
+    "nombre": "Programas",
+    "slug": "programas",
+    "mensaje": "<p>La categoría <strong>Programas</strong> está conformada por líneas de fomento destinadas al desarrollo de proyectos, que brindan acompañamiento mediante tutorías especializadas, instancias de formación —como laboratorios— y aportes económicos.</p>\r\n\r\n<p>Para ver los programas disponibles:</p>\r\n\r\n<a href=\"/convocatorias/?categoria=PROGRAMA\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Ir a programas\r\n</a><br><br>\r\n\r\n<p>¿Necesitás ayuda con la inscripción?</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 18,
+  "fields": {
+    "nombre": "Subsidios",
+    "slug": "subsidios",
+    "mensaje": "<p>La categoría <strong>Subsidios</strong> está conformada por líneas de fomento que otorgan aportes económicos no reintegrables destinados a cubrir etapas específicas de la producción audiovisual.</p>\r\n\r\n<p>Para ver los subsidios disponibles:</p>\r\n<a href=\"/convocatorias/?categoria=SUBSIDIO\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Ir a subsidios\r\n</a><br><br>\r\n<p>¿Necesitás ayuda con la inscripción?</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 20,
+  "fields": {
+    "nombre": "No tengo usuario",
+    "slug": "no-tengo-usuario",
+    "mensaje": "<p>Para postularte a una convocatoria, primero tenés que crear un usuario en la plataforma.<br><br>\r\nPara crear un usuario, debes contar con un correo electrónico:<br><br>\r\n<a href=\"/usuarios/registro/\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Crear usuario\r\n</a><br><br>\r\nUna vez que tengas usuario, el siguiente paso es completar el Registro Audiovisual.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 21,
+  "fields": {
+    "nombre": "Tengo usuario pero no registro",
+    "slug": "tengo-usuario-sin-registro",
+    "mensaje": "<p>Para avanzar con una convocatoria, además de tener usuario, tenés que estar inscripto en el Registro Audiovisual.<br><br>\r\nPara inscribirte en el Registro Audiovisual:<br><br>\r\n<a href=\"/registro/seleccionar-tipo/\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Registro Audiovisual\r\n</a><br><br>\r\nUna vez completado el registro, ya vas a poder iniciar tu postulación.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 22,
+  "fields": {
+    "nombre": "Ya estoy registrado",
+    "slug": "ya-estoy-registrado",
+    "mensaje": "<p>Ahora ya podés iniciar una postulación a una convocatoria.<br>\r\nEl siguiente paso es completar los datos del proyecto y luego subir la documentación requerida.<br><br>\r\n<strong>Recuerda:</strong> Antes de comenzar con la inscripción, lee atentamente las Bases y condiciones de la convocatoria elegida.",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 23,
+  "fields": {
+    "nombre": "Estoy cargando documentación",
+    "slug": "estoy-cargando-documentacion",
+    "mensaje": "<p>En esta etapa tenés que subir la documentación requerida para la convocatoria.<br>\r\n\r\nLa documentación se divide en dos grupos:\r\n<ol>\r\n<li>documentación personal</li>\r\n<li>documentación del proyecto</li>\r\n</ol>\r\nRecordá que el detalle específico de la documentación consta en las bases y condiciones de la convocatoria elegida.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 24,
+  "fields": {
+    "nombre": "Documentación personal",
+    "slug": "documentacion-personal",
+    "mensaje": "<p>La documentación personal corresponde al postulante.<br>\r\n\r\nPuede incluir documentación identificatoria, administrativa o fiscal, según la convocatoria.<br>\r\nPuedes subir hasta un máximo de 3 archivos, solo en formato PDF, y de un peso máximo de 5mb cada uno.<br>\r\n\r\nRecordá que el detalle exacto de la documentación requerida consta en las bases y condiciones de la convocatoria elegida.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 25,
+  "fields": {
+    "nombre": "Documentación del proyecto",
+    "slug": "documentacion-del-proyecto",
+    "mensaje": "<p>La documentación del proyecto corresponde específicamente a la propuesta presentada.<br>\r\n\r\nPuede incluir formularios, archivos descriptivos, presupuesto u otra documentación vinculada al proyecto, según la convocatoria.<br>\r\nPuedes subir hasta un máximo de 3 archivos, en formato PDF, y de un peso máximo de 5mb cada uno.<br>\r\nTambién se acepta formatos xls,xlsx y ods  para la Planilla oficial.\r\n\r\nRecordá que el detalle exacto de la documentación requerida consta en las bases y condiciones de la convocatoria elegida.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 26,
+  "fields": {
+    "nombre": "Borrador",
+    "slug": "borrador",
+    "mensaje": "<p>Tu postulación se encuentra en estado <strong>borrador</strong>.</p>\r\n\r\n<p>Esto significa que aún no fue enviada.</p>\r\n\r\n<p>Podés continuar completando la información y adjuntando la documentación antes de enviarla.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 27,
+  "fields": {
+    "nombre": "Enviado",
+    "slug": "enviado",
+    "mensaje": "<p>Tu postulación fue enviada correctamente.</p>\r\n\r\n<p>La fecha de envío corresponde al momento en que confirmaste la presentación.</p>\r\n\r\n<p>La postulación se encuentra ahora en etapa de revisión administrativa.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 28,
+  "fields": {
+    "nombre": "En revisión administrativa",
+    "slug": "en-revision-administrativa",
+    "mensaje": "<p>Tu postulación se encuentra en proceso de revisión administrativa.</p>\r\n\r\n<p>En esta etapa se verifica que la información y la documentación estén completas y correctas.</p>\r\n\r\n<p>En caso de requerirse una subsanación, recibirás una notificación por correo electrónico y también podrás verla en \"Mi cuenta\".</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 29,
+  "fields": {
+    "nombre": "Observado (requiere subsanación)",
+    "slug": "observado-requiere-subsanacion",
+    "mensaje": "<p>Tu postulación tiene observaciones.</p>\r\n\r\n<p>Esto significa que hay errores o documentación faltante que debés corregir.</p>\r\n\r\n<p>Tenés que revisar las observaciones indicadas en la plataforma y realizar la subsanación dentro del plazo establecido.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 30,
+  "fields": {
+    "nombre": "Admitido",
+    "slug": "admitido",
+    "mensaje": "<p>Tu postulación fue admitida.</p>\r\n\r\n<p>Esto significa que superó la revisión administrativa y se encuentra en etapa de evaluación por jurado.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 31,
+  "fields": {
+    "nombre": "En evaluación por jurado",
+    "slug": "en-evaluacion-por-jurado",
+    "mensaje": "<p>Tu proyecto se encuentra en etapa de evaluación por jurado.</p>\r\n\r\n<p>En esta instancia no es necesario que realices ninguna acción.</p>\r\n\r\n<p>Los resultados serán informados oportunamente. Te recomendamos estar atento a tu correo electrónico y a las notificaciones en \"Mi cuenta\".</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 32,
+  "fields": {
+    "nombre": "Resultado de la convocatoria",
+    "slug": "resultado-de-la-convocatoria",
+    "mensaje": "<p>El proceso de evaluación ha finalizado.</p>\r\n\r\n<p>Tu proyecto puede haber sido seleccionado o no seleccionado.</p>\r\n\r\n<p>Los resultados serán informados a través de los canales oficiales.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 33,
+  "fields": {
+    "nombre": "Finalizado",
+    "slug": "finalizado",
+    "mensaje": "<p>Tu postulación se encuentra finalizada.</p>\r\n\r\n<p>Esto significa que el proceso completo de la convocatoria ya concluyó.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 34,
+  "fields": {
+    "nombre": "Seguimiento de postulación",
+    "slug": "seguimiento-de-postulacion",
+    "mensaje": "<p>Podés realizar el seguimiento de tu postulación desde el panel de usuario, accediendo a \"Mi cuenta\". <br><br>\r\n\r\nEn el panel vas a poder consultar el estado de tu postulación y recibir notificaciones.<br><br>\r\n\r\n<p>Podés acceder al panel aquí:</p>\r\n<a href=\"/usuarios/panel/\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Ver convocatorias\r\n</a><br><br>\r\n¿En que estado estás?</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 35,
+  "fields": {
+    "nombre": "Proceso de inscripción exención",
+    "slug": "proceso-de-inscripcion-exencion",
+    "mensaje": "<p>Para obtener la constancia de inscripción FRC-35 tenés que seguir estos pasos:</p>\r\n<ol>\r\n<li>Crear usuario</li>\r\n<li>Completar el Registro Audiovisual</li>\r\n<li>Ir a Exención Impositiva</li>\r\n<li>Subir la documentación</li>\r\n<li>Enviar la postulación</li>\r\n</ol>\r\n\r\n<p>¿En que paso estás?</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 36,
+  "fields": {
+    "nombre": "Requisitos exención",
+    "slug": "requisitos-exencion",
+    "mensaje": "<p>Es importante tener en cuenta los siguientes requisitos para obtener la constancia de inscripción:</p>\r\n\r\n<ol>\r\n  <li>Tener completos los <u>datos fiscales</u> en el Registro Audiovisual. </li>\r\n  <li>Tener declarada al actividad en ARCA</li>\r\n  <li>Tener la documentación actualizada.</li>\r\n</ol>\r\n\r\n<p>¿Cómo querés continuar?</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 37,
+  "fields": {
+    "nombre": "No tengo usuario exención",
+    "slug": "no-tengo-usuario-exencion",
+    "mensaje": "<p>Para obtener la constancia, primero tenés que crear un usuario en la plataforma.<br><br>\r\nPara crear un usuario, debes contar con un correo electrónico:<br><br>\r\n<a href=\"/usuarios/registro/\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Crear usuario\r\n</a><br><br>\r\nUna vez que tengas usuario, el siguiente paso es completar el Registro Audiovisual.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 38,
+  "fields": {
+    "nombre": "Tengo usuario pero no registro exención",
+    "slug": "tengo-usuario-pero-no-registro-exencion",
+    "mensaje": "<p>Para avanzar con la solicitud de constancia, además de tener usuario, tenés que estar inscripto en el Registro Audiovisual.<br><br>\r\nPara inscribirte en el Registro Audiovisual:<br><br>\r\n<a href=\"/registro/seleccionar-tipo/\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n  Registro Audiovisual\r\n</a><br><br>\r\n<strong>IMPORTANTE:</strong> Para poder solicitar la inscripción debes completar los <u>datos fiscales</u> en el Registro Audiovisual. <br><br>\r\nUna vez completado el registro, ya vas a poder iniciar tu solicitud.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 39,
+  "fields": {
+    "nombre": "Ya estoy registrado exención",
+    "slug": "ya-estoy-registrado-exencion",
+    "mensaje": "<p>Ahora ya podés iniciar la solicitud de constancia.<br>\r\nEl siguiente paso es subir la documentación requerida.<br><br>\r\n<strong>Recuerda:</strong> Antes de comenzar con la inscripción, lee atentamente las indicaciones descriptas en la convocatoria.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 40,
+  "fields": {
+    "nombre": "Documentación exención",
+    "slug": "documentacion-exencion",
+    "mensaje": "<p>Para inscribirse en la Exención Impositiva, deberás subir la documentación correspondiente según tu caso<br>\r\n<ol>\r\n<li>Persona humana</li>\r\n<li>Persona jurídica</li>\r\n</ol>\r\nPara más información puede ir a:<br><br>\r\n<a href=\"/convocatorias/exencion-impositiva/\" class=\"btn btn-primary\" target=\"_top\">\r\n  Ir a Exención impositiva\r\n</a></p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 41,
+  "fields": {
+    "nombre": "Estado exención",
+    "slug": "estado-exencion",
+    "mensaje": "Tu postulación pasa por distintas etapas dentro del proceso. Puedes verlo en \"Mi cuenta\".\r\n<ol>\r\n<li><strong>Borrador:</strong>  aún no fue enviada. Podés continuar adjuntando la documentación antes de enviarla.\r\n<li><strong>Enviada:</strong> Tu postulación fue enviada correctamente, ahora está en etapa de revisión.\r\n<li><strong>Aprobada:</strong> Tu solicitud fue aprobada, puedes descargarla la constancia  en \"Mi cuenta\".\r\n<li><strong>Rechazada:</strong> Tu solicitud fue rechazada.\r\n</ol>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 42,
+  "fields": {
+    "nombre": "Requerimientos cine móvil",
+    "slug": "requerimientos-cine-movil",
+    "mensaje": "<p>REQUERIMIENTOS:</p>\r\n<ul>\r\n<li>Las funciones deben ser gratuitas. </li>\r\n<li>La institución solicitante debe contar con una persona responsable del evento.</li>\r\n<li>La institución solicitante debe garantizar la presencia de público presente en la proyección. </li>\r\n<li>El solicitante debe contar con un espacio físico interior o exterior. En ambos casos debe tener las dimensiones suficientes para poder instalar pantalla, equipo de sonido, proyector y platea para el público.</li>\r\n<li>Se debe producir un “efecto cine”, es decir que, la luminosidad en el espacio debe ser mínima. </li>\r\n<li>El espacio físico deberá proveer de sillas o butacas para el público.</li>\r\n<li>El solicitante deberá gestionar los permisos correspondientes para el uso de espacios públicos.</li>\r\n</ul>\r\n<p>El cine móvil provee la movilidad y traslado de equipos: pantalla, sonido, proyector y películas del cine nacional y el personal técnico para las proyecciones de forma gratuita</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 43,
+  "fields": {
+    "nombre": "Inscripción general",
+    "slug": "inscripcion-general",
+    "mensaje": "<p>Puedo orientarte sobre distintos procesos de inscripción.</p>\r\n\r\n<p>Elegí cuál te interesa.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 44,
+  "fields": {
+    "nombre": "Línea de fomento",
+    "slug": "linea-de-fomento",
+    "mensaje": "<p>Una <strong>línea de fomento</strong>, es cada una de las convocatorias del plan de fomento. Se dividen en tres categorías: concursos, programas y subsidios.</p>\r\n<p>Selecciona una opción para saber más.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 45,
+  "fields": {
+    "nombre": "Trámite en DGR",
+    "slug": "tramite-en-dgr",
+    "mensaje": "<p>Una vez que obtengas la Constancia de Inscripción FRC-35, deberás continuar el trámite ante la Dirección General de Rentas de Salta para acceder a la exención impositiva.</p>\r\n\r\n<p>Podés ver el siguiente video, donde se explica cómo realizar la solicitud:</p>\r\n\r\n<p>\r\n  <a href=\"https://www.youtube.com/watch?v=WOzYp4F5caY\" target=\"_blank\">\r\n    Ver instructivo de solicitud\r\n  </a>\r\n</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 46,
+  "fields": {
+    "nombre": "Requermientos las escuelas",
+    "slug": "requermientos-las-escuelas",
+    "mensaje": "<p>Pueden solicitar funciones instituciones educativas de nivel inicial, primario, secundario y superior, tanto públicas como privadas de la provincia de Salta.</p>\r\n\r\n<p>Las funciones se realizan en el Auditorio Macacha Güemes de la Usina Cultural, ubicado en Juramento y España, Salta, los días martes en horario de mañana y tarde.</p>\r\n\r\n<p>También se pueden solicitar proyecciones con temáticas específicas.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 47,
+  "fields": {
+    "nombre": "Pueden incribirse al registro",
+    "slug": "pueden-incribirse-al-registro",
+    "mensaje": "<p>Pueden inscribirse al Registro Provincial Audiovisual:</p>\r\n\r\n<ul>\r\n  <li><strong>Personas humanas:</strong> Personas que actúan en nombre propio.</li>\r\n  <li><strong>Personas jurídicas:</strong> Organizaciones o empresas que actúan legalmente como una persona.</li>\r\n</ul>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 48,
+  "fields": {
+    "nombre": "Requisitos registro audiovisual",
+    "slug": "requisitos-registro-audiovisual",
+    "mensaje": "<p>Para registrarte, debés:</p>\r\n\r\n<ol>\r\n  <li>Crear un usuario.</li>\r\n  <li>Completar los datos de forma correcta.</li>\r\n  <li>No es necesario adjuntar documentación para el registro.</li>\r\n  <li>Si vas a solicitar la exención impositiva, deberás completar los datos fiscales.</li>\r\n  <li>Mantener la información actualizada. Podés editarla desde \"Mi cuenta\".</li>\r\n</ol>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 49,
+  "fields": {
+    "nombre": "No tengo usuario registro",
+    "slug": "no-tengo-usuario-registro",
+    "mensaje": "<p>Para registrarte, primero debés crear un usuario en la plataforma.</p>\r\n\r\n<p>Para hacerlo, necesitás contar con un correo electrónico:</p>\r\n<a href=\"/usuarios/registro/\" class=\"btn btn-primary btn-sm\" target=\"_top\">\r\n Crear usuario\r\n</a>\r\n\r\n<p>Una vez creado el usuario, el siguiente paso es completar el Registro Audiovisual.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 50,
+  "fields": {
+    "nombre": "Requisitos Cash Rebate",
+    "slug": "requisitos-cash-rebate",
+    "mensaje": "<p><strong>Formatos elegibles:</strong> Largometrajes, series, producciones para TV, publicidad y videoclips.</p>\r\n\r\n<p><strong>Etapas elegibles:</strong> Preproducción, producción y postproducción.</p>\r\n\r\n<p><strong>Presentantes:</strong> Productoras con personería jurídica constituida en Argentina.</p>\r\n\r\n<p><strong>Requisitos:</strong></p>\r\n<ul>\r\n  <li>El proyecto debe filmarse total o parcialmente en Salta.</li>\r\n  <li>Se debe acreditar una contratación mínima del 30% de equipo técnico y artístico local.</li>\r\n</ul>\r\n\r\n<p><strong>Enlaces de interés:</strong></p>\r\n<ul>\r\n  <li><a href=\"https://saltaset.gob.ar\" target=\"_blank\">SALTA SET Film Commission</a></li>\r\n  <li>Instagram Salta Set: @salta.set</li>\r\n</ul>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 51,
+  "fields": {
+    "nombre": "Formatos",
+    "slug": "formatos",
+    "mensaje": "<p>Según el formato de tu proyecto, podés acceder a distintas líneas de apoyo:</p>\r\n\r\n<ul>\r\n  <li><strong>Publicidad:</strong> Salta Cash Rebate.</li>\r\n  <li><strong>Largometrajes:</strong> Plan IDEA o Salta Cash Rebate.</li>\r\n  <li><strong>Cortometrajes:</strong> Plan IDEA.</li>\r\n  <li><strong>Series:</strong> Plan IDEA o Salta Cash Rebate.</li>\r\n  <li><strong>Producciones para TV:</strong> Salta Cash Rebate.</li>\r\n</ul>\r\n\r\n<p>Elegí una opción para continuar.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.nodo",
+  "pk": 52,
+  "fields": {
+    "nombre": "Que es idea",
+    "slug": "que-es-idea",
+    "mensaje": "<p>El Plan IDEA es el programa anual de fomento audiovisual de la provincia de Salta. Tiene como objetivo apoyar la producción audiovisual local a través de distintas líneas de fomento concursables.</p>\r\n\r\n<p>El Plan se financia con el Fondo de Fomento Audiovisual.</p>\r\n\r\n<p>Pueden inscribirse personas humanas con residencia efectiva en la provincia de Salta.</p>",
+    "es_inicio": false,
+    "activo": true
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 1,
+  "fields": {
+    "nodo_origen": 1,
+    "texto": "Convocatorias / Plan IDEA",
+    "nodo_destino": 2,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 2,
+  "fields": {
+    "nodo_origen": 1,
+    "texto": "Exención impositiva",
+    "nodo_destino": 3,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 3,
+  "fields": {
+    "nodo_origen": 1,
+    "texto": "Formación",
+    "nodo_destino": 4,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 4,
+  "fields": {
+    "nodo_origen": 1,
+    "texto": "Cash Rebate",
+    "nodo_destino": 5,
+    "orden": 4
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 5,
+  "fields": {
+    "nodo_origen": 1,
+    "texto": "Registro Audiovisual",
+    "nodo_destino": 6,
+    "orden": 5
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 6,
+  "fields": {
+    "nodo_origen": 1,
+    "texto": "Solicitud de Cine Móvil",
+    "nodo_destino": 7,
+    "orden": 6
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 7,
+  "fields": {
+    "nodo_origen": 1,
+    "texto": "Las Escuelas van al Cine",
+    "nodo_destino": 8,
+    "orden": 7
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 8,
+  "fields": {
+    "nodo_origen": 1,
+    "texto": "Solicitud de avales",
+    "nodo_destino": 9,
+    "orden": 8
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 9,
+  "fields": {
+    "nodo_origen": 1,
+    "texto": "Información institucional",
+    "nodo_destino": 10,
+    "orden": 9
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 10,
+  "fields": {
+    "nodo_origen": 2,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 11,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 11,
+  "fields": {
+    "nodo_origen": 2,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 12,
+  "fields": {
+    "nodo_origen": 2,
+    "texto": "Requisitos",
+    "nodo_destino": 13,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 13,
+  "fields": {
+    "nodo_origen": 2,
+    "texto": "Documentación",
+    "nodo_destino": 14,
+    "orden": 4
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 14,
+  "fields": {
+    "nodo_origen": 2,
+    "texto": "Estado de mi postulación",
+    "nodo_destino": 15,
+    "orden": 5
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 15,
+  "fields": {
+    "nodo_origen": 11,
+    "texto": "Concursos",
+    "nodo_destino": 16,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 16,
+  "fields": {
+    "nodo_origen": 11,
+    "texto": "Programas",
+    "nodo_destino": 17,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 17,
+  "fields": {
+    "nodo_origen": 11,
+    "texto": "Subsidios",
+    "nodo_destino": 18,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 19,
+  "fields": {
+    "nodo_origen": 16,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 11,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 20,
+  "fields": {
+    "nodo_origen": 16,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 21,
+  "fields": {
+    "nodo_origen": 16,
+    "texto": "Requisitos",
+    "nodo_destino": 13,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 22,
+  "fields": {
+    "nodo_origen": 18,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 11,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 23,
+  "fields": {
+    "nodo_origen": 18,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 24,
+  "fields": {
+    "nodo_origen": 18,
+    "texto": "Requisitos",
+    "nodo_destino": 13,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 25,
+  "fields": {
+    "nodo_origen": 17,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 11,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 26,
+  "fields": {
+    "nodo_origen": 17,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 27,
+  "fields": {
+    "nodo_origen": 17,
+    "texto": "Requisitos",
+    "nodo_destino": 13,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 28,
+  "fields": {
+    "nodo_origen": 12,
+    "texto": "No tengo usuario",
+    "nodo_destino": 20,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 29,
+  "fields": {
+    "nodo_origen": 12,
+    "texto": "Ya tengo usuario, pero no estoy registrado",
+    "nodo_destino": 21,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 30,
+  "fields": {
+    "nodo_origen": 12,
+    "texto": "Ya estoy registrado",
+    "nodo_destino": 22,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 31,
+  "fields": {
+    "nodo_origen": 12,
+    "texto": "Estoy cargando documentación",
+    "nodo_destino": 23,
+    "orden": 4
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 32,
+  "fields": {
+    "nodo_origen": 20,
+    "texto": "Ir al Registro Audiovisual",
+    "nodo_destino": 6,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 33,
+  "fields": {
+    "nodo_origen": 20,
+    "texto": "Volver al proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 34,
+  "fields": {
+    "nodo_origen": 21,
+    "texto": "Ir a convocatorias",
+    "nodo_destino": 11,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 35,
+  "fields": {
+    "nodo_origen": 21,
+    "texto": "Volver al proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 36,
+  "fields": {
+    "nodo_origen": 22,
+    "texto": "Ver documentación",
+    "nodo_destino": 14,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 38,
+  "fields": {
+    "nodo_origen": 22,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 11,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 39,
+  "fields": {
+    "nodo_origen": 23,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 14,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 40,
+  "fields": {
+    "nodo_origen": 23,
+    "texto": "Documentación personal",
+    "nodo_destino": 24,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 42,
+  "fields": {
+    "nodo_origen": 24,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 11,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 43,
+  "fields": {
+    "nodo_origen": 24,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 44,
+  "fields": {
+    "nodo_origen": 25,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 11,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 46,
+  "fields": {
+    "nodo_origen": 25,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 47,
+  "fields": {
+    "nodo_origen": 15,
+    "texto": "Borrador",
+    "nodo_destino": 26,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 48,
+  "fields": {
+    "nodo_origen": 15,
+    "texto": "Enviado",
+    "nodo_destino": 27,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 49,
+  "fields": {
+    "nodo_origen": 15,
+    "texto": "En revisión administrativa",
+    "nodo_destino": 28,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 50,
+  "fields": {
+    "nodo_origen": 15,
+    "texto": "Observado (requiere subsanación)",
+    "nodo_destino": 29,
+    "orden": 4
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 51,
+  "fields": {
+    "nodo_origen": 15,
+    "texto": "Admitido",
+    "nodo_destino": 30,
+    "orden": 5
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 52,
+  "fields": {
+    "nodo_origen": 15,
+    "texto": "En evaluación por jurado",
+    "nodo_destino": 31,
+    "orden": 6
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 53,
+  "fields": {
+    "nodo_origen": 15,
+    "texto": "Resultado de la convocatoria",
+    "nodo_destino": 32,
+    "orden": 7
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 54,
+  "fields": {
+    "nodo_origen": 15,
+    "texto": "Finalizado",
+    "nodo_destino": 33,
+    "orden": 8
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 55,
+  "fields": {
+    "nodo_origen": 21,
+    "texto": "No sé como registrarme",
+    "nodo_destino": 6,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 56,
+  "fields": {
+    "nodo_origen": 23,
+    "texto": "Documentación del proyecto",
+    "nodo_destino": 25,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 57,
+  "fields": {
+    "nodo_origen": 14,
+    "texto": "Documentación personal",
+    "nodo_destino": 24,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 58,
+  "fields": {
+    "nodo_origen": 14,
+    "texto": "Documentación del proyecto",
+    "nodo_destino": 25,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 59,
+  "fields": {
+    "nodo_origen": 14,
+    "texto": "Volver a Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 60,
+  "fields": {
+    "nodo_origen": 13,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 11,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 61,
+  "fields": {
+    "nodo_origen": 13,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 62,
+  "fields": {
+    "nodo_origen": 12,
+    "texto": "Ya envié mi postulación",
+    "nodo_destino": 34,
+    "orden": 5
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 63,
+  "fields": {
+    "nodo_origen": 34,
+    "texto": "Estado de mi postulación",
+    "nodo_destino": 15,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 64,
+  "fields": {
+    "nodo_origen": 26,
+    "texto": "Estado de mi postulación",
+    "nodo_destino": 15,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 65,
+  "fields": {
+    "nodo_origen": 26,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 66,
+  "fields": {
+    "nodo_origen": 26,
+    "texto": "Volver al inicio",
+    "nodo_destino": 1,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 67,
+  "fields": {
+    "nodo_origen": 27,
+    "texto": "Estado de mi postulación",
+    "nodo_destino": 15,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 68,
+  "fields": {
+    "nodo_origen": 27,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 69,
+  "fields": {
+    "nodo_origen": 27,
+    "texto": "Volver al inicio",
+    "nodo_destino": 1,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 70,
+  "fields": {
+    "nodo_origen": 28,
+    "texto": "Estado de mi postulación",
+    "nodo_destino": 15,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 71,
+  "fields": {
+    "nodo_origen": 28,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 72,
+  "fields": {
+    "nodo_origen": 28,
+    "texto": "Volver al inicio",
+    "nodo_destino": 1,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 73,
+  "fields": {
+    "nodo_origen": 29,
+    "texto": "Estado de postulación",
+    "nodo_destino": 15,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 74,
+  "fields": {
+    "nodo_origen": 29,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 75,
+  "fields": {
+    "nodo_origen": 29,
+    "texto": "Volver al inicio",
+    "nodo_destino": 1,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 76,
+  "fields": {
+    "nodo_origen": 30,
+    "texto": "Estado de postulación",
+    "nodo_destino": 15,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 77,
+  "fields": {
+    "nodo_origen": 30,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 78,
+  "fields": {
+    "nodo_origen": 30,
+    "texto": "Volver al inicio",
+    "nodo_destino": 1,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 79,
+  "fields": {
+    "nodo_origen": 31,
+    "texto": "Estado de mi postulación",
+    "nodo_destino": 15,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 80,
+  "fields": {
+    "nodo_origen": 31,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 81,
+  "fields": {
+    "nodo_origen": 31,
+    "texto": "Volver al inicio",
+    "nodo_destino": 1,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 82,
+  "fields": {
+    "nodo_origen": 32,
+    "texto": "Estado de mi postulación",
+    "nodo_destino": 15,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 83,
+  "fields": {
+    "nodo_origen": 32,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 84,
+  "fields": {
+    "nodo_origen": 32,
+    "texto": "Volver al inicio",
+    "nodo_destino": 1,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 85,
+  "fields": {
+    "nodo_origen": 35,
+    "texto": "No tengo usuario",
+    "nodo_destino": 37,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 86,
+  "fields": {
+    "nodo_origen": 35,
+    "texto": "Ya tengo usuario, pero no estoy registrado",
+    "nodo_destino": 38,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 87,
+  "fields": {
+    "nodo_origen": 35,
+    "texto": "Ya estoy registrado",
+    "nodo_destino": 39,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 88,
+  "fields": {
+    "nodo_origen": 35,
+    "texto": "Estoy cargando documentación",
+    "nodo_destino": 40,
+    "orden": 4
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 89,
+  "fields": {
+    "nodo_origen": 35,
+    "texto": "Ya envié mi postulación",
+    "nodo_destino": 41,
+    "orden": 5
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 90,
+  "fields": {
+    "nodo_origen": 3,
+    "texto": "Solicitar constancia",
+    "nodo_destino": 35,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 91,
+  "fields": {
+    "nodo_origen": 37,
+    "texto": "Ir al Registro Audiovisual",
+    "nodo_destino": 6,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 92,
+  "fields": {
+    "nodo_origen": 37,
+    "texto": "Volver Solicitar constancia",
+    "nodo_destino": 35,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 93,
+  "fields": {
+    "nodo_origen": 38,
+    "texto": "Ir a Exención impositiva",
+    "nodo_destino": 3,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 94,
+  "fields": {
+    "nodo_origen": 38,
+    "texto": "No sé como registrarme",
+    "nodo_destino": 6,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 95,
+  "fields": {
+    "nodo_origen": 38,
+    "texto": "Volver a Solicitar constancia",
+    "nodo_destino": 35,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 96,
+  "fields": {
+    "nodo_origen": 39,
+    "texto": "Ir a Exención impositiva",
+    "nodo_destino": 3,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 97,
+  "fields": {
+    "nodo_origen": 39,
+    "texto": "Documentación",
+    "nodo_destino": 40,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 98,
+  "fields": {
+    "nodo_origen": 40,
+    "texto": "Solicitar constancia",
+    "nodo_destino": 35,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 99,
+  "fields": {
+    "nodo_origen": 40,
+    "texto": "Ir a Exención impositiva",
+    "nodo_destino": 3,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 100,
+  "fields": {
+    "nodo_origen": 41,
+    "texto": "Ir a Exención Impositiva",
+    "nodo_destino": 3,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 101,
+  "fields": {
+    "nodo_origen": 7,
+    "texto": "Requerimientos",
+    "nodo_destino": 42,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 102,
+  "fields": {
+    "nodo_origen": 7,
+    "texto": "Ir al inicio",
+    "nodo_destino": 1,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 103,
+  "fields": {
+    "nodo_origen": 42,
+    "texto": "Solicitar Cine Móvil",
+    "nodo_destino": 7,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 104,
+  "fields": {
+    "nodo_origen": 42,
+    "texto": "Ir a inicio",
+    "nodo_destino": 1,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 105,
+  "fields": {
+    "nodo_origen": 8,
+    "texto": "Ir a inicio",
+    "nodo_destino": 1,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 106,
+  "fields": {
+    "nodo_origen": 43,
+    "texto": "Convocatorias / Plan IDEA",
+    "nodo_destino": 2,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 107,
+  "fields": {
+    "nodo_origen": 43,
+    "texto": "Cash Rebate",
+    "nodo_destino": 5,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 108,
+  "fields": {
+    "nodo_origen": 43,
+    "texto": "Exención Impostiva",
+    "nodo_destino": 3,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 109,
+  "fields": {
+    "nodo_origen": 43,
+    "texto": "Formación",
+    "nodo_destino": 4,
+    "orden": 4
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 110,
+  "fields": {
+    "nodo_origen": 44,
+    "texto": "Concursos",
+    "nodo_destino": 16,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 111,
+  "fields": {
+    "nodo_origen": 44,
+    "texto": "Programas",
+    "nodo_destino": 17,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 112,
+  "fields": {
+    "nodo_origen": 44,
+    "texto": "Subsidios",
+    "nodo_destino": 18,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 113,
+  "fields": {
+    "nodo_origen": 44,
+    "texto": "Convocatorias / Plan IDEA",
+    "nodo_destino": 2,
+    "orden": 4
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 114,
+  "fields": {
+    "nodo_origen": 2,
+    "texto": "¿Qué es una línea de fomento?",
+    "nodo_destino": 44,
+    "orden": 6
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 115,
+  "fields": {
+    "nodo_origen": 45,
+    "texto": "Solicitar constancia",
+    "nodo_destino": 35,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 116,
+  "fields": {
+    "nodo_origen": 35,
+    "texto": "Ya tengo la constancia",
+    "nodo_destino": 45,
+    "orden": 6
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 117,
+  "fields": {
+    "nodo_origen": 3,
+    "texto": "Ya tengo la constancia",
+    "nodo_destino": 45,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 118,
+  "fields": {
+    "nodo_origen": 46,
+    "texto": "Ir al inicio",
+    "nodo_destino": 1,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 119,
+  "fields": {
+    "nodo_origen": 8,
+    "texto": "Necesito más información",
+    "nodo_destino": 46,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 120,
+  "fields": {
+    "nodo_origen": 9,
+    "texto": "Ir al inicio",
+    "nodo_destino": 1,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 121,
+  "fields": {
+    "nodo_origen": 10,
+    "texto": "Ir al inicio",
+    "nodo_destino": 1,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 122,
+  "fields": {
+    "nodo_origen": 47,
+    "texto": "Ir al inicio",
+    "nodo_destino": 1,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 123,
+  "fields": {
+    "nodo_origen": 6,
+    "texto": "¿Quiénes pueden registrarse?",
+    "nodo_destino": 47,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 124,
+  "fields": {
+    "nodo_origen": 6,
+    "texto": "Proceso y requisitos",
+    "nodo_destino": 48,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 125,
+  "fields": {
+    "nodo_origen": 6,
+    "texto": "No tengo usuario",
+    "nodo_destino": 49,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 126,
+  "fields": {
+    "nodo_origen": 49,
+    "texto": "Procesos y requisitos",
+    "nodo_destino": 48,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 127,
+  "fields": {
+    "nodo_origen": 47,
+    "texto": "Procesos y requisitos",
+    "nodo_destino": 48,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 128,
+  "fields": {
+    "nodo_origen": 5,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 129,
+  "fields": {
+    "nodo_origen": 5,
+    "texto": "Estado de mi postulación",
+    "nodo_destino": 15,
+    "orden": 3
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 130,
+  "fields": {
+    "nodo_origen": 50,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 131,
+  "fields": {
+    "nodo_origen": 5,
+    "texto": "Requisitos",
+    "nodo_destino": 50,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 132,
+  "fields": {
+    "nodo_origen": 4,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 11,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 133,
+  "fields": {
+    "nodo_origen": 51,
+    "texto": "Plan IDEA",
+    "nodo_destino": 2,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 134,
+  "fields": {
+    "nodo_origen": 51,
+    "texto": "Cash rebate",
+    "nodo_destino": 5,
+    "orden": 0
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 135,
+  "fields": {
+    "nodo_origen": 52,
+    "texto": "Ver convocatorias",
+    "nodo_destino": 11,
+    "orden": 1
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 136,
+  "fields": {
+    "nodo_origen": 52,
+    "texto": "Proceso de inscripción",
+    "nodo_destino": 12,
+    "orden": 2
+  }
+},
+{
+  "model": "chatbot.opcion",
+  "pk": 137,
+  "fields": {
+    "nodo_origen": 2,
+    "texto": "¿Qué es el Plan IDEA?",
+    "nodo_destino": 52,
+    "orden": 7
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 1,
+  "fields": {
+    "texto": "inscripción",
+    "nodo_destino": 43,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 2,
+  "fields": {
+    "texto": "postularme",
+    "nodo_destino": 12,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 3,
+  "fields": {
+    "texto": "registro",
+    "nodo_destino": 6,
+    "activo": true,
+    "prioridad": 3
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 4,
+  "fields": {
+    "texto": "exención",
+    "nodo_destino": 3,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 5,
+  "fields": {
+    "texto": "impuestos",
+    "nodo_destino": 3,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 6,
+  "fields": {
+    "texto": "ingresos brutos",
+    "nodo_destino": 3,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 7,
+  "fields": {
+    "texto": "actividades económicas",
+    "nodo_destino": 3,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 8,
+  "fields": {
+    "texto": "cash rebate",
+    "nodo_destino": 5,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 9,
+  "fields": {
+    "texto": "formación",
+    "nodo_destino": 4,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 10,
+  "fields": {
+    "texto": "curso",
+    "nodo_destino": 4,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 11,
+  "fields": {
+    "texto": "cine móvil",
+    "nodo_destino": 7,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 12,
+  "fields": {
+    "texto": "avales",
+    "nodo_destino": 9,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 13,
+  "fields": {
+    "texto": "convocatorias",
+    "nodo_destino": 43,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 14,
+  "fields": {
+    "texto": "concursos",
+    "nodo_destino": 2,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 15,
+  "fields": {
+    "texto": "idea",
+    "nodo_destino": 2,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 16,
+  "fields": {
+    "texto": "documentación",
+    "nodo_destino": 12,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 17,
+  "fields": {
+    "texto": "rebate",
+    "nodo_destino": 3,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 18,
+  "fields": {
+    "texto": "Rebate",
+    "nodo_destino": 5,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 19,
+  "fields": {
+    "texto": "Idea",
+    "nodo_destino": 2,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 20,
+  "fields": {
+    "texto": "Inscripción",
+    "nodo_destino": 43,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 21,
+  "fields": {
+    "texto": "inscripcion",
+    "nodo_destino": 43,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 22,
+  "fields": {
+    "texto": "inscribirme",
+    "nodo_destino": 43,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 23,
+  "fields": {
+    "texto": "anotarme",
+    "nodo_destino": 43,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 24,
+  "fields": {
+    "texto": "postular",
+    "nodo_destino": 43,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 25,
+  "fields": {
+    "texto": "Postularme",
+    "nodo_destino": 43,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 26,
+  "fields": {
+    "texto": "Aval",
+    "nodo_destino": 9,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 27,
+  "fields": {
+    "texto": "Plan Idea",
+    "nodo_destino": 2,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 28,
+  "fields": {
+    "texto": "plan idea",
+    "nodo_destino": 2,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 29,
+  "fields": {
+    "texto": "documentacion",
+    "nodo_destino": 14,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 30,
+  "fields": {
+    "texto": "línea de fomento",
+    "nodo_destino": 44,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 31,
+  "fields": {
+    "texto": "línea",
+    "nodo_destino": 44,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 32,
+  "fields": {
+    "texto": "linea",
+    "nodo_destino": 44,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 33,
+  "fields": {
+    "texto": "programas",
+    "nodo_destino": 11,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 34,
+  "fields": {
+    "texto": "subsidios",
+    "nodo_destino": 11,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 35,
+  "fields": {
+    "texto": "subsido",
+    "nodo_destino": 11,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 36,
+  "fields": {
+    "texto": "programa",
+    "nodo_destino": 11,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 37,
+  "fields": {
+    "texto": "DGR",
+    "nodo_destino": 45,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 38,
+  "fields": {
+    "texto": "dgr",
+    "nodo_destino": 45,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 39,
+  "fields": {
+    "texto": "trámite",
+    "nodo_destino": 45,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 40,
+  "fields": {
+    "texto": "tramite",
+    "nodo_destino": 45,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 41,
+  "fields": {
+    "texto": "escuelas",
+    "nodo_destino": 8,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 42,
+  "fields": {
+    "texto": "Escuelas",
+    "nodo_destino": 8,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 43,
+  "fields": {
+    "texto": "colegio",
+    "nodo_destino": 8,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 44,
+  "fields": {
+    "texto": "registrarme",
+    "nodo_destino": 6,
+    "activo": true,
+    "prioridad": 3
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 45,
+  "fields": {
+    "texto": "requisitos cash rebate",
+    "nodo_destino": 50,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 46,
+  "fields": {
+    "texto": "corto",
+    "nodo_destino": 16,
+    "activo": true,
+    "prioridad": 3
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 47,
+  "fields": {
+    "texto": "cortometraje",
+    "nodo_destino": 16,
+    "activo": true,
+    "prioridad": 3
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 48,
+  "fields": {
+    "texto": "concurso",
+    "nodo_destino": 16,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 49,
+  "fields": {
+    "texto": "laboratorio",
+    "nodo_destino": 17,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 50,
+  "fields": {
+    "texto": "lab",
+    "nodo_destino": 17,
+    "activo": true,
+    "prioridad": 5
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 51,
+  "fields": {
+    "texto": "largometraje",
+    "nodo_destino": 51,
+    "activo": true,
+    "prioridad": 3
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 52,
+  "fields": {
+    "texto": "largo",
+    "nodo_destino": 51,
+    "activo": true,
+    "prioridad": 3
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 53,
+  "fields": {
+    "texto": "largos",
+    "nodo_destino": 51,
+    "activo": true,
+    "prioridad": 3
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 54,
+  "fields": {
+    "texto": "largometrajes",
+    "nodo_destino": 51,
+    "activo": true,
+    "prioridad": 3
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 55,
+  "fields": {
+    "texto": "cash",
+    "nodo_destino": 5,
+    "activo": true,
+    "prioridad": 10
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 56,
+  "fields": {
+    "texto": "publicidad",
+    "nodo_destino": 51,
+    "activo": true,
+    "prioridad": 3
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 57,
+  "fields": {
+    "texto": "TV",
+    "nodo_destino": 51,
+    "activo": true,
+    "prioridad": 1
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 58,
+  "fields": {
+    "texto": "serie",
+    "nodo_destino": 51,
+    "activo": true,
+    "prioridad": 3
+  }
+},
+{
+  "model": "chatbot.palabraclave",
+  "pk": 59,
+  "fields": {
+    "texto": "series",
+    "nodo_destino": 51,
+    "activo": true,
+    "prioridad": 3
+  }
+}
+]

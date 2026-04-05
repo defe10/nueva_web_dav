@@ -24,6 +24,9 @@ urlpatterns = [
 
     # Backoffice
     path("backoffice/", include("backoffice.urls")),
+    
+    # Chatbot
+    path('chatbot/', include('chatbot.urls')),
 ]
 
 if settings.DEBUG:

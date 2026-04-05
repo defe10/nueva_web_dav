@@ -1,0 +1,73 @@
+<div class="card shadow-sm border-0 rounded-4 chatbot-card">
+
+    <!-- HEADER -->
+    <div class="card-header header-dav rounded-top-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="mb-0">dav.</h1>
+            <small class="text-white texto-liviano">Asistente virtual</small>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'chatbot_volver' %}" class="btn btn-light btn-sm chatbot-nav-btn" data-chat-action="volver">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+
+            <a href="{% url 'chatbot_inicio' %}" class="btn btn-light btn-sm chatbot-nav-btn" data-chat-action="inicio">
+                <i class="bi bi-house"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- CUERPO DEL CHAT -->
+    <div class="chatbot-body" id="chatbot-body">
+
+        {% for mensaje in historial %}
+            {% if mensaje.tipo == "bot" %}
+                <div class="d-flex mb-3 mensaje-fade">
+                    <div class="d-flex align-items-start gap-2">
+                        <div class="chatbot-avatar">dav.</div>
+
+                        <div class="bot-message">
+                            <div class="mensaje-texto">{{ mensaje.texto|safe }}</div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="d-flex justify-content-end mb-3 mensaje-fade">
+                    <div class="user-message">
+                        <div class="mensaje-texto">{{ mensaje.texto|linebreaksbr }}</div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        {% if nodo.opciones.all %}
+            <div class="chatbot-options">
+                {% for opcion in nodo.opciones.all %}
+                    <a href="{% url 'ver_nodo' opcion.id %}" class="btn btn-outline-primary chatbot-chip chatbot-option-link">
+                        {{ opcion.texto }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    </div>
+
+    <!-- INPUT FIJO -->
+    <div class="chatbot-input-container">
+        <form id="chatbot-form" action="{% url 'chatbot_buscar' %}" method="post">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="text"
+                       name="consulta"
+                       id="chatbot-input"
+                       class="form-control"
+                       placeholder="Escribí tu consulta...">
+                <button type="submit" class="btn btn-enviar">
+                    Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
