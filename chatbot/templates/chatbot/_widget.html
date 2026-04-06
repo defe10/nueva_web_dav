@@ -2,19 +2,24 @@
 
     <!-- HEADER -->
     <div class="card-header header-dav rounded-top-4 d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="mb-0">dav.</h1>
-            <small class="text-white texto-liviano">Asistente virtual</small>
+        <div class="d-flex align-items-center gap-2">
+            <div>
+                <h1 class="mb-0">dav.</h1>
+                <small class="text-white texto-liviano">Asistente virtual</small>
+            </div>
         </div>
 
         <div class="d-flex gap-2">
+
             <a href="{% url 'chatbot_volver' %}" class="btn btn-light btn-sm chatbot-nav-btn" data-chat-action="volver">
                 <i class="bi bi-arrow-left"></i>
             </a>
 
+            <!-- 🏠 INICIO DEL CHAT -->
             <a href="{% url 'chatbot_inicio' %}" class="btn btn-light btn-sm chatbot-nav-btn" data-chat-action="inicio">
                 <i class="bi bi-house"></i>
             </a>
+
         </div>
     </div>
 

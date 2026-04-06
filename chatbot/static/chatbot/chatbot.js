@@ -4,6 +4,13 @@ document.addEventListener("DOMContentLoaded", function () {
     scrollChatToBottom(true);
 });
 
+document.addEventListener("click", function (e) {
+    const botonNodo = e.target.closest(".mensaje-texto a.btn");
+    if (!botonNodo) return;
+
+    window.parent.postMessage({ accion: "cerrar_chatbot" }, "*");
+});
+
 function scrollChatToBottom(force = false) {
     const chatBody = document.getElementById("chatbot-body");
     if (!chatBody) return;
@@ -33,13 +40,20 @@ function prepararChatVisible() {
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-            if (document.activeElement) {
-                document.activeElement.blur();
-            }
-
             chatBody.classList.add("chat-ready");
+            enfocarInputChat();
         });
     });
+}
+
+function enfocarInputChat() {
+    const input = document.getElementById("chatbot-input");
+    if (!input) return;
+
+    input.focus();
+
+    const largo = input.value.length;
+    input.setSelectionRange(largo, largo);
 }
 
 function agregarMensajeUsuario(texto) {
@@ -53,6 +67,7 @@ function agregarMensajeUsuario(texto) {
             <div class="mensaje-texto"></div>
         </div>
     `;
+
     userWrapper.querySelector(".mensaje-texto").textContent = texto;
     chatBody.appendChild(userWrapper);
 }
@@ -73,6 +88,7 @@ function agregarTyping() {
             </div>
         </div>
     `;
+
     chatBody.appendChild(botWrapper);
     return botWrapper;
 }

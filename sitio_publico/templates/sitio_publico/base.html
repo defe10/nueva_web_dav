@@ -126,6 +126,18 @@
               </a>
             </li>
 
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'chatbot_inicio' %}">
+                Ayuda
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="#contacto">
+                Contacto
+              </a>
+            </li>
+
             {% if user.is_authenticated %}
               <li class="nav-item dropdown ms-2">
                 <a class="btn btn-outline-secondary btn-sm dropdown-toggle"
@@ -275,7 +287,7 @@
             </ul>
           </div>
 
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" id="contacto">
             <h6 class="text-uppercase fw-bold small">Contacto</h6>
             <p class="small text-muted mb-1">audiovisuales@edusalta.gov.ar</p>
             <p class="small text-muted mb-1">+54 387 495 4287</p>

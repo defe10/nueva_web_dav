@@ -10,7 +10,7 @@
     height: 64px;
     border: none;
     border-radius: 50%;
-    background: #e0007a;
+    background: #0dcaf0;
     color: #fff;
     font-weight: 700;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
@@ -29,10 +29,20 @@
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
     z-index: 9998;
+
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transform-origin: bottom right;
+
+    transition:
+        transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.25s ease;
 }
 
 #dav-panel.dav-hidden {
-    display: none;
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+    pointer-events: none;
 }
 
 #dav-iframe {
