@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     activarChatbot();
     prepararChatVisible();
-    scrollChatToBottom(true);
+    scrollInicialOIntercambio();
 });
 
 document.addEventListener("click", function (e) {
@@ -32,6 +32,26 @@ function scrollChatToTopMessage() {
     chatBody.scrollTop = 0;
 }
 
+function scrollInicialOIntercambio() {
+    const chatBody = document.getElementById("chatbot-body");
+    if (!chatBody) return;
+
+    const mensajesUsuario = chatBody.querySelectorAll(".d-flex.justify-content-end");
+
+    if (!mensajesUsuario.length) {
+        chatBody.scrollTop = 0;
+        return;
+    }
+
+    const ultimoMensajeUsuario = mensajesUsuario[mensajesUsuario.length - 1];
+
+    // 🔥 cálculo relativo al contenedor (NO a la página)
+    const offsetTopRelativo =
+        ultimoMensajeUsuario.offsetTop - chatBody.offsetTop;
+
+    chatBody.scrollTop = offsetTopRelativo - 12; // margen arriba
+}
+
 function prepararChatVisible() {
     const chatBody = document.getElementById("chatbot-body");
     if (!chatBody) return;
@@ -41,19 +61,8 @@ function prepararChatVisible() {
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             chatBody.classList.add("chat-ready");
-            enfocarInputChat();
         });
     });
-}
-
-function enfocarInputChat() {
-    const input = document.getElementById("chatbot-input");
-    if (!input) return;
-
-    input.focus();
-
-    const largo = input.value.length;
-    input.setSelectionRange(largo, largo);
 }
 
 function agregarMensajeUsuario(texto) {
@@ -106,7 +115,7 @@ function activarChatbot() {
 
             agregarMensajeUsuario(texto);
             agregarTyping();
-            scrollChatToBottom();
+            scrollInicialOIntercambio();
 
             document.querySelectorAll(".chatbot-option-link").forEach(btn => {
                 btn.style.pointerEvents = "none";
@@ -124,7 +133,7 @@ function activarChatbot() {
                         container.innerHTML = data.widget_html;
                         activarChatbot();
                         prepararChatVisible();
-                        scrollChatToBottom(true);
+                        scrollInicialOIntercambio();
                     }, 450);
                 })
                 .catch(() => {
@@ -155,9 +164,9 @@ function activarChatbot() {
                     prepararChatVisible();
 
                     if (action === "inicio") {
-                        scrollChatToTopMessage();
-                    } else {
                         scrollChatToBottom(true);
+                    } else {
+                        scrollInicialOIntercambio();
                     }
                 })
                 .catch(() => {
@@ -180,7 +189,7 @@ function activarChatbot() {
 
             agregarMensajeUsuario(texto);
             agregarTyping();
-            scrollChatToBottom();
+            scrollInicialOIntercambio();
 
             const formData = new FormData(form);
             input.value = "";
@@ -198,7 +207,7 @@ function activarChatbot() {
                         container.innerHTML = data.widget_html;
                         activarChatbot();
                         prepararChatVisible();
-                        scrollChatToBottom(true);
+                        scrollInicialOIntercambio();
                     }, 450);
                 })
                 .catch(() => {
