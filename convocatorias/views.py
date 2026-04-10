@@ -451,6 +451,25 @@ def confirmar_documentacion_personal(request, postulacion_id):
 
     # Si no hay pendientes pero ya hay enviados, no reenviar
     if not qs_pendientes.exists():
+        if es_linea_libre and postulacion.estado != "enviado":
+            postulacion.estado = "enviado"
+            if not postulacion.fecha_envio:
+                ultimo_envio = (
+                    DocumentoPostulacion.objects.filter(
+                        postulacion=postulacion,
+                        tipo="PERSONAL",
+                        estado="ENVIADO",
+                    )
+                    .order_by("-fecha_envio")
+                    .first()
+                )
+                postulacion.fecha_envio = (
+                    ultimo_envio.fecha_envio if ultimo_envio and ultimo_envio.fecha_envio else timezone.now()
+                )
+                postulacion.save(update_fields=["estado", "fecha_envio"])
+            else:
+                postulacion.save(update_fields=["estado"])
+
         messages.info(request, "Tu documentación personal ya fue enviada.")
         if es_linea_libre:
             return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
