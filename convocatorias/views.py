@@ -447,13 +447,24 @@ def confirmar_documentacion_personal(request, postulacion_id):
         estado="PENDIENTE",
     )
 
+    es_linea_libre = (postulacion.convocatoria.linea or "").lower() == "libre"
+
     # Si no hay pendientes pero ya hay enviados, no reenviar
     if not qs_pendientes.exists():
         messages.info(request, "Tu documentación personal ya fue enviada.")
+        if es_linea_libre:
+            return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
         return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
 
     ahora = timezone.now()
     qs_pendientes.update(estado="ENVIADO", fecha_envio=ahora)
+
+    if es_linea_libre:
+        postulacion.estado = "enviado"
+        postulacion.fecha_envio = ahora
+        postulacion.save(update_fields=["estado", "fecha_envio"])
+        messages.success(request, "Documentación personal enviada correctamente. Tu postulación quedó registrada.")
+        return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
 
     messages.success(request, "Documentación personal enviada correctamente.")
     return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
@@ -801,4 +812,3 @@ def subir_documentacion_proyecto(request, postulacion_id):
             "documentos_enviados": documentos_enviados,
         },
     )
-
