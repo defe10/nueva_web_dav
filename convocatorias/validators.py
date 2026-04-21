@@ -34,6 +34,6 @@ def validar_documento_admitido(archivo):
 
 
 def validar_tamano_archivo(archivo):
-    max_mb = 5  # ajustable
+    max_mb = 25  # ajustable
     if archivo.size > max_mb * 1024 * 1024:
         raise ValidationError(f"El archivo no puede superar los {max_mb} MB.")
