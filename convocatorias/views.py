@@ -27,7 +27,7 @@ from .forms import (
 # ============================================================
 
 MAX_DOCS_POR_TIPO = {
-    "PERSONAL": 3,
+    "PERSONAL": 5,
     "PROYECTO": 3,
     "SUBSANADO": 3,
 }
