@@ -113,7 +113,7 @@ def convocatorias_home(request):
 def inscribirse_convocatoria(request, slug):
     convocatoria = get_object_or_404(Convocatoria, slug=slug)
     linea = (convocatoria.linea or "").lower()
-    hoy = timezone.now().date()
+    hoy = timezone.localdate()
 
     # ✅ bloqueo por fechas
     if hoy < convocatoria.fecha_inicio:
@@ -242,7 +242,7 @@ def inscribirse_convocatoria(request, slug):
 def postular_convocatoria(request, convocatoria_id):
     convocatoria = get_object_or_404(Convocatoria, id=convocatoria_id)
     user = request.user
-    hoy = timezone.now().date()
+    hoy = timezone.localdate()
 
     # ✅ bloqueo por fechas
     if hoy < convocatoria.fecha_inicio:

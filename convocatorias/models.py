@@ -127,7 +127,7 @@ class Convocatoria(models.Model):
 
     @property
     def vigente(self):
-        hoy = timezone.now().date()
+        hoy = timezone.localdate()
         return self.fecha_inicio <= hoy <= self.fecha_fin
 
     def save(self, *args, **kwargs):
