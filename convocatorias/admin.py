@@ -26,7 +26,10 @@ from .models import (
     ObservacionAdministrativa,
     AsignacionJuradoConvocatoria,
     InscripcionFormacion,
-    Rendicion,  # ✅ NUEVO
+    Rendicion,
+    ConfiguracionPostulacion,
+    IntegrantePostulacion,
+    DocumentoIntegrante,
 )
 
 
@@ -71,6 +74,26 @@ class ConvocatoriaAdmin(admin.ModelAdmin):
             obj.url_destino
         )
     url_destino_admin.short_description = "URL destino"
+
+
+# ============================================================
+# INTEGRANTES DEL EQUIPO (inline en Postulación)
+# ============================================================
+class DocumentoIntegranteInline(admin.TabularInline):
+    model = DocumentoIntegrante
+    extra = 0
+    can_delete = False
+    fields = ("tipo", "estado", "archivo", "fecha_subida")
+    readonly_fields = ("archivo", "fecha_subida")
+
+
+class IntegrantePostulacionInline(admin.StackedInline):
+    model = IntegrantePostulacion
+    extra = 0
+    can_delete = False
+    fields = ("rol", "nombre_busqueda", "persona_humana", "verificado")
+    readonly_fields = ("verificado",)
+    show_change_link = True
 
 
 # ============================================================
@@ -153,7 +176,7 @@ class PostulacionAdmin(admin.ModelAdmin):
         "lugar_residencia",
     )
 
-    inlines = [PostulacionDocumentoInline]
+    inlines = [IntegrantePostulacionInline, PostulacionDocumentoInline]
 
     # ==================================================
     # FIELDSETS DINÁMICOS (línea libre: oculta “Datos del proyecto”)
@@ -921,6 +944,71 @@ class RendicionAdmin(admin.ModelAdmin):
     estado_postulacion.short_description = "Estado"
 
 
+
+
+# ============================================================
+# CONFIGURACIÓN DE POSTULACIÓN (inline en Convocatoria)
+# ============================================================
+class ConfiguracionPostulacionInline(admin.StackedInline):
+    model = ConfiguracionPostulacion
+    can_delete = False
+    verbose_name = "Configuración de postulación"
+    verbose_name_plural = "Configuración de postulación"
+    fieldsets = (
+        ("Equipo", {
+            "fields": (
+                "requiere_director",
+                "requiere_guionista",
+                "requiere_realizador",
+                "requiere_cbu",
+            )
+        }),
+        ("Proyecto — texto", {
+            "fields": (
+                "requiere_sinopsis",
+                "requiere_link_pitch",
+            )
+        }),
+        ("Proyecto — documentos", {
+            "description": "Activá los documentos que se mostrarán en el formulario. Todos son opcionales para el postulante.",
+            "fields": (
+                "mostrar_guion",
+                "mostrar_dossier",
+                "mostrar_material_adicional",
+                "mostrar_planilla_oficial",
+                "mostrar_dnda",
+                "mostrar_autorizacion_derechos",
+                "mostrar_nota_intencion",
+                "mostrar_carta_intencion",
+                "mostrar_constancia_invitacion",
+            )
+        }),
+    )
+
+
+# ============================================================
+# REGISTRO ADMIN NUEVOS MODELOS
+# ============================================================
+@admin.register(ConfiguracionPostulacion)
+class ConfiguracionPostulacionAdmin(admin.ModelAdmin):
+    list_display  = ("convocatoria", "requiere_director", "requiere_guionista", "requiere_realizador")
+    list_filter   = ("requiere_director", "requiere_guionista")
+    search_fields = ("convocatoria__titulo",)
+
+
+@admin.register(IntegrantePostulacion)
+class IntegrantePostulacionAdmin(admin.ModelAdmin):
+    list_display  = ("postulacion", "rol", "nombre_busqueda", "persona_humana", "verificado")
+    list_filter   = ("rol", "verificado")
+    search_fields = ("nombre_busqueda", "persona_humana__nombre_completo", "postulacion__nombre_proyecto")
+    inlines       = [DocumentoIntegranteInline]
+
+
+# ============================================================
+# CONVOCATORIA — agregar ConfiguracionPostulacion inline
+# ============================================================
+# (parchamos el ConvocatoriaAdmin ya registrado)
+ConvocatoriaAdmin.inlines = [ConfiguracionPostulacionInline]
 
 
 # @admin.register(DocumentoPostulacion)
