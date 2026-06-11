@@ -1,0 +1,69 @@
+{% extends "convocatorias/wizard/base_wizard.html" %}
+
+{% block wizard_content %}
+<div class="dav-card">
+  <div class="dav-card-body">
+
+    <h3 class="mb-1">Documentación del proyecto</h3>
+    <p class="text-muted mb-4">Todos los documentos son opcionales. Subí los que tenés disponibles.</p>
+
+    {% if not docs_activos %}
+      <div class="alert alert-info">Esta convocatoria no requiere documentación adicional del proyecto.</div>
+    {% else %}
+
+      {% for tipo, label in docs_activos %}
+      <div class="mb-4 pb-3 border-bottom">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="fw-semibold">{{ label }}</span>
+          {% with archivos=docs_subidos|default_if_none:'' %}
+            {% if docs_subidos %}
+              {% if tipo in docs_subidos and docs_subidos|length > 0 %}
+                <span class="badge bg-success">✓ Subido</span>
+              {% else %}
+                <span class="badge bg-light text-dark border">Opcional</span>
+              {% endif %}
+            {% endif %}
+          {% endwith %}
+        </div>
+
+        {% if docs_subidos %}
+          {% for doc_tipo, doc_lista in docs_subidos.items %}
+            {% if doc_tipo == tipo %}
+              {% for doc in doc_lista %}
+                <p class="small text-muted mb-1">
+                  ✓ {{ doc.archivo.name|slice:"-40:" }}
+                  <a href="{% url 'convocatorias:eliminar_documento_postulacion' doc.id %}"
+                     class="text-danger ms-2 small"
+                     onclick="return confirm('¿Eliminar este archivo?')">eliminar</a>
+                </p>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="accion" value="subir">
+          <input type="hidden" name="tipo" value="{{ tipo }}">
+          <div class="d-flex gap-2 align-items-center flex-wrap">
+            <input type="file" name="archivo" class="form-control form-control-sm" style="max-width:300px;" accept=".pdf,.xls,.xlsx">
+            <button type="submit" class="btn btn-sm btn-outline-primary">Subir</button>
+          </div>
+        </form>
+      </div>
+      {% endfor %}
+
+    {% endif %}
+
+    <!-- SIGUIENTE -->
+    <div class="text-end mt-4">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="siguiente">
+        <button type="submit" class="btn btn-primary px-4">Siguiente →</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

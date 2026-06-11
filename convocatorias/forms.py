@@ -4,9 +4,11 @@ from django.utils.text import slugify
 from .models import (
     Postulacion,
     Convocatoria,
-    Jurado,  # lo dejo porque lo importabas (aunque no lo uses acá)
+    Jurado,
     DocumentoPostulacion,
-    InscripcionFormacion,  # ✅ NUEVO
+    DocumentoIntegrante,
+    IntegrantePostulacion,
+    InscripcionFormacion,
 )
 
 
@@ -119,6 +121,129 @@ class ConvocatoriaForm(forms.ModelForm):
     # No sobrescribimos save() para slug.
     # Tu modelo ya crea un slug único en Convocatoria.save().
     # Si lo pisás acá con slugify(titulo), podés duplicar y romper unique=True.
+
+
+# ============================================================
+# WIZARD — PASO 1: PRODUCTOR (solo CBU)
+# ============================================================
+class ProductorCBUForm(forms.ModelForm):
+    class Meta:
+        model = Postulacion
+        fields = ["cbu"]
+        widgets = {
+            "cbu": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ej: 0000000000000000000000",
+                "maxlength": 30,
+            })
+        }
+
+    def __init__(self, *args, requiere_cbu=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["cbu"].required = requiere_cbu
+        if not requiere_cbu:
+            self.fields["cbu"].widget = forms.HiddenInput()
+
+
+# ============================================================
+# WIZARD — DOCUMENTO DE INTEGRANTE (DNI o ARCA)
+# ============================================================
+class DocumentoIntegranteForm(forms.ModelForm):
+    class Meta:
+        model = DocumentoIntegrante
+        fields = ["tipo", "archivo"]
+        widgets = {
+            "tipo": forms.Select(attrs={"class": "form-select"}),
+            "archivo": forms.ClearableFileInput(attrs={"class": "form-control"}),
+        }
+
+
+# ============================================================
+# WIZARD — PASO 2/3/4: BUSCAR INTEGRANTE (director / guionista / realizador)
+# ============================================================
+class IntegranteSearchForm(forms.Form):
+    nombre_busqueda = forms.CharField(
+        label="Nombre completo",
+        max_length=200,
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Escribí el nombre completo tal como figura en el registro",
+            "autocomplete": "off",
+        })
+    )
+
+
+# ============================================================
+# WIZARD — PASO PROYECTO: datos del proyecto
+# ============================================================
+class ProyectoDataForm(forms.ModelForm):
+    class Meta:
+        model = Postulacion
+        fields = [
+            "nombre_proyecto",
+            "tipo_proyecto",
+            "genero",
+            "sinopsis_corta",
+            "link_pitch",
+        ]
+        widgets = {
+            "nombre_proyecto": forms.TextInput(attrs={"class": "form-control"}),
+            "tipo_proyecto":   forms.Select(attrs={"class": "form-select"}),
+            "genero":          forms.Select(attrs={"class": "form-select"}),
+            "sinopsis_corta":  forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 6,
+                "maxlength": 3000,
+                "placeholder": "Máximo 3000 caracteres.",
+            }),
+            "link_pitch": forms.URLInput(attrs={
+                "class": "form-control",
+                "placeholder": "https://...",
+            }),
+        }
+
+    def __init__(self, *args, config=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Sinopsis y pitch: obligatorios solo si la config los exige
+        self.fields["sinopsis_corta"].required = bool(config and config.requiere_sinopsis)
+        self.fields["link_pitch"].required = bool(config and config.requiere_link_pitch)
+
+        # Si no se muestran, los ocultamos
+        if config and not config.requiere_sinopsis:
+            self.fields["sinopsis_corta"].widget.attrs["placeholder"] = "Opcional"
+        if config and not config.requiere_link_pitch:
+            self.fields["link_pitch"].widget.attrs["placeholder"] = "Opcional"
+
+    def clean_sinopsis_corta(self):
+        valor = self.cleaned_data.get("sinopsis_corta", "")
+        if len(valor) > 3000:
+            raise forms.ValidationError("La sinopsis no puede superar los 3000 caracteres.")
+        return valor
+
+
+# ============================================================
+# WIZARD — PASO DOCUMENTACIÓN: subida de archivos del proyecto
+# ============================================================
+class DocumentoProyectoForm(forms.ModelForm):
+    class Meta:
+        model = DocumentoPostulacion
+        fields = ["tipo", "archivo"]
+        widgets = {
+            "tipo":    forms.HiddenInput(),
+            "archivo": forms.ClearableFileInput(attrs={"class": "form-control"}),
+        }
+
+
+# ============================================================
+# WIZARD — PASO CONFIRMACIÓN: declaración jurada
+# ============================================================
+class DeclaracionJuradaForm(forms.Form):
+    declaracion_jurada = forms.BooleanField(
+        required=True,
+        label="Declaro bajo juramento que la información presentada es verdadera y acepto las bases y condiciones de la convocatoria.",
+        error_messages={"required": "Debés aceptar la declaración jurada para enviar la postulación."},
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+    )
 
 
 # ============================================================

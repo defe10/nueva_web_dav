@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Q
 
@@ -12,6 +13,8 @@ from convocatorias.models import (
     Convocatoria,
     Postulacion,
     DocumentoPostulacion,
+    DocumentoIntegrante,
+    IntegrantePostulacion,
     InscripcionFormacion,
     Rendicion,
 )
@@ -20,6 +23,12 @@ from .forms import (
     PostulacionForm,
     ConvocatoriaForm,
     InscripcionFormacionForm,
+    ProductorCBUForm,
+    IntegranteSearchForm,
+    ProyectoDataForm,
+    DocumentoProyectoForm,
+    DocumentoIntegranteForm,
+    DeclaracionJuradaForm,
 )
 
 # ============================================================
@@ -831,3 +840,323 @@ def subir_documentacion_proyecto(request, postulacion_id):
             "documentos_enviados": documentos_enviados,
         },
     )
+
+
+# ============================================================
+# WIZARD DE POSTULACIÓN — NUEVO FLUJO
+# ============================================================
+
+PASOS_INTEGRANTES = {
+    "director":  "DIRECTOR",
+    "guionista": "GUIONISTA",
+    "realizador": "REALIZADOR",
+}
+
+DOCS_PROYECTO_CONFIG = [
+    ("GUION",                 "mostrar_guion",                "Guion"),
+    ("DOSSIER",               "mostrar_dossier",              "Dossier del proyecto"),
+    ("MATERIAL_ADICIONAL",    "mostrar_material_adicional",   "Material adicional"),
+    ("PLANILLA_OFICIAL",      "mostrar_planilla_oficial",     "Planilla oficial"),
+    ("REGISTRO_DNDA",         "mostrar_dnda",                 "Registro DNDA"),
+    ("AUTORIZACION_DERECHOS", "mostrar_autorizacion_derechos","Autorización de derechos"),
+    ("NOTA_INTENCION",        "mostrar_nota_intencion",       "Nota de intención / documentación"),
+    ("CARTA_INTENCION",       "mostrar_carta_intencion",      "Carta de intención"),
+    ("CONSTANCIA_INVITACION", "mostrar_constancia_invitacion","Constancia de invitación/participación"),
+]
+
+
+def _get_pasos(config):
+    pasos = ["productor"]
+    if config:
+        if config.requiere_director:
+            pasos.append("director")
+        if config.requiere_guionista:
+            pasos.append("guionista")
+        if config.requiere_realizador:
+            pasos.append("realizador")
+    pasos += ["proyecto", "documentacion", "confirmacion"]
+    return pasos
+
+
+def _get_persona_productor(user):
+    try:
+        return user.persona_humana
+    except PersonaHumana.DoesNotExist:
+        return None
+
+
+def _docs_proyecto_activos(config):
+    """Retorna lista de (tipo, label) según la configuración de la convocatoria."""
+    if not config:
+        return []
+    return [
+        (tipo, label)
+        for tipo, attr, label in DOCS_PROYECTO_CONFIG
+        if getattr(config, attr, False)
+    ]
+
+
+# ── Inicio: crea o recupera el borrador y redirige al paso 1 ──────────────────
+@login_required(login_url="/usuarios/login/")
+def wizard_inicio(request, convocatoria_id):
+    convocatoria = get_object_or_404(Convocatoria, pk=convocatoria_id)
+
+    persona_humana = _get_persona_productor(request.user)
+    if not persona_humana:
+        messages.error(request, "Debés completar tu Registro Audiovisual antes de postularte.")
+        return redirect("registro_audiovisual:mi_registro")
+
+    postulacion = Postulacion.objects.filter(
+        user=request.user,
+        convocatoria=convocatoria,
+        estado="borrador",
+    ).first()
+
+    if not postulacion:
+        postulacion = Postulacion.objects.create(
+            user=request.user,
+            convocatoria=convocatoria,
+            estado="borrador",
+        )
+        IntegrantePostulacion.objects.create(
+            postulacion=postulacion,
+            rol="PRODUCTOR",
+            persona_humana=persona_humana,
+            verificado=True,
+        )
+
+    config = getattr(convocatoria, "configuracion", None)
+    pasos = _get_pasos(config)
+    return redirect("convocatorias:wizard_paso", postulacion_id=postulacion.id, paso=pasos[0])
+
+
+# ── Router principal ──────────────────────────────────────────────────────────
+@login_required(login_url="/usuarios/login/")
+def wizard_paso(request, postulacion_id, paso):
+    postulacion = get_object_or_404(Postulacion, pk=postulacion_id, user=request.user)
+
+    if postulacion.estado == "enviado":
+        return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
+
+    convocatoria = postulacion.convocatoria
+    config = getattr(convocatoria, "configuracion", None)
+    pasos = _get_pasos(config)
+
+    if paso not in pasos:
+        return redirect("convocatorias:wizard_paso", postulacion_id=postulacion_id, paso=pasos[0])
+
+    idx = pasos.index(paso)
+    ctx = {
+        "postulacion":    postulacion,
+        "convocatoria":   convocatoria,
+        "config":         config,
+        "pasos":          pasos,
+        "paso_actual":    paso,
+        "paso_num":       idx + 1,
+        "total_pasos":    len(pasos),
+        "paso_siguiente": pasos[idx + 1] if idx + 1 < len(pasos) else None,
+        "paso_anterior":  pasos[idx - 1] if idx > 0 else None,
+    }
+
+    handlers = {
+        "productor":    _paso_productor,
+        "proyecto":     _paso_proyecto,
+        "documentacion":_paso_documentacion,
+        "confirmacion": _paso_confirmacion,
+    }
+    # Pasos de integrantes (director, guionista, realizador)
+    for nombre_paso, rol in PASOS_INTEGRANTES.items():
+        handlers[nombre_paso] = lambda req, post, cfg, c, _rol=rol: _paso_integrante(req, post, cfg, c, _rol)
+
+    return handlers[paso](request, postulacion, config, ctx)
+
+
+# ── Paso 1: Productor ─────────────────────────────────────────────────────────
+def _paso_productor(request, postulacion, config, ctx):
+    persona = _get_persona_productor(request.user)
+    integrante = postulacion.integrantes.filter(rol="PRODUCTOR").first()
+
+    requiere_cbu = bool(config and config.requiere_cbu)
+    form = ProductorCBUForm(instance=postulacion, requiere_cbu=requiere_cbu)
+
+    if request.method == "POST":
+        form = ProductorCBUForm(request.POST, instance=postulacion, requiere_cbu=requiere_cbu)
+        if form.is_valid():
+            form.save()
+            paso_sig = ctx["paso_siguiente"]
+            return redirect("convocatorias:wizard_paso", postulacion_id=postulacion.id, paso=paso_sig)
+
+    ctx.update({
+        "persona":      persona,
+        "integrante":   integrante,
+        "form":         form,
+        "requiere_cbu": requiere_cbu,
+        "docs_dni":     integrante.documentos.filter(tipo="DNI").first() if integrante else None,
+        "docs_arca":    integrante.documentos.filter(tipo="CONSTANCIA_ARCA").first() if integrante else None,
+    })
+    return render(request, "convocatorias/wizard/paso_productor.html", ctx)
+
+
+# ── Subir documento de integrante (DNI o ARCA) — POST único ──────────────────
+@login_required(login_url="/usuarios/login/")
+def subir_doc_integrante(request, postulacion_id, rol):
+    postulacion = get_object_or_404(Postulacion, pk=postulacion_id, user=request.user)
+    integrante = get_object_or_404(IntegrantePostulacion, postulacion=postulacion, rol=rol.upper())
+
+    if request.method == "POST":
+        tipo = request.POST.get("tipo")
+        archivo = request.FILES.get("archivo")
+        if tipo and archivo:
+            DocumentoIntegrante.objects.update_or_create(
+                integrante=integrante,
+                tipo=tipo,
+                defaults={"archivo": archivo},
+            )
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+# ── Pasos 2/3/4: Integrante (director, guionista, realizador) ─────────────────
+def _paso_integrante(request, postulacion, config, ctx, rol):
+    label = dict(IntegrantePostulacion.ROLES).get(rol, rol)
+    integrante = postulacion.integrantes.filter(rol=rol).first()
+    form = IntegranteSearchForm()
+    resultados = []
+    buscado = False
+
+    if request.method == "POST":
+        accion = request.POST.get("accion")
+
+        if accion == "buscar":
+            form = IntegranteSearchForm(request.POST)
+            if form.is_valid():
+                nombre = form.cleaned_data["nombre_busqueda"]
+                resultados = PersonaHumana.objects.filter(nombre_completo__icontains=nombre)[:10]
+                buscado = True
+
+        elif accion == "seleccionar":
+            persona_id = request.POST.get("persona_id")
+            persona = get_object_or_404(PersonaHumana, pk=persona_id)
+            integrante, _ = IntegrantePostulacion.objects.update_or_create(
+                postulacion=postulacion,
+                rol=rol,
+                defaults={
+                    "persona_humana": persona,
+                    "nombre_busqueda": persona.nombre_completo,
+                    "verificado": True,
+                },
+            )
+            messages.success(request, f"{label} vinculado: {persona.nombre_completo}")
+            return redirect("convocatorias:wizard_paso", postulacion_id=postulacion.id, paso=ctx["paso_actual"])
+
+        elif accion == "siguiente":
+            if not integrante or not integrante.verificado:
+                messages.error(request, f"Debés buscar y seleccionar al/a la {label} antes de continuar.")
+            else:
+                return redirect("convocatorias:wizard_paso", postulacion_id=postulacion.id, paso=ctx["paso_siguiente"])
+
+    ctx.update({
+        "rol":        rol,
+        "label":      label,
+        "integrante": integrante,
+        "form":       form,
+        "resultados": resultados,
+        "buscado":    buscado,
+        "docs_dni":   integrante.documentos.filter(tipo="DNI").first() if integrante else None,
+        "docs_arca":  integrante.documentos.filter(tipo="CONSTANCIA_ARCA").first() if integrante else None,
+    })
+    return render(request, "convocatorias/wizard/paso_integrante.html", ctx)
+
+
+# ── Paso Proyecto ─────────────────────────────────────────────────────────────
+def _paso_proyecto(request, postulacion, config, ctx):
+    form = ProyectoDataForm(instance=postulacion, config=config)
+
+    if request.method == "POST":
+        form = ProyectoDataForm(request.POST, instance=postulacion, config=config)
+        if form.is_valid():
+            form.save()
+            return redirect("convocatorias:wizard_paso", postulacion_id=postulacion.id, paso=ctx["paso_siguiente"])
+
+    ctx["form"] = form
+    return render(request, "convocatorias/wizard/paso_proyecto.html", ctx)
+
+
+# ── Paso Documentación del proyecto ──────────────────────────────────────────
+def _paso_documentacion(request, postulacion, config, ctx):
+    docs_activos = _docs_proyecto_activos(config)
+
+    if request.method == "POST":
+        accion = request.POST.get("accion")
+
+        if accion == "subir":
+            tipo = request.POST.get("tipo")
+            archivo = request.FILES.get("archivo")
+            if tipo and archivo:
+                ok, msg = _validar_cupo_documentos(postulacion, tipo, 1)
+                if ok:
+                    DocumentoPostulacion.objects.create(
+                        postulacion=postulacion,
+                        tipo=tipo,
+                        archivo=archivo,
+                    )
+                else:
+                    messages.error(request, msg)
+
+        elif accion == "siguiente":
+            return redirect("convocatorias:wizard_paso", postulacion_id=postulacion.id, paso=ctx["paso_siguiente"])
+
+    docs_subidos = {
+        tipo: postulacion.documentos.filter(tipo=tipo)
+        for tipo, _ in docs_activos
+    }
+
+    ctx.update({
+        "docs_activos": docs_activos,
+        "docs_subidos": docs_subidos,
+    })
+    return render(request, "convocatorias/wizard/paso_documentacion.html", ctx)
+
+
+# ── Paso Confirmación + DDJJ ──────────────────────────────────────────────────
+def _paso_confirmacion(request, postulacion, config, ctx):
+    form = DeclaracionJuradaForm()
+
+    if request.method == "POST":
+        form = DeclaracionJuradaForm(request.POST)
+        if form.is_valid():
+            postulacion.declaracion_jurada = True
+            postulacion.estado = "enviado"
+            postulacion.fecha_envio = timezone.now()
+
+            # Marcar todos los documentos pendientes como enviados
+            postulacion.documentos.filter(estado="PENDIENTE").update(
+                estado="ENVIADO",
+                fecha_envio=timezone.now(),
+            )
+            postulacion.integrantes.prefetch_related("documentos")
+            for integrante in postulacion.integrantes.all():
+                integrante.documentos.filter(estado="PENDIENTE").update(
+                    estado="ENVIADO",
+                    fecha_envio=timezone.now(),
+                )
+
+            postulacion.save()
+            return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
+
+    # Resumen para mostrar antes de confirmar
+    persona = _get_persona_productor(request.user)
+    integrantes = postulacion.integrantes.select_related("persona_humana").exclude(rol="PRODUCTOR")
+    docs_activos = _docs_proyecto_activos(config)
+    docs_subidos = {
+        tipo: postulacion.documentos.filter(tipo=tipo)
+        for tipo, _ in docs_activos
+    }
+
+    ctx.update({
+        "form":        form,
+        "persona":     persona,
+        "integrantes": integrantes,
+        "docs_activos": docs_activos,
+        "docs_subidos": docs_subidos,
+    })
+    return render(request, "convocatorias/wizard/paso_confirmacion.html", ctx)

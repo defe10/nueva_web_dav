@@ -1,0 +1,91 @@
+{% extends "convocatorias/wizard/base_wizard.html" %}
+
+{% block wizard_content %}
+<div class="dav-card">
+  <div class="dav-card-body">
+
+    <h3 class="mb-1">Datos del proyecto</h3>
+    <p class="text-muted mb-4">Completá la información del proyecto que estás presentando.</p>
+
+    <form method="post" class="row g-3">
+      {% csrf_token %}
+
+      <div class="col-12">
+        <label class="form-label">Título del proyecto <span class="text-danger">*</span></label>
+        {{ form.nombre_proyecto }}
+        {% if form.nombre_proyecto.errors %}
+          <div class="text-danger small mt-1">{{ form.nombre_proyecto.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Tipo de proyecto <span class="text-danger">*</span></label>
+        {{ form.tipo_proyecto }}
+        {% if form.tipo_proyecto.errors %}
+          <div class="text-danger small mt-1">{{ form.tipo_proyecto.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Género <span class="text-danger">*</span></label>
+        {{ form.genero }}
+        {% if form.genero.errors %}
+          <div class="text-danger small mt-1">{{ form.genero.errors }}</div>
+        {% endif %}
+      </div>
+
+      {% if config.requiere_sinopsis or not config %}
+      <div class="col-12">
+        <label class="form-label">
+          Logline / Sinopsis corta
+          {% if config.requiere_sinopsis %}<span class="text-danger">*</span>{% else %}<span class="text-muted small">(opcional)</span>{% endif %}
+        </label>
+        {{ form.sinopsis_corta }}
+        <div class="d-flex justify-content-between">
+          {% if form.sinopsis_corta.errors %}
+            <div class="text-danger small mt-1">{{ form.sinopsis_corta.errors }}</div>
+          {% else %}
+            <div></div>
+          {% endif %}
+          <div class="form-text text-end" id="contador-sinopsis">0 / 3000 caracteres</div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if config.requiere_link_pitch or not config %}
+      <div class="col-12">
+        <label class="form-label">
+          Link al pitch
+          {% if config.requiere_link_pitch %}<span class="text-danger">*</span>{% else %}<span class="text-muted small">(opcional)</span>{% endif %}
+        </label>
+        {{ form.link_pitch }}
+        {% if form.link_pitch.errors %}
+          <div class="text-danger small mt-1">{{ form.link_pitch.errors }}</div>
+        {% endif %}
+        <div class="form-text">YouTube, Vimeo, Google Drive, etc.</div>
+      </div>
+      {% endif %}
+
+      <div class="col-12 text-end mt-4">
+        <button type="submit" class="btn btn-primary px-4">Siguiente →</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+<script>
+  const textarea = document.querySelector('textarea[name="sinopsis_corta"]');
+  const contador = document.getElementById('contador-sinopsis');
+  if (textarea && contador) {
+    const actualizar = () => {
+      const n = textarea.value.length;
+      contador.textContent = n + ' / 3000 caracteres';
+      contador.classList.toggle('text-danger', n > 3000);
+    };
+    textarea.addEventListener('input', actualizar);
+    actualizar();
+  }
+</script>
+{% endblock %}

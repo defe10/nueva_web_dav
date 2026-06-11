@@ -1,0 +1,65 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Postulación</h1>
+  <p class="text-white">{{ convocatoria.titulo }}</p>
+</section>
+
+<!-- INDICADOR DE PASOS -->
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="dav-steps">
+        {% for p in pasos %}
+          <div class="step {% if p == paso_actual %}active{% elif forloop.counter < paso_num %}done{% endif %}">
+            {{ forloop.counter }}. {{ p|capfirst }}
+          </div>
+        {% endfor %}
+      </div>
+      <p class="text-center text-muted small mt-2">Paso {{ paso_num }} de {{ total_pasos }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENIDO DEL PASO -->
+<div class="container py-3">
+  <div class="row justify-content-center">
+
+    <!-- COLUMNA PRINCIPAL -->
+    <div class="col-lg-8">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      {% block wizard_content %}{% endblock %}
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="col-lg-4 mb-4 order-lg-first">
+      <div class="dav-card">
+        <div class="dav-card-body">
+          <h6 class="fw-bold mb-2">Convocatoria</h6>
+          <p class="mb-1 small">{{ convocatoria.titulo }}</p>
+          {% if convocatoria.fecha_fin %}
+            <p class="mb-0 small text-muted">Cierre: {{ convocatoria.fecha_fin|date:"d/m/Y" }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if paso_anterior %}
+        <a href="{% url 'convocatorias:wizard_paso' postulacion.id paso_anterior %}"
+           class="btn btn-outline-secondary btn-sm mt-3 w-100">
+          ← Paso anterior
+        </a>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
