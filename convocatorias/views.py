@@ -36,22 +36,45 @@ from .forms import (
 # ============================================================
 
 MAX_DOCS_POR_TIPO = {
-    "PERSONAL": 5,
-    "PROYECTO": 3,
+    # Genéricos (flujo viejo / línea libre)
+    "PERSONAL":  5,
+    "PROYECTO":  3,
     "SUBSANADO": 3,
+    # Productor
+    "COMPROBANTE_CBU": 1,
+    # Documentos del proyecto (1 archivo por tipo)
+    "GUION":                 1,
+    "DOSSIER":               1,
+    "MATERIAL_ADICIONAL":    1,
+    "PLANILLA_OFICIAL":      1,
+    "REGISTRO_DNDA":         1,
+    "AUTORIZACION_DERECHOS": 1,
+    "NOTA_INTENCION":        1,
+    "CARTA_INTENCION":       1,
+    "CONSTANCIA_INVITACION": 1,
 }
 
 TIPO_LABEL = {
-    "PERSONAL": "personal",
-    "PROYECTO": "del proyecto",
+    "PERSONAL":  "personal",
+    "PROYECTO":  "del proyecto",
     "SUBSANADO": "de subsanación",
+    "COMPROBANTE_CBU":       "comprobante de CBU",
+    "GUION":                 "guion",
+    "DOSSIER":               "dossier",
+    "MATERIAL_ADICIONAL":    "material adicional",
+    "PLANILLA_OFICIAL":      "planilla oficial",
+    "REGISTRO_DNDA":         "registro DNDA",
+    "AUTORIZACION_DERECHOS": "autorización de derechos",
+    "NOTA_INTENCION":        "nota de intención",
+    "CARTA_INTENCION":       "carta de intención",
+    "CONSTANCIA_INVITACION": "constancia de invitación",
 }
 
 
 def _validar_cupo_documentos(postulacion, tipo, cantidad_nueva):
     """
     Valida cupo TOTAL por tipo (PENDIENTE + ENVIADO).
-    Así garantizamos un máximo absoluto de 3 por tipo.
+    Tipos no listados en MAX_DOCS_POR_TIPO son rechazados.
     """
     maximo = MAX_DOCS_POR_TIPO.get(tipo, 0)
 
@@ -244,151 +267,6 @@ def inscribirse_convocatoria(request, slug):
     return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
 
 
-# ============================================================
-# POSTULACIÓN — PASO 1 (IDEA)
-# ============================================================
-@login_required(login_url="/usuarios/login/")
-def postular_convocatoria(request, convocatoria_id):
-    convocatoria = get_object_or_404(Convocatoria, id=convocatoria_id)
-    user = request.user
-    hoy = timezone.localdate()
-
-    # ✅ bloqueo por fechas
-    if hoy < convocatoria.fecha_inicio:
-        messages.error(request, "La convocatoria todavía no se encuentra abierta.")
-        return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
-
-    if hoy > convocatoria.fecha_fin:
-        messages.error(request, "La convocatoria ya finalizó.")
-        return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
-
-    # seguridad: solo IDEA
-    if (convocatoria.linea or "").lower() not in ["fomento", "beneficio"]:
-        return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
-
-    # validar registro audiovisual
-    persona_humana = PersonaHumana.objects.filter(user=user).first()
-    persona_juridica = PersonaJuridica.objects.filter(user=user).first()
-
-    if not (persona_humana or persona_juridica):
-        messages.error(request, "Antes de inscribirte es necesario completar el Registro Audiovisual.")
-        return redirect(f"/registro/seleccionar-tipo/?next=/convocatorias/{convocatoria.slug}/inscribirse/")
-
-    persona_nombre = (
-        persona_humana.nombre_completo
-        if persona_humana
-        else persona_juridica.razon_social
-    )
-
-    if request.method == "POST":
-        form = PostulacionForm(request.POST)
-
-        form.instance.user = user
-        form.instance.convocatoria = convocatoria
-
-        if form.is_valid():
-            postulacion = form.save(commit=False)
-
-            postulacion.estado = "borrador"
-
-            # ⚠️ esto hoy te funciona, pero conceptualmente no es ideal
-            if not postulacion.fecha_envio:
-                postulacion.fecha_envio = timezone.now()
-
-            postulacion.save()
-
-            return redirect(
-                "convocatorias:subir_documentacion_personal",
-                postulacion_id=postulacion.id,
-            )
-        else:
-            messages.error(request, "Revisá los campos marcados. La declaración jurada es obligatoria.")
-    else:
-        form = PostulacionForm()
-
-    return render(
-        request,
-        "convocatorias/postulacion_formulario.html",
-        {
-            "convocatoria": convocatoria,
-            "form": form,
-            "persona_nombre": persona_nombre,
-        },
-    )
-
-
-# ============================================================
-# DOCUMENTACIÓN PERSONAL (pantalla)
-# ============================================================
-@login_required(login_url="/usuarios/login/")
-def subir_documentacion_personal(request, postulacion_id):
-    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
-
-    if postulacion.user != request.user:
-        return redirect("convocatorias:convocatorias_home")
-
-    documentos_pendientes = DocumentoPostulacion.objects.filter(
-        postulacion=postulacion,
-        tipo="PERSONAL",
-        estado="PENDIENTE",
-    ).order_by("-fecha_subida")
-
-    documentos_enviados = DocumentoPostulacion.objects.filter(
-        postulacion=postulacion,
-        tipo="PERSONAL",
-        estado="ENVIADO",
-    ).order_by("-fecha_envio", "-fecha_subida")
-
-    return render(
-        request,
-        "convocatorias/documentacion_personal.html",
-        {
-            "postulacion": postulacion,
-            "documentos_pendientes": documentos_pendientes,
-            "documentos_enviados": documentos_enviados,
-        },
-    )
-
-
-# ============================================================
-# DOCUMENTACIÓN PERSONAL (agregar archivos)
-# ============================================================
-@login_required(login_url="/usuarios/login/")
-def agregar_documentacion_personal(request, postulacion_id):
-    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
-
-    if postulacion.user != request.user:
-        return redirect("convocatorias:convocatorias_home")
-
-    if request.method != "POST":
-        return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion.id)
-
-    archivos = request.FILES.getlist("archivos")
-    if not archivos:
-        messages.error(request, "No se seleccionó ningún archivo.")
-        return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion.id)
-
-    ok, msg = _validar_cupo_documentos(postulacion, "PERSONAL", len(archivos))
-    if not ok:
-        messages.error(request, msg)
-        return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion.id)
-
-    for archivo in archivos:
-        documento = DocumentoPostulacion(
-            postulacion=postulacion,
-            tipo="PERSONAL",
-            estado="PENDIENTE",
-            archivo=archivo,
-        )
-        try:
-            documento.full_clean()
-            documento.save()
-        except ValidationError as e:
-            messages.error(request, e.message_dict.get("archivo", ["Error al validar el archivo."])[0])
-            return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion.id)
-
-    messages.success(request, "Archivos agregados. Podés eliminar o enviar cuando estés listo/a.")
-    return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion.id)
 
 
 # ============================================================
@@ -406,180 +284,19 @@ def eliminar_documento_postulacion(request, documento_id):
 
     if documento.estado != "PENDIENTE":
         messages.error(request, "No podés eliminar un documento ya enviado.")
-        tipo = documento.tipo
-        if tipo == "PROYECTO":
-            return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=documento.postulacion.id)
-        if tipo == "SUBSANADO":
-            return redirect("convocatorias:subir_documento_subsanado", postulacion_id=documento.postulacion.id)
-        return redirect("convocatorias:subir_documentacion_personal", postulacion_id=documento.postulacion.id)
+        return redirect(request.META.get("HTTP_REFERER", "/"))
 
     postulacion_id = documento.postulacion.id
     tipo = documento.tipo
     documento.delete()
-
     messages.success(request, "Documento eliminado.")
 
-    if tipo == "PERSONAL":
-        return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion_id)
-    if tipo == "PROYECTO":
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion_id)
     if tipo == "SUBSANADO":
         return redirect("convocatorias:subir_documento_subsanado", postulacion_id=postulacion_id)
 
-    return redirect("usuarios:panel_usuario")
+    return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
-# ============================================================
-# DOCUMENTACIÓN PERSONAL (confirmar envío)
-# ============================================================
-@login_required(login_url="/usuarios/login/")
-def confirmar_documentacion_personal(request, postulacion_id):
-    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
-
-    if postulacion.user != request.user:
-        return redirect("convocatorias:convocatorias_home")
-
-    if request.method != "POST":
-        return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion.id)
-
-    # ✅ NUEVO: exigir que exista al menos 1 documento cargado (pendiente o enviado)
-    if not DocumentoPostulacion.objects.filter(
-        postulacion=postulacion,
-        tipo="PERSONAL",
-    ).exists():
-        messages.error(request, "Debés subir al menos un archivo antes de enviar la documentación personal.")
-        return redirect("convocatorias:subir_documentacion_personal", postulacion_id=postulacion.id)
-
-    qs_pendientes = DocumentoPostulacion.objects.filter(
-        postulacion=postulacion,
-        tipo="PERSONAL",
-        estado="PENDIENTE",
-    )
-
-    es_linea_libre = (postulacion.convocatoria.linea or "").lower() == "libre"
-
-    # Si no hay pendientes pero ya hay enviados, no reenviar
-    if not qs_pendientes.exists():
-        if es_linea_libre and postulacion.estado != "enviado":
-            postulacion.estado = "enviado"
-            if not postulacion.fecha_envio:
-                ultimo_envio = (
-                    DocumentoPostulacion.objects.filter(
-                        postulacion=postulacion,
-                        tipo="PERSONAL",
-                        estado="ENVIADO",
-                    )
-                    .order_by("-fecha_envio")
-                    .first()
-                )
-                postulacion.fecha_envio = (
-                    ultimo_envio.fecha_envio if ultimo_envio and ultimo_envio.fecha_envio else timezone.now()
-                )
-                postulacion.save(update_fields=["estado", "fecha_envio"])
-            else:
-                postulacion.save(update_fields=["estado"])
-
-        messages.info(request, "Tu documentación personal ya fue enviada.")
-        if es_linea_libre:
-            return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
-
-    ahora = timezone.now()
-    qs_pendientes.update(estado="ENVIADO", fecha_envio=ahora)
-
-    if es_linea_libre:
-        postulacion.estado = "enviado"
-        postulacion.fecha_envio = ahora
-        postulacion.save(update_fields=["estado", "fecha_envio"])
-        messages.success(request, "Documentación personal enviada correctamente. Tu postulación quedó registrada.")
-        return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
-
-    messages.success(request, "Documentación personal enviada correctamente.")
-    return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
-
-
-# ============================================================
-# DOCUMENTACIÓN DEL PROYECTO (pantalla)
-# ============================================================
-@login_required(login_url="/usuarios/login/")
-def confirmar_documentacion_proyecto(request, postulacion_id):
-    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
-
-    if postulacion.user != request.user:
-        return redirect("convocatorias:convocatorias_home")
-
-    if request.method != "POST":
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
-
-    # ✅ NUEVO: exigir al menos 1 documento cargado (pendiente o enviado)
-    if not DocumentoPostulacion.objects.filter(
-        postulacion=postulacion,
-        tipo="PROYECTO",
-    ).exists():
-        messages.error(request, "Debés subir al menos un archivo antes de enviar la documentación del proyecto.")
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
-
-    qs_pendientes = DocumentoPostulacion.objects.filter(
-        postulacion=postulacion,
-        tipo="PROYECTO",
-        estado="PENDIENTE",
-    )
-
-    if not qs_pendientes.exists():
-        messages.info(request, "Tu documentación del proyecto ya fue enviada.")
-        return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
-
-    ahora = timezone.now()
-    qs_pendientes.update(estado="ENVIADO", fecha_envio=ahora)
-
-    postulacion.estado = "enviado"
-    postulacion.fecha_envio = ahora
-    postulacion.save(update_fields=["estado", "fecha_envio"])
-
-    messages.success(request, "Documentación del proyecto enviada correctamente. Tu postulación quedó registrada.")
-    return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
-
-
-
-# ============================================================
-# DOCUMENTACIÓN DEL PROYECTO (agregar archivos)
-# ============================================================
-@login_required(login_url="/usuarios/login/")
-def agregar_documentacion_proyecto(request, postulacion_id):
-    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
-
-    if postulacion.user != request.user:
-        return redirect("convocatorias:convocatorias_home")
-
-    if request.method != "POST":
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
-
-    archivos = request.FILES.getlist("archivos")
-    if not archivos:
-        messages.error(request, "No se seleccionó ningún archivo.")
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
-
-    ok, msg = _validar_cupo_documentos(postulacion, "PROYECTO", len(archivos))
-    if not ok:
-        messages.error(request, msg)
-        return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
-
-    for archivo in archivos:
-        documento = DocumentoPostulacion(
-            postulacion=postulacion,
-            tipo="PROYECTO",
-            estado="PENDIENTE",
-            archivo=archivo,
-        )
-        try:
-            documento.full_clean()
-            documento.save()
-        except ValidationError as e:
-            messages.error(request, e.message_dict.get("archivo", ["Error al validar el archivo."])[0])
-            return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
-
-    messages.success(request, "Archivos agregados. Podés eliminar o enviar cuando estés listo/a.")
-    return redirect("convocatorias:subir_documentacion_proyecto", postulacion_id=postulacion.id)
 
 
 
@@ -810,36 +527,6 @@ def rendicion_detalle(request, rendicion_id):
         },
     )
 
-
-
-@login_required(login_url="/usuarios/login/")
-def subir_documentacion_proyecto(request, postulacion_id):
-    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
-
-    if postulacion.user != request.user:
-        return redirect("convocatorias:convocatorias_home")
-
-    documentos_pendientes = DocumentoPostulacion.objects.filter(
-        postulacion=postulacion,
-        tipo="PROYECTO",
-        estado="PENDIENTE",
-    ).order_by("-fecha_subida")
-
-    documentos_enviados = DocumentoPostulacion.objects.filter(
-        postulacion=postulacion,
-        tipo="PROYECTO",
-        estado="ENVIADO",
-    ).order_by("-fecha_envio", "-fecha_subida")
-
-    return render(
-        request,
-        "convocatorias/documentacion_proyecto.html",
-        {
-            "postulacion": postulacion,
-            "documentos_pendientes": documentos_pendientes,
-            "documentos_enviados": documentos_enviados,
-        },
-    )
 
 
 # ============================================================
