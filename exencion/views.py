@@ -11,6 +11,7 @@ from django.db.models import Q
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
+from django.urls import reverse
 from convocatorias.models import Convocatoria
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 
@@ -41,8 +42,11 @@ def _cupos_restantes(exencion):
 # ============================================================
 # PASO 1 — INICIAR SOLICITUD
 # ============================================================
-@login_required(login_url="/usuarios/login/")
 def iniciar_solicitud(request, convocatoria_id=None):
+
+    if not request.user.is_authenticated:
+        messages.warning(request, "Para solicitar una exención impositiva necesitás ingresar con tu usuario.")
+        return redirect(f"/usuarios/login/?next={request.path}")
 
     convocatoria = None
     if convocatoria_id is not None:
@@ -54,8 +58,9 @@ def iniciar_solicitud(request, convocatoria_id=None):
     persona_juridica = PersonaJuridica.objects.filter(user=user).first()
 
     if not (persona_humana or persona_juridica):
-        next_url = request.path
-        return redirect(f"/registro/seleccionar-tipo/?next={next_url}")
+        messages.warning(request, "Para solicitar una exención impositiva primero debés completar tu Registro Audiovisual.")
+        next_url = request.path + "?confirmed=1"
+        return redirect(reverse("registro_audiovisual:seleccionar_tipo_registro") + f"?next={next_url}")
 
     persona = persona_humana or persona_juridica
 
@@ -65,12 +70,20 @@ def iniciar_solicitud(request, convocatoria_id=None):
             "Para solicitar la exención impositiva es necesario completar previamente "
             "todos los datos fiscales en el Registro Audiovisual "
             "(Situación IVA, Actividad DGR, Domicilio fiscal, Localidad fiscal y Código Postal). "
-            "Si elegiste “Ninguna/Ninguno” en IVA o DGR, se considera incompleto."
+            'Si elegiste "Ninguna/Ninguno" en IVA o DGR, se considera incompleto.'
         )
-        next_url = request.path
-        if persona_humana:
-            return redirect(f"/registro/persona-humana/?next={next_url}")
-        return redirect(f"/registro/persona-juridica/?next={next_url}")
+        edit_view = (
+            "registro_audiovisual:editar_persona_humana"
+            if persona_humana
+            else "registro_audiovisual:editar_persona_juridica"
+        )
+        next_url = request.path + "?confirmed=1"
+        return redirect(reverse(edit_view) + f"?next={next_url}")
+
+    # Usuario con registro completo: ofrecer revisión de datos (solo si no viene de confirmar)
+    if not request.GET.get("confirmed"):
+        next_url = request.path + "?confirmed=1"
+        return redirect(reverse("registro_audiovisual:confirmar_datos") + f"?next={next_url}")
 
     exencion, _creada = Exencion.objects.get_or_create(
         user=user,
@@ -114,28 +127,6 @@ def iniciar_solicitud(request, convocatoria_id=None):
         "actividad_dgr",
     ])
 
-    # ✅ SIEMPRE sincronizar (creada o no)
-    exencion.persona_humana = persona_humana
-    exencion.persona_juridica = persona_juridica
-    exencion.nombre_razon_social = (
-        getattr(persona, "nombre_completo", None)
-        or getattr(persona, "razon_social", "")
-        or ""
-    )
-    exencion.email = getattr(persona, "email", "") or user.email or ""
-    exencion.cuit = getattr(persona, "cuil_cuit", "") or ""
-    exencion.domicilio_fiscal = getattr(persona, "domicilio_fiscal", "") or ""
-    exencion.localidad_fiscal = getattr(persona, "localidad_fiscal", "") or ""
-    exencion.codigo_postal_fiscal = getattr(persona, "codigo_postal_fiscal", "") or ""
-    exencion.actividad_dgr = getattr(persona, "actividad_dgr", "") or ""
-
-    exencion.save(update_fields=[
-        "persona_humana", "persona_juridica",
-        "nombre_razon_social", "email", "cuit",
-        "domicilio_fiscal", "localidad_fiscal", "codigo_postal_fiscal",
-        "actividad_dgr",
-    ])
-
     return redirect("exencion:documentacion", exencion_id=exencion.id)
 
 
@@ -156,7 +147,7 @@ def subir_documentacion(request, exencion_id):
             request,
             "Para continuar con la solicitud de exención debés completar previamente "
             "todos los datos fiscales en tu Registro Audiovisual. "
-            "Si elegiste “Ninguna/Ninguno” en IVA o DGR, se considera incompleto."
+            'Si elegiste "Ninguna/Ninguno" en IVA o DGR, se considera incompleto.'
         )
         next_url = request.path
         if exencion.persona_humana:
@@ -277,7 +268,7 @@ def confirmar_documentacion(request, exencion_id):
         estado="PENDIENTE",
     )
 
-    # Si no hay pendientes pero ya hay enviados, no vuelvas a “enviar”: redirigí a completada
+    # Si no hay pendientes pero ya hay enviados, no vuelvas a "enviar": redirigí a completada
     if not qs_pendientes.exists():
         messages.info(request, "Tu documentación ya fue enviada.")
         return redirect("exencion:completada", exencion_id=exencion.id)

@@ -53,6 +53,7 @@
 
         <form method="post" class="row g-3">
           {% csrf_token %}
+          {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
 
           <!-- DATOS JURÍDICOS -->
           <div class="col-12">

@@ -282,7 +282,7 @@ class ObservacionAdministrativaExencionAdmin(admin.ModelAdmin):
         if not user:
             return
 
-        destinatario = exencion.email or getattr(user, "email", "")
+        destinatario = user.email
         if not destinatario:
             messages.warning(request, "No se envió email: la exención no tiene email y el usuario tampoco.")
             return

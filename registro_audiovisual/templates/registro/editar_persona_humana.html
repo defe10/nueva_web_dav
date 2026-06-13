@@ -52,6 +52,7 @@
 
         <form method="post" class="row g-3">
           {% csrf_token %}
+          {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
 
           <!-- DATOS PERSONALES -->
           <div class="col-12">
@@ -59,7 +60,7 @@
           </div>
 
           <div class="col-md-8">
-            <label class="form-label">Nombre completo</label>
+            <label class="form-label">Nombre/s y apellido/s completo</label>
             {{ form.nombre_completo }}
             <small class="text-muted">Debe coincidir con el DNI.</small>
             {{ form.nombre_completo.errors }}

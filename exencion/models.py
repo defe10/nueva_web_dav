@@ -150,7 +150,7 @@ class Exencion(models.Model):
                     "Adjuntamos la constancia en formato PDF.\n\n"
                     "Secretaría de Cultura de Salta"
                 ),
-                to=[self.email],
+                to=[self.user.email],
             )
             email.attach(filename, pdf_content, "application/pdf")
             email.send()
