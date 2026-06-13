@@ -88,15 +88,6 @@ urlpatterns = [
     ),
 
     # --------------------------------
-    # VER DOCUMENTACIÓN (USUARIO)
-    # --------------------------------
-    path(
-        "ver-documentacion/<int:postulacion_id>/",
-        views.ver_documentacion_proyecto,
-        name="ver_documentacion_proyecto"
-    ),
-
-    # --------------------------------
     # ✅ RENDICIÓN (DETALLE)
     # --------------------------------
     path(

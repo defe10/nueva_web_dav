@@ -10,7 +10,8 @@ from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
-from convocatorias.models import Postulacion, InscripcionFormacion
+from convocatorias.models import Postulacion
+from formacion.models import InscripcionFormacion
 
 
 def _admin_change_url_for(obj):
@@ -198,7 +199,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.html import format_html
 
-from convocatorias.models import Postulacion, InscripcionFormacion
+from convocatorias.models import Postulacion
+from formacion.models import InscripcionFormacion
 
 
 @staff_member_required

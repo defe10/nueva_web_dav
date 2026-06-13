@@ -170,10 +170,8 @@ Inicio — Dirección de Audiovisuales
       <a href="?categoria=PROGRAMA" class="filtro {% if request.GET.categoria == 'PROGRAMA' %}active{% endif %}">Programas</a>
       <a href="?categoria=SUBSIDIO" class="filtro {% if request.GET.categoria == 'SUBSIDIO' %}active{% endif %}">Subsidios</a>
       <a href="?categoria=CURSO" class="filtro {% if request.GET.categoria == 'CURSO' %}active{% endif %}">Cursos</a>
-      <a href="?categoria=INCENTIVO" class="filtro {% if request.GET.categoria == 'INCENTIVO' %}active{% endif %}">Incentivos</a>
       <a href="?categoria=BENEFICIO" class="filtro {% if request.GET.categoria == 'BENEFICIO' %}active{% endif %}">Beneficios</a>
     </div>
-
 
     <div id="convocatorias-grid">
       {% if vigentes %}
@@ -197,11 +195,12 @@ Inicio — Dirección de Audiovisuales
         </div>
       {% else %}
         <div class="alert alert-light border text-muted">
-          No hay convocatorias abiertas en esta categoría en este momento.
+          No hay convocatorias abiertas en este momento.
         </div>
       {% endif %}
     </div>
 
+  </div>
 </section>
 
 <!-- ================================================== -->

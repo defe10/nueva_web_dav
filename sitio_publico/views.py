@@ -8,23 +8,15 @@ def inicio(request):
     hoy = timezone.now().date()
     categoria = request.GET.get("categoria")
 
-    convocatorias_vigentes = Convocatoria.objects.filter(
+    vigentes = Convocatoria.objects.filter(
         fecha_inicio__lte=hoy,
         fecha_fin__gte=hoy,
-    )
+    ).order_by("orden")
 
     if categoria:
-        convocatorias_vigentes = convocatorias_vigentes.filter(
-            categoria=categoria
-        )
+        vigentes = vigentes.filter(categoria=categoria)
 
-    return render(
-        request,
-        "sitio_publico/inicio.html",
-        {
-            "vigentes": convocatorias_vigentes
-        }
-    )
+    return render(request, "sitio_publico/inicio.html", {"vigentes": vigentes})
 
 
 def institucional(request):

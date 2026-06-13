@@ -25,10 +25,11 @@ from exencion.models import Exencion
 from convocatorias.models import (
     Postulacion,
     AsignacionJuradoConvocatoria,
-    InscripcionFormacion,
+    IntegrantePostulacion,
     Rendicion,
-    DocumentoPostulacion,  # ✅ IMPORT REAL
+    DocumentoPostulacion,
 )
+from formacion.models import InscripcionFormacion
 
 
 # ============================================================
@@ -257,31 +258,34 @@ def panel_jurado(request):
     if not user.groups.filter(name__iexact="jurado").exists():
         return redirect("usuarios:panel_usuario")
 
-    convocatorias_asignadas = (
+    asignaciones = (
         AsignacionJuradoConvocatoria.objects
         .filter(jurado=user)
-        .values_list("convocatoria_id", flat=True)
+        .select_related("convocatoria")
+        .order_by("convocatoria__titulo")
     )
 
-    postulaciones = (
-        Postulacion.objects
-        .filter(
-            estado="evaluacion_jurado",
-            convocatoria_id__in=convocatorias_asignadas
+    ESTADOS_JURADO = ["admitido", "evaluacion_jurado", "seleccionado", "no_seleccionado"]
+
+    grupos = []
+    for asig in asignaciones:
+        postulaciones = (
+            Postulacion.objects
+            .filter(convocatoria=asig.convocatoria, estado__in=ESTADOS_JURADO)
+            .select_related("convocatoria")
+            .order_by("nombre_proyecto")
         )
-        .select_related("convocatoria", "user")
-        .order_by("-fecha_envio", "-id")
-    )
+        grupos.append({"convocatoria": asig.convocatoria, "postulaciones": postulaciones})
 
     return render(
         request,
         "usuarios/panel_jurado.html",
-        {"postulaciones": postulaciones},
+        {"grupos": grupos},
     )
 
 
 # ============================================================
-# DOCUMENTACIÓN DEL PROYECTO (JURADO)
+# DETALLE DE POSTULACIÓN (JURADO)
 # ============================================================
 @login_required(login_url="/usuarios/login/")
 def jurado_ver_documentacion(request, postulacion_id):
@@ -297,29 +301,28 @@ def jurado_ver_documentacion(request, postulacion_id):
     )
 
     postulacion = get_object_or_404(
-        Postulacion.objects.select_related("convocatoria", "user"),
+        Postulacion.objects.select_related("convocatoria"),
         id=postulacion_id,
         convocatoria_id__in=convocatorias_asignadas,
+        estado__in=["admitido", "evaluacion_jurado", "seleccionado", "no_seleccionado"],
+    )
+
+    integrantes = (
+        IntegrantePostulacion.objects
+        .filter(postulacion=postulacion)
+        .select_related("persona_humana")
+        .order_by("rol")
     )
 
     documentos = (
         DocumentoPostulacion.objects
-        .filter(
-            postulacion=postulacion,
-            estado="ENVIADO",
-        )
-        .filter(
-            Q(tipo="PROYECTO") |
-            Q(tipo="SUBSANADO", subtipo_subsanado="PROYECTO")
-        )
-        .order_by("-fecha_subida")
+        .filter(postulacion=postulacion, estado="ENVIADO")
+        .order_by("tipo", "-fecha_subida")
     )
-
-
 
     return render(
         request,
         "usuarios/jurado_documentacion.html",
-        {"postulacion": postulacion, "documentos": documentos},
+        {"postulacion": postulacion, "integrantes": integrantes, "documentos": documentos},
     )
 

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.text import slugify
-from django.utils.html import format_html
+from django.utils.html import format_html, mark_safe, escape
 from django.urls import reverse
 
 from openpyxl import Workbook
@@ -21,11 +21,11 @@ from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 
 from .models import (
     Convocatoria,
+    MiembroJurado,
     Postulacion,
     DocumentoPostulacion,
     ObservacionAdministrativa,
     AsignacionJuradoConvocatoria,
-    InscripcionFormacion,
     Rendicion,
     ConfiguracionPostulacion,
     IntegrantePostulacion,
@@ -91,9 +91,29 @@ class IntegrantePostulacionInline(admin.StackedInline):
     model = IntegrantePostulacion
     extra = 0
     can_delete = False
-    fields = ("rol", "nombre_busqueda", "persona_humana", "verificado")
-    readonly_fields = ("verificado",)
+    fields = ("rol", "persona_humana", "verificado", "documentos_integrante")
+    readonly_fields = ("verificado", "documentos_integrante")
     show_change_link = True
+
+    def documentos_integrante(self, obj):
+        docs = obj.documentos.all()
+        if not docs:
+            return "Sin documentación"
+        filas = mark_safe("".join(
+            "<tr>"
+            f"<td>{escape(d.get_tipo_display())}</td>"
+            f"<td>{escape(d.get_estado_display())}</td>"
+            f"<td><a href='{escape(d.archivo.url)}' target='_blank'>Ver archivo</a></td>"
+            "</tr>"
+            for d in docs
+        ))
+        return mark_safe(
+            "<table style='font-size:12px'>"
+            "<thead><tr><th>Tipo</th><th>Estado</th><th>Archivo</th></tr></thead>"
+            f"<tbody>{filas}</tbody>"
+            "</table>"
+        )
+    documentos_integrante.short_description = "Documentación"
 
 
 # ============================================================
@@ -103,19 +123,11 @@ class PostulacionDocumentoInline(admin.TabularInline):
     model = DocumentoPostulacion
     extra = 0
     can_delete = False
-
-    fields = ("tipo", "subtipo_subsanado", "estado", "archivo", "fecha_subida", "fecha_envio")
-    readonly_fields = ("archivo", "fecha_subida", "fecha_envio")
-
-
-    def get_formset(self, request, obj=None, **kwargs):
-        """
-        Evita confusiones:
-        - Si NO es SUBSANADO, ocultamos subtipo (o lo dejamos editable pero sin sentido).
-        Como TabularInline no permite ocultar por fila fácilmente,
-        lo controlamos por validación en el admin (save_model).
-        """
-        return super().get_formset(request, obj, **kwargs)
+    verbose_name = "Documento del proyecto"
+    verbose_name_plural = "Documentación del proyecto"
+    fields = ("tipo", "estado", "archivo", "fecha_subida")
+    readonly_fields = ("archivo", "fecha_subida")
+    ordering = ("tipo",)
 
 
 
@@ -489,6 +501,15 @@ class PostulacionAdmin(admin.ModelAdmin):
                 "documentacion",
                 slugify(doc.get_tipo_display())
             )
+        for integrante in p.integrantes.all():
+            carpeta = f"equipo/{integrante.rol.lower()}_{slugify(integrante.nombre_busqueda or str(integrante.id))}"
+            for doc in integrante.documentos.all():
+                self._agregar_archivo_zip(
+                    zf,
+                    doc.archivo,
+                    carpeta,
+                    slugify(doc.get_tipo_display()),
+                )
 
     # ==================================================
     # EXPORTAR EXCEL
@@ -585,118 +606,6 @@ class PostulacionAdmin(admin.ModelAdmin):
             except Exception:
                 return ""
         return ""
-
-
-# ============================================================
-# INSCRIPCIONES DE FORMACIÓN
-# ============================================================
-def marcar_admitido(modeladmin, request, queryset):
-    queryset.update(estado="admitido")
-marcar_admitido.short_description = "✅ Marcar como ADMITIDO"
-
-
-def marcar_no_admitido(modeladmin, request, queryset):
-    queryset.update(estado="no_admitido")
-marcar_no_admitido.short_description = "❌ Marcar como NO ADMITIDO"
-
-
-def marcar_lista_espera(modeladmin, request, queryset):
-    queryset.update(estado="lista_espera")
-marcar_lista_espera.short_description = "🕒 Marcar como LISTA DE ESPERA"
-
-
-@admin.register(InscripcionFormacion)
-class InscripcionFormacionAdmin(admin.ModelAdmin):
-    list_display = (
-        "usuario",
-        "convocatoria",
-        "estado",
-        "contacto_email",
-        "contacto_telefono",
-        "vinculo_sector",
-        "fecha",
-    )
-    list_filter = ("estado", "vinculo_sector", "convocatoria")
-    search_fields = ("user__username", "user__email", "nombre", "apellido", "dni", "email", "telefono")
-    ordering = ("-fecha",)
-    actions = [marcar_admitido, marcar_no_admitido, marcar_lista_espera, "exportar_excel_inscripciones_formacion"]
-
-    readonly_fields = ("user", "convocatoria", "fecha")
-
-    fieldsets = (
-        ("Datos del sistema", {"fields": ("user", "convocatoria", "estado", "fecha")}),
-        ("Vinculación (si existe Registro Audiovisual)", {"fields": ("persona_humana", "persona_juridica")}),
-        ("Datos de contacto (si NO hay registro)", {"fields": ("nombre", "apellido", "dni", "email", "telefono", "localidad")}),
-        ("Perfil", {"fields": ("vinculo_sector", "declaracion_jurada")}),
-    )
-
-    def usuario(self, obj):
-        return obj.user.username
-    usuario.short_description = "Usuario"
-
-    def contacto_email(self, obj):
-        return obj.user.email or obj.email or "—"
-    contacto_email.short_description = "Email"
-
-    def contacto_telefono(self, obj):
-        if obj.persona_humana_id and getattr(obj.persona_humana, "telefono", None):
-            return obj.persona_humana.telefono
-        if obj.persona_juridica_id and getattr(obj.persona_juridica, "telefono", None):
-            return obj.persona_juridica.telefono
-        return obj.telefono or "—"
-    contacto_telefono.short_description = "Teléfono"
-
-    def exportar_excel_inscripciones_formacion(self, request, queryset):
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Formación"
-
-        headers = [
-            "Fecha",
-            "Usuario",
-            "Convocatoria",
-            "Estado",
-            "Email",
-            "Teléfono",
-            "Vínculo con el sector",
-            "Nombre",
-            "Apellido",
-            "DNI",
-            "Localidad",
-            "Tiene Registro Audiovisual",
-        ]
-        ws.append(headers)
-
-        queryset = queryset.select_related("user", "convocatoria", "persona_humana", "persona_juridica")
-
-        for ins in queryset:
-            tiene_registro = bool(ins.persona_humana_id or ins.persona_juridica_id)
-            ws.append([
-                ins.fecha.strftime("%d/%m/%Y %H:%M") if ins.fecha else "",
-                ins.user.username,
-                ins.convocatoria.titulo if ins.convocatoria else "",
-                ins.get_estado_display() if ins.estado else "",
-                ins.user.email or ins.email or "",
-                self.contacto_telefono(ins),
-                ins.get_vinculo_sector_display() if ins.vinculo_sector else "",
-                ins.nombre or "",
-                ins.apellido or "",
-                ins.dni or "",
-                getattr(ins, "get_localidad_display", lambda: ins.localidad)() if ins.localidad else "",
-                "SI" if tiene_registro else "NO",
-            ])
-
-        for col in range(1, len(headers) + 1):
-            ws.column_dimensions[get_column_letter(col)].width = 25
-
-        response = HttpResponse(
-            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-        response["Content-Disposition"] = 'attachment; filename="inscripciones_formacion.xlsx"'
-        wb.save(response)
-        return response
-
-    exportar_excel_inscripciones_formacion.short_description = "📤 Exportar seleccionadas a Excel (.xlsx)"
 
 
 # ============================================================
@@ -1005,10 +914,18 @@ class IntegrantePostulacionAdmin(admin.ModelAdmin):
 
 
 # ============================================================
-# CONVOCATORIA — agregar ConfiguracionPostulacion inline
+# MIEMBROS DEL JURADO (inline en Convocatoria)
 # ============================================================
-# (parchamos el ConvocatoriaAdmin ya registrado)
-ConvocatoriaAdmin.inlines = [ConfiguracionPostulacionInline]
+class MiembroJuradoInline(admin.TabularInline):
+    model = MiembroJurado
+    extra = 1
+    fields = ("orden", "nombre", "foto", "bio")
+
+
+# ============================================================
+# CONVOCATORIA — agregar inlines
+# ============================================================
+ConvocatoriaAdmin.inlines = [ConfiguracionPostulacionInline, MiembroJuradoInline]
 
 
 # @admin.register(DocumentoPostulacion)

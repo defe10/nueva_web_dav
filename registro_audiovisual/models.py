@@ -384,6 +384,10 @@ class PersonaJuridica(models.Model):
     telefono = models.CharField(max_length=50)
     email = models.EmailField()
 
+    representante_nombre   = models.CharField(max_length=100, blank=True, null=True, verbose_name="Nombre del representante legal")
+    representante_apellido = models.CharField(max_length=100, blank=True, null=True, verbose_name="Apellido del representante legal")
+    representante_dni      = models.CharField(max_length=20,  blank=True, null=True, verbose_name="DNI del representante legal")
+
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,

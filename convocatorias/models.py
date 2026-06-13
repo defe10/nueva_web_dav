@@ -16,10 +16,9 @@ from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 # ==========================================
 LINEAS = [
     ("fomento", "Fomento"),
-    ("beneficio", "Beneficio"),
-    ("formacion", "Formación"),
-    ("incentivo", "Incentivo"),
-    ("libre", "Libre"),
+    ("cash_rebate", "Cash Rebate"),
+    ("formacion", "Formación"),  # gestionado por la app formacion
+    ("exencion", "Exención impositiva"),  # gestionado por la app exencion
 ]
 
 
@@ -27,11 +26,11 @@ LINEAS = [
 # CATEGORÍAS
 # ==========================================
 CATEGORIAS = [
-    ("CONCURSO", "Concurso"),
-    ("PROGRAMA", "Programa"),
-    ("SUBSIDIO", "Subsidio"),
-    ("CURSO", "Curso / Capacitación"),
-    ("INCENTIVO", "Incentivo"),
+    ("CONCURSO",  "Concurso"),
+    ("PROGRAMA",  "Programa"),
+    ("SUBSIDIO",  "Subsidio"),
+    ("CURSO",     "Curso / Capacitación"),
+    ("FORMACION", "Formación"),
     ("BENEFICIO", "Beneficio"),
 ]
 
@@ -41,21 +40,9 @@ CATEGORIAS = [
 # ==========================================
 BLOQUE_PERSONAS_TITULO = [
     ("JURADO", "Jurado"),
-    ("FORMADORES", "Formadores"),
     ("TUTORES", "Tutores"),
     ("NINGUNO", "Sin título"),
 ]
-
-
-# ==========================================
-# JURADOS (opcional)
-# ==========================================
-class Jurado(models.Model):
-    nombre = models.CharField(max_length=200)
-    foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
-
-    def __str__(self):
-        return self.nombre
 
 
 # ==========================================
@@ -69,11 +56,25 @@ class Convocatoria(models.Model):
     descripcion_corta = models.TextField(blank=True)
     descripcion_larga = models.TextField(blank=True)
 
+    TIPO_FORMACION = [
+        ("ASINCRONICA",         "Asincrónica (link público al curso)"),
+        ("INSCRIPCION_LIBRE",   "Inscripción sin registro audiovisual"),
+        ("INSCRIPCION_REGISTRO","Inscripción con registro audiovisual"),
+    ]
+    tipo_formacion = models.CharField(
+        "Tipo de formación",
+        max_length=25,
+        choices=TIPO_FORMACION,
+        blank=True,
+        default="",
+        help_text="Solo para convocatorias de línea Formación.",
+    )
+
     url_curso = models.URLField(
         "URL del curso asincrónico",
         blank=True,
         null=True,
-        help_text="Solo completar si el curso es asincrónico."
+        help_text="Completar si el tipo es Asincrónica.",
     )
 
     categoria = models.CharField(max_length=20, choices=CATEGORIAS)
@@ -107,18 +108,6 @@ class Convocatoria(models.Model):
         default="JURADO"
     )
 
-    jurado1_nombre = models.CharField(max_length=200, blank=True)
-    jurado1_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
-    jurado1_bio = models.TextField(blank=True)
-
-    jurado2_nombre = models.CharField(max_length=200, blank=True)
-    jurado2_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
-    jurado2_bio = models.TextField(blank=True)
-
-    jurado3_nombre = models.CharField(max_length=200, blank=True)
-    jurado3_foto = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
-    jurado3_bio = models.TextField(blank=True)
-
     orden = models.PositiveIntegerField(default=0)
     url_destino = models.CharField(max_length=300, blank=True)
 
@@ -147,6 +136,29 @@ class Convocatoria(models.Model):
 
     def __str__(self):
         return self.titulo
+
+
+# ==========================================
+# MIEMBROS DEL JURADO (bloque público de la convocatoria)
+# ==========================================
+class MiembroJurado(models.Model):
+    convocatoria = models.ForeignKey(
+        Convocatoria,
+        on_delete=models.CASCADE,
+        related_name="miembros_jurado",
+    )
+    nombre = models.CharField(max_length=200)
+    foto   = models.ImageField(upload_to="convocatorias/jurados/", blank=True, null=True)
+    bio    = models.TextField(blank=True)
+    orden  = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["orden", "id"]
+        verbose_name = "Miembro del jurado"
+        verbose_name_plural = "Miembros del jurado"
+
+    def __str__(self):
+        return f"{self.nombre} — {self.convocatoria}"
 
 
 # ==========================================
@@ -247,20 +259,7 @@ class Postulacion(models.Model):
         verbose_name_plural = "Postulaciones"
 
     def clean(self):
-        """
-        Regla clave:
-        - Si la convocatoria NO es línea libre → exigir datos de proyecto
-        - Si es línea libre → permitir vacío
-        """
         super().clean()
-
-        if self.convocatoria and self.convocatoria.linea != "libre":
-            if not self.nombre_proyecto:
-                raise ValidationError({"nombre_proyecto": "Campo obligatorio para esta convocatoria."})
-            if not self.tipo_proyecto:
-                raise ValidationError({"tipo_proyecto": "Campo obligatorio para esta convocatoria."})
-            if not self.genero:
-                raise ValidationError({"genero": "Campo obligatorio para esta convocatoria."})
 
     def __str__(self):
         nombre = self.nombre_proyecto or "(Sin título)"
@@ -287,9 +286,17 @@ class DocumentoPostulacion(models.Model):
         ("REGISTRO_DNDA",         "Registro de la obra en DNDA"),
         ("AUTORIZACION_DERECHOS", "Autorización de derechos"),
         ("NOTA_INTENCION",        "Nota de intención / documentación"),
+        ("DOCUMENTACION",         "Documentación"),
         # ── Apoyo a participación ────────────────────────────
         ("CARTA_INTENCION",       "Carta de intención"),
         ("CONSTANCIA_INVITACION", "Constancia de invitación/participación"),
+        # ── Persona jurídica ─────────────────────────────────
+        ("ESTATUTO",              "Estatuto / instrumento constitutivo"),
+        ("CONSTANCIA_ARCA_JUR",   "Constancia ARCA persona jurídica"),
+        ("DNI_REPRESENTANTE",     "DNI del representante legal"),
+        ("DNI_PRODUCTOR_RESP",    "DNI del productor/a responsable"),
+        ("ACTA_AUTORIDADES",      "Acta de designación de autoridades"),
+        ("CONTRATO_COPRODUCTORA", "Contrato con empresa coproductora"),
     ]
 
     SUBTIPOS_SUBSANADO = [
@@ -346,166 +353,6 @@ class DocumentoPostulacion(models.Model):
         return f"{self.postulacion_id} · {self.get_tipo_display()} · {self.get_estado_display()}"
 
 
-
-# ==========================================
-# FORMACIÓN — INSCRIPCIÓN (sin obligar Registro Audiovisual)
-# ==========================================
-class InscripcionFormacion(models.Model):
-    """
-    Si el usuario YA está en Registro Audiovisual:
-      - vincula persona_humana o persona_juridica y no repite datos.
-
-    Si NO está:
-      - guarda datos mínimos de contacto y perfil.
-    """
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    convocatoria = models.ForeignKey(Convocatoria, on_delete=models.CASCADE)
-
-    persona_humana = models.ForeignKey(PersonaHumana, on_delete=models.SET_NULL, null=True, blank=True)
-    persona_juridica = models.ForeignKey(PersonaJuridica, on_delete=models.SET_NULL, null=True, blank=True)
-
-    nombre = models.CharField(max_length=120, blank=True)
-    apellido = models.CharField(max_length=120, blank=True)
-    dni = models.CharField(max_length=30, blank=True)
-
-    email = models.EmailField(blank=True)
-    telefono = models.CharField(max_length=60, blank=True)
-
-    # ✅ Localidad con lista de municipios (mismos códigos que venís usando)
-    LOCALIDADES = [
-        ("", "- Seleccionar -"),
-        ("SC", "Salta Capital"),
-        ("otro", "Otro"),
-        ("Ag", "Aguaray"),
-        ("AB", "Aguas Blancas"),
-        ("An", "Angastaco"),
-        ("Ai", "Animaná"),
-        ("AS", "Apolinario Saravia"),
-        ("Ca", "Cachi"),
-        ("Cf", "Cafayate"),
-        ("CQ", "Campo Quijano"),
-        ("CS", "Campo Santo"),
-        ("Ce", "Cerrillos"),
-        ("Ch", "Chicoana"),
-        ("CSR", "Colonia Santa Rosa"),
-        ("CM", "Coronel Moldes"),
-        ("EB", "El Bordo"),
-        ("EC", "El Carril"),
-        ("EG", "El Galpón"),
-        ("EJ", "El Jardín"),
-        ("EM", "El Molinar"),
-        ("ET", "El Tala"),
-        ("Gi", "General Güemes"),
-        ("GM", "General Mosconi"),
-        ("Ga", "Gaona"),
-        ("Gp", "Guachipas"),
-        ("Hi", "Hipólito Yrigoyen"),
-        ("I", "Iruya"),
-        ("JV", "Joaquín V. González"),
-        ("LL", "La Caldera"),
-        ("LC", "La Candelaria"),
-        ("LV", "La Viña"),
-        ("LM", "Las Lajitas"),
-        ("LS", "Los Toldos"),
-        ("LR", "Rosario de Lerma"),
-        ("LP", "La Poma"),
-        ("LQ", "La Quesera"),
-        ("MA", "Metán"),
-        ("Mi", "Molinos"),
-        ("NP", "Nazareno"),
-        ("OC", "Orán"),
-        ("Pa", "Payogasta"),
-        ("Pi", "Pichanal"),
-        ("Po", "Posadas"),
-        ("Ri", "Rivadavia"),
-        ("RN", "Rosario de la Frontera"),
-        ("RS", "Rosario de Santa Fe"),
-        ("SA", "San Antonio de los Cobres"),
-        ("SL", "San Carlos"),
-        ("SO", "San Lorenzo"),
-        ("SP", "San Ramón de la Nueva Orán"),
-        ("ST", "Santa Victoria Este"),
-        ("Se", "Seclantás"),
-        ("Ta", "Tartagal"),
-        ("To", "Tolombón"),
-        ("Ur", "Urundel"),
-        ("Va", "Vaqueros"),
-    ]
-
-    localidad = models.CharField(max_length=20, choices=LOCALIDADES, blank=True)
-    otra_localidad = models.CharField(max_length=120, blank=True)
-
-    VINCULO_SECTOR = [
-        ("sector", "Trabajo actualmente en el sector audiovisual"),
-        ("empezando", "Estoy empezando / quiero insertarme"),
-        ("no_sector", "No, pero quiero capacitarme"),
-    ]
-    vinculo_sector = models.CharField(max_length=20, choices=VINCULO_SECTOR, blank=True)
-
-    declaracion_jurada = models.BooleanField(default=False)
-
-    ESTADOS = [
-        ("inscripto", "Inscripto"),
-        ("admitido", "Admitido"),
-        ("no_admitido", "No admitido"),
-        ("lista_espera", "Lista de espera"),
-    ]
-    estado = models.CharField(max_length=20, choices=ESTADOS, default="inscripto")
-
-    fecha = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ("user", "convocatoria")
-        ordering = ["-fecha"]
-        verbose_name = "Inscripción a formación"
-        verbose_name_plural = "Inscripciones a formación"
-
-    def clean(self):
-        super().clean()
-
-        # durante form.is_valid() puede no estar seteada convocatoria todavía
-        if not self.convocatoria_id:
-            return
-
-        if self.convocatoria.linea != "formacion":
-            raise ValidationError("Esta inscripción solo corresponde a convocatorias de línea Formación.")
-
-        if self.persona_humana_id and self.persona_juridica_id:
-            raise ValidationError("La inscripción no puede vincular Persona Humana y Persona Jurídica al mismo tiempo.")
-
-        tiene_registro = bool(self.persona_humana_id or self.persona_juridica_id)
-        if not tiene_registro:
-            if not self.email:
-                raise ValidationError({"email": "Ingresá un email de contacto."})
-            if not self.telefono:
-                raise ValidationError({"telefono": "Ingresá un teléfono de contacto."})
-
-        # si elige "Otro", exigir texto
-        if self.localidad == "otro" and not self.otra_localidad.strip():
-            raise ValidationError({"otra_localidad": "Indicá tu localidad."})
-
-    def __str__(self):
-        titulo = self.convocatoria.titulo if self.convocatoria_id else "(sin convocatoria)"
-        return f"{self.user.username} → {titulo} ({self.estado})"
-
-
-
-# ==========================================
-# INSCRIPCIÓN A CURSOS (existente)
-# ==========================================
-class InscripcionCurso(models.Model):
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    convocatoria = models.ForeignKey(Convocatoria, on_delete=models.CASCADE)
-    fecha = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ("user", "convocatoria")
-        ordering = ["-fecha"]
-
-    def __str__(self):
-        return f"{self.user.username} → {self.convocatoria.titulo}"
 
 
 # ==========================================
@@ -577,22 +424,6 @@ class AsignacionJuradoConvocatoria(models.Model):
         return f"{self.jurado.username} → {self.convocatoria.titulo}"
 
 
-# ==========================================
-# ARCHIVO POSTULACIÓN (sin relación; lo dejo)
-# ==========================================
-class ArchivoPostulacion(models.Model):
-
-    archivo = models.FileField(
-        upload_to="convocatorias/archivos/",
-        validators=[validar_documento_admitido, validar_tamano_archivo],
-        verbose_name="Archivo del proyecto (PDF / Excel / Planilla)"
-    )
-
-
-
-    def __str__(self):
-        return self.archivo.name or "ArchivoPostulacion"
-
 
 # ==========================================
 # CONFIGURACIÓN DE POSTULACIÓN POR CONVOCATORIA
@@ -608,13 +439,30 @@ class ConfiguracionPostulacion(models.Model):
         related_name="configuracion",
     )
 
-    # ── Equipo ──────────────────────────────────────────────
-    requiere_director       = models.BooleanField(default=False)
-    requiere_guionista      = models.BooleanField(default=False)
-    requiere_realizador     = models.BooleanField(default=False)
-    requiere_cbu            = models.BooleanField(default=True, help_text="CBU del productor/presentante")
+    # ── Tipo de postulante ───────────────────────────────────
+    TIPO_POSTULANTE = [
+        ("HUMANA",   "Solo persona humana"),
+        ("JURIDICA", "Solo persona jurídica"),
+        ("AMBAS",    "Persona humana o jurídica"),
+    ]
+    tipo_postulante = models.CharField(
+        max_length=10,
+        choices=TIPO_POSTULANTE,
+        default="HUMANA",
+        verbose_name="Tipo de postulante admitido",
+    )
+
+    # ── Equipo ───────────────────────────────────────────────
+    requiere_director        = models.BooleanField(default=False, verbose_name="Requiere director/a")
+    director_puede_coincidir = models.BooleanField(default=False, verbose_name="El/la director/a puede ser la misma persona que el/la productor/a presentante")
+    requiere_guionista       = models.BooleanField(default=False, verbose_name="Requiere guionista")
+    requiere_realizador      = models.BooleanField(default=False, verbose_name="Requiere realizador/a")
+    requiere_cbu             = models.BooleanField(default=True,  verbose_name="Requiere CBU")
 
     # ── Proyecto — campos de texto ───────────────────────────
+    mostrar_titulo          = models.BooleanField(default=True,  verbose_name="Título del proyecto")
+    mostrar_formato         = models.BooleanField(default=True,  verbose_name="Formato (tipo de proyecto)")
+    mostrar_genero          = models.BooleanField(default=True,  verbose_name="Género")
     requiere_sinopsis       = models.BooleanField(default=False, verbose_name="Logline / Sinopsis corta")
     requiere_link_pitch     = models.BooleanField(default=False, verbose_name="Link al pitch")
 
@@ -628,6 +476,7 @@ class ConfiguracionPostulacion(models.Model):
     mostrar_nota_intencion          = models.BooleanField(default=False, verbose_name="Mostrar sección: Nota de intención")
     mostrar_carta_intencion         = models.BooleanField(default=False, verbose_name="Mostrar sección: Carta de intención")
     mostrar_constancia_invitacion   = models.BooleanField(default=False, verbose_name="Mostrar sección: Constancia de invitación")
+    mostrar_documentacion           = models.BooleanField(default=False, verbose_name="Mostrar sección: Documentación (genérica)")
 
     class Meta:
         verbose_name = "Configuración de postulación"

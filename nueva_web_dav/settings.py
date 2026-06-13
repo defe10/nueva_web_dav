@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'usuarios',
     'registro_audiovisual',
     'convocatorias',
+    'formacion.apps.FormacionConfig',
     'exencion',
     "backoffice",
     'chatbot',

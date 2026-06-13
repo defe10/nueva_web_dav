@@ -19,6 +19,9 @@ urlpatterns = [
     # Convocatorias
     path("convocatorias/", include("convocatorias.urls")),
 
+    # Formación
+    path("formacion/", include("formacion.urls")),
+
     # Exención
     path("exencion/", include("exencion.urls")),
 

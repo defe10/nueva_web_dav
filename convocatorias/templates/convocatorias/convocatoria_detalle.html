@@ -54,96 +54,46 @@
       <!-- JURADOS / FORMADORES / TUTORES -->
       <!-- En móvil: SOLO FOTO + NOMBRE (sin bio) -->
       <!-- ================================================= -->
-      {% if convocatoria.jurado1_nombre or convocatoria.jurado2_nombre or convocatoria.jurado3_nombre %}
+      {% with miembros=convocatoria.miembros_jurado.all %}
+      {% if miembros and convocatoria.bloque_personas != "NINGUNO" %}
       <div class="mb-5">
 
-        {% if convocatoria.bloque_personas != "NINGUNO" %}
         <h3 class="fw-bold mb-4">
           {% if convocatoria.bloque_personas == "JURADO" %}
-            Jurado
+            Evaluadores/as
           {% elif convocatoria.bloque_personas == "FORMADORES" %}
-            Formadores
+            Formadores/as
           {% elif convocatoria.bloque_personas == "TUTORES" %}
-            Tutores
+            Tutores/as
           {% endif %}
           <hr class="my-2 border-dotted"><br>
         </h3>
-        {% endif %}
 
         <div class="vstack gap-4">
-
-          {% if convocatoria.jurado1_nombre %}
+          {% for m in miembros %}
           <div class="card border-0 shadow-sm p-3 jurado-card">
             <div class="row g-3">
 
-              <!-- FOTO + NOMBRE (mobile y desktop) -->
               <div class="col-12 col-md-3 text-center">
-                {% if convocatoria.jurado1_foto %}
-                  <img src="{{ convocatoria.jurado1_foto.url }}" class="jurado-foto">
+                {% if m.foto %}
+                  <img src="{{ m.foto.url }}" class="jurado-foto">
                 {% endif %}
-                <h6 class="fw-bold mt-2 mb-0">{{ convocatoria.jurado1_nombre }}</h6>
+                <h6 class="fw-bold mt-2 mb-0">{{ m.nombre }}</h6>
               </div>
 
-              <!-- BIO (solo desktop) -->
               <div class="col-12 col-md-9 d-none d-md-block">
                 <p class="jurado-bio mb-0">
-                  {{ convocatoria.jurado1_bio|linebreaks }}
+                  {{ m.bio|linebreaks }}
                 </p>
               </div>
 
             </div>
           </div>
-          {% endif %}
-
-          {% if convocatoria.jurado2_nombre %}
-          <div class="card border-0 shadow-sm p-3 jurado-card">
-            <div class="row g-3">
-
-              <!-- FOTO + NOMBRE (mobile y desktop) -->
-              <div class="col-12 col-md-3 text-center">
-                {% if convocatoria.jurado2_foto %}
-                  <img src="{{ convocatoria.jurado2_foto.url }}" class="jurado-foto">
-                {% endif %}
-                <h6 class="fw-bold mt-2 mb-0">{{ convocatoria.jurado2_nombre }}</h6>
-              </div>
-
-              <!-- BIO (solo desktop) -->
-              <div class="col-12 col-md-9 d-none d-md-block">
-                <p class="jurado-bio mb-0">
-                  {{ convocatoria.jurado2_bio|linebreaks }}
-                </p>
-              </div>
-
-            </div>
-          </div>
-          {% endif %}
-
-          {% if convocatoria.jurado3_nombre %}
-          <div class="card border-0 shadow-sm p-3 jurado-card">
-            <div class="row g-3">
-
-              <!-- FOTO + NOMBRE (mobile y desktop) -->
-              <div class="col-12 col-md-3 text-center">
-                {% if convocatoria.jurado3_foto %}
-                  <img src="{{ convocatoria.jurado3_foto.url }}" class="jurado-foto">
-                {% endif %}
-                <h6 class="fw-bold mt-2 mb-0">{{ convocatoria.jurado3_nombre }}</h6>
-              </div>
-
-              <!-- BIO (solo desktop) -->
-              <div class="col-12 col-md-9 d-none d-md-block">
-                <p class="jurado-bio mb-0">
-                  {{ convocatoria.jurado3_bio|linebreaks }}
-                </p>
-              </div>
-
-            </div>
-          </div>
-          {% endif %}
-
+          {% endfor %}
         </div>
       </div>
       {% endif %}
+      {% endwith %}
 
     </div>
 
@@ -215,30 +165,62 @@
           <div class="d-grid gap-2">
             {% if convocatoria.vigente %}
 
-              {# 1) Si hay URL destino, va primero y manda afuera #}
-              {% if convocatoria.url_destino %}
-                <a href="{{ convocatoria.url_destino }}"
-                  target="_blank"
-                  rel="noopener"
-                  class="btn btn-primary btn-sm">
-                  Acceder
-                </a>
+              {% if convocatoria.linea == "formacion" %}
 
-              {# 2) Si no hay destino, pero hay curso, manda al curso #}
-              {% elif convocatoria.url_curso %}
-                <a href="{{ convocatoria.url_curso }}"
-                  target="_blank"
-                  rel="noopener"
-                  class="btn btn-warning btn-sm">
-                  Acceder al curso
-                </a>
+                {# FORMACIÓN: el tipo define el CTA #}
+                {% if convocatoria.tipo_formacion == "ASINCRONICA" %}
+                  {% if convocatoria.url_curso %}
+                    <a href="{{ convocatoria.url_curso }}"
+                       target="_blank" rel="noopener"
+                       class="btn btn-warning btn-sm">
+                      Acceder al curso
+                    </a>
+                  {% endif %}
 
-              {# 3) Si no hay destino ni curso, inscripción normal #}
+                {% elif convocatoria.tipo_formacion == "INSCRIPCION_LIBRE" or convocatoria.tipo_formacion == "INSCRIPCION_REGISTRO" %}
+                  <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}"
+                     class="btn btn-primary btn-sm">
+                    Inscribirme
+                  </a>
+
+                {% else %}
+                  {# tipo_formacion no seteado: fallback genérico #}
+                  {% if convocatoria.url_curso %}
+                    <a href="{{ convocatoria.url_curso }}"
+                       target="_blank" rel="noopener"
+                       class="btn btn-warning btn-sm">
+                      Acceder al curso
+                    </a>
+                  {% else %}
+                    <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}"
+                       class="btn btn-primary btn-sm">
+                      Inscribirme
+                    </a>
+                  {% endif %}
+                {% endif %}
+
               {% else %}
-                <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}"
-                  class="btn btn-primary btn-sm">
-                  Inscribirme
-                </a>
+
+                {# OTRAS LÍNEAS: lógica original #}
+                {% if convocatoria.url_destino %}
+                  <a href="{{ convocatoria.url_destino }}"
+                     target="_blank" rel="noopener"
+                     class="btn btn-primary btn-sm">
+                    Acceder
+                  </a>
+                {% elif convocatoria.url_curso %}
+                  <a href="{{ convocatoria.url_curso }}"
+                     target="_blank" rel="noopener"
+                     class="btn btn-warning btn-sm">
+                    Acceder al curso
+                  </a>
+                {% else %}
+                  <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}"
+                     class="btn btn-primary btn-sm">
+                    Inscribirme
+                  </a>
+                {% endif %}
+
               {% endif %}
 
             {% endif %}
