@@ -1,0 +1,64 @@
+{% extends "sitio_publico/base.html" %}
+
+{% block title %}{{ persona.nombre_completo }} · Perfil{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:680px;">
+
+  <div class="mb-4">
+    <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">← Volver</a>
+  </div>
+
+  <div class="card shadow-sm" style="border-radius:16px;">
+    <div class="card-body p-4">
+
+      <h2 class="fw-bold mb-1">{{ persona.nombre_completo }}</h2>
+
+      {% if persona.area_desempeno_1 %}
+        <p class="text-muted mb-3">{{ persona.get_area_desempeno_1_display }}{% if persona.area_desempeno_2 %} · {{ persona.get_area_desempeno_2_display }}{% endif %}</p>
+      {% endif %}
+
+      {% if persona.portfolio_web or persona.canal_video or persona.instagram or persona.linkedin or persona.link_trabajo_destacado %}
+      <hr>
+      <h6 class="fw-semibold mb-3">CV / Biofilmografía</h6>
+      <ul class="list-unstyled mb-0">
+        {% if persona.portfolio_web %}
+        <li class="mb-2">
+          <span class="text-muted small d-block">Sitio web / Portfolio</span>
+          <a href="{{ persona.portfolio_web }}" target="_blank" rel="noopener">{{ persona.portfolio_web }}</a>
+        </li>
+        {% endif %}
+        {% if persona.canal_video %}
+        <li class="mb-2">
+          <span class="text-muted small d-block">Canal audiovisual</span>
+          <a href="{{ persona.canal_video }}" target="_blank" rel="noopener">{{ persona.canal_video }}</a>
+        </li>
+        {% endif %}
+        {% if persona.link_trabajo_destacado %}
+        <li class="mb-2">
+          <span class="text-muted small d-block">Trabajo destacado</span>
+          <a href="{{ persona.link_trabajo_destacado }}" target="_blank" rel="noopener">{{ persona.link_trabajo_destacado }}</a>
+        </li>
+        {% endif %}
+        {% if persona.instagram %}
+        <li class="mb-2">
+          <span class="text-muted small d-block">Instagram</span>
+          <a href="{{ persona.instagram }}" target="_blank" rel="noopener">{{ persona.instagram }}</a>
+        </li>
+        {% endif %}
+        {% if persona.linkedin %}
+        <li class="mb-2">
+          <span class="text-muted small d-block">LinkedIn</span>
+          <a href="{{ persona.linkedin }}" target="_blank" rel="noopener">{{ persona.linkedin }}</a>
+        </li>
+        {% endif %}
+      </ul>
+      {% else %}
+      <p class="text-muted">Este integrante no cargó links de CV o biofilmografía.</p>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

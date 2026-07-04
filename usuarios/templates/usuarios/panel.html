@@ -111,6 +111,7 @@
           <!-- ========================= -->
           <!-- CONVOCATORIAS (GRILLA 4 COL) -->
           <!-- ========================= -->
+          {% if postulaciones %}
           <div class="panel-section">
             <div class="panel-section-title">
               <span class="panel-ico"><i class="bi bi-megaphone"></i></span>
@@ -128,8 +129,7 @@
                 <div class="panel-head-right">Acción</div>
               </div>
 
-              {% if postulaciones %}
-                {% for p in postulaciones %}
+              {% for p in postulaciones %}
                   <div class="panel-grid-row panel-grid-4">
                     <div class="panel-cell panel-cell-left">
                       <div class="panel-primary panel-clamp-2">
@@ -156,6 +156,7 @@
                         {% elif p.estado == 'revision_admin' %} bg-info
                         {% elif p.estado == 'observado' %} bg-warning text-dark
                         {% elif p.estado == 'admitido' %} bg-primary
+                        {% elif p.estado == 'no_admitido' %} bg-danger
                         {% elif p.estado == 'evaluacion_jurado' %} bg-primary
                         {% elif p.estado == 'seleccionado' %} bg-success
                         {% elif p.estado == 'no_seleccionado' %} bg-danger
@@ -163,7 +164,7 @@
                         {% else %} bg-secondary
                         {% endif %}
                       ">
-                        {{ p.get_estado_display }}
+                        {% if p.estado == "evaluacion_jurado" %}En evaluación{% elif p.estado == "observado" %}Subsanar{% else %}{{ p.get_estado_display }}{% endif %}
                       </span>
                     </div>
 
@@ -200,19 +201,49 @@
                         {% endfor %}
                       </ul>
                     </div>
+                  {% elif p.estado == "no_admitido" %}
+                    <div class="panel-note alert alert-danger mt-2 mb-0">
+                      Tu postulación no fue admitida en la instancia de revisión administrativa. Para más información comunicate con la Dirección de Audiovisuales.
+                    </div>
                   {% endif %}
                 {% endfor %}
-              {% else %}
-                <div class="panel-empty">
-                  <p class="text-muted small mb-0">Aún no participaste en convocatorias.</p>
-                </div>
-              {% endif %}
             </div>
+
+            {% if postulaciones.has_other_pages %}
+            <nav class="mt-3 d-flex justify-content-center">
+              <ul class="pagination pagination-sm mb-0">
+                {% if postulaciones.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?p_post={{ postulaciones.previous_page_number }}">‹</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">‹</span></li>
+                {% endif %}
+
+                {% for num in postulaciones.paginator.page_range %}
+                  <li class="page-item {% if num == postulaciones.number %}active{% endif %}">
+                    <a class="page-link" href="?p_post={{ num }}">{{ num }}</a>
+                  </li>
+                {% endfor %}
+
+                {% if postulaciones.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?p_post={{ postulaciones.next_page_number }}">›</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">›</span></li>
+                {% endif %}
+              </ul>
+            </nav>
+            {% endif %}
+
           </div>
+          {% endif %}
 
           <!-- ========================= -->
           <!-- FORMACIÓN (DEBAJO DE CONVOCATORIAS) -->
           <!-- ========================= -->
+          {% if inscripciones_formacion %}
           <div class="panel-section">
             <div class="panel-section-title">
               <span class="panel-ico"><i class="bi bi-mortarboard"></i></span>
@@ -230,8 +261,7 @@
                 <div class="panel-head-right">Acción</div>
               </div>
 
-              {% if inscripciones_formacion %}
-                {% for ins in inscripciones_formacion %}
+              {% for ins in inscripciones_formacion %}
                   <div class="panel-grid-row panel-grid-4">
                     <div class="panel-cell panel-cell-left">
                       <div class="panel-primary panel-clamp-2">
@@ -264,7 +294,7 @@
 
                     <div class="panel-cell panel-cell-right">
                       {% if ins.convocatoria %}
-                        <a href="{% url 'convocatorias:convocatoria_detalle' ins.convocatoria.slug %}"
+                        <a href="{% url 'formacion:detalle' ins.convocatoria.slug %}"
                            class="btn btn-outline-primary btn-sm btn-pill">
                           Abrir
                         </a>
@@ -273,18 +303,32 @@
                       {% endif %}
                     </div>
                   </div>
+
+                  {% if ins.estado == "observado" %}
+                    <div class="panel-note alert alert-warning mt-2 mb-0">
+                      <div class="fw-bold mb-2">Observaciones pendientes</div>
+                      <ul class="mb-0">
+                        {% for obs in ins.observaciones.all %}
+                          {% if not obs.subsanada %}
+                            <li>{{ obs.descripcion }}</li>
+                          {% endif %}
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  {% elif ins.estado == "no_admitido" %}
+                    <div class="panel-note alert alert-danger mt-2 mb-0">
+                      Tu inscripción no fue admitida. Para más información comunicate con la Dirección de Audiovisuales.
+                    </div>
+                  {% endif %}
                 {% endfor %}
-              {% else %}
-                <div class="panel-empty">
-                  <p class="text-muted small mb-0">No registrás inscripciones a formación.</p>
-                </div>
-              {% endif %}
             </div>
           </div>
+          {% endif %}
 
           <!-- ========================= -->
           <!-- RENDICIONES (MISMA GRILLA 4 COL) -->
           <!-- ========================= -->
+          {% if rendiciones %}
           <div class="panel-section">
             <div class="panel-section-title">
               <span class="panel-ico"><i class="bi bi-receipt"></i></span>
@@ -302,8 +346,7 @@
                 <div class="panel-head-right">Acción</div>
               </div>
 
-              {% if rendiciones %}
-                {% for r in rendiciones %}
+              {% for r in rendiciones %}
                   <div class="panel-grid-row panel-grid-4">
                     <div class="panel-cell panel-cell-left">
                       <div class="panel-primary panel-clamp-2">
@@ -355,17 +398,14 @@
                     </div>
                   {% endif %}
                 {% endfor %}
-              {% else %}
-                <div class="panel-empty">
-                  <p class="text-muted small mb-0">No tenés rendiciones asignadas.</p>
-                </div>
-              {% endif %}
             </div>
           </div>
+          {% endif %}
 
           <!-- ========================= -->
           <!-- EXENCIÓN (MISMA GRILLA 4 COL) -->
           <!-- ========================= -->
+          {% if persona_humana or persona_juridica %}
           <div class="panel-section">
             <div class="panel-section-title">
               <span class="panel-ico"><i class="bi bi-file-earmark-check"></i></span>
@@ -383,69 +423,79 @@
                 <div class="panel-head-right">Acción</div>
               </div>
 
-              {% if exencion or exencion_observaciones_pendientes %}
-                <div class="panel-grid-row panel-grid-4">
-                  <div class="panel-cell panel-cell-left">
-                    <div class="panel-primary panel-clamp-2">Certificado de exención</div>
-                  </div>
+              <div class="panel-grid-row panel-grid-4">
+                <div class="panel-cell panel-cell-left">
+                  <div class="panel-primary panel-clamp-2">Certificado de exención</div>
+                </div>
 
-                  <div class="panel-cell panel-cell-center">
-                    <div class="panel-secondary panel-clamp-2 panel-center-text">
-                      Beneficio fiscal para actividades audiovisuales
-                    </div>
-                  </div>
-
-                  <div class="panel-cell panel-cell-right">
-                    {% if exencion and exencion.certificado_pdf %}
-                      <span class="badge bg-success">Aprobada</span>
-                    {% elif exencion_observaciones_pendientes %}
-                      <span class="badge bg-warning text-dark">Observada</span>
-                    {% else %}
-                      <span class="badge bg-info">En revisión</span>
-                    {% endif %}
-                  </div>
-
-                  <div class="panel-cell panel-cell-right">
-                    <div class="panel-actions panel-actions-inline justify-content-end">
-                      {% if exencion_observaciones_pendientes and exencion %}
-                        <a href="{% url 'exencion:subir_documento_subsanado_exencion' exencion.id %}"
-                           class="btn btn-warning btn-sm btn-pill">
-                          Subir docs
-                        </a>
-                      {% endif %}
-
-                      {% if exencion and exencion.certificado_pdf %}
-                        <a href="{{ exencion.certificado_pdf.url }}"
-                           class="btn btn-info btn-sm btn-pill"
-                           download>
-                          Descargar
-                        </a>
-                      {% endif %}
-                    </div>
+                <div class="panel-cell panel-cell-center">
+                  <div class="panel-secondary panel-clamp-2 panel-center-text">
+                    Beneficio fiscal para actividades audiovisuales
                   </div>
                 </div>
 
-                {% if exencion_observaciones_pendientes %}
-                  <div class="panel-note alert alert-warning mt-2 mb-0">
-                    <div class="fw-bold mb-2">Observaciones pendientes</div>
-                    <ul class="mb-0">
-                      {% for obsx in exencion_observaciones_pendientes %}
-                        <li>
-                          <strong>{{ obsx.get_tipo_documento_display }}:</strong>
-                          {{ obsx.descripcion }}
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  </div>
-                {% endif %}
+                <div class="panel-cell panel-cell-right">
+                  {% if not exencion %}
+                    <span class="badge bg-secondary">Sin solicitud</span>
+                  {% elif exencion.estado == "BORRADOR" %}
+                    <span class="badge bg-secondary">Borrador</span>
+                  {% elif exencion.estado == "ENVIADA" %}
+                    <span class="badge bg-info">En revisión</span>
+                  {% elif exencion_observaciones_pendientes %}
+                    <span class="badge bg-warning text-dark">Observada</span>
+                  {% elif exencion.estado == "APROBADA" %}
+                    <span class="badge bg-success">Aprobada</span>
+                  {% elif exencion.estado == "RECHAZADA" %}
+                    <span class="badge bg-danger">Rechazada</span>
+                  {% else %}
+                    <span class="badge bg-info">En revisión</span>
+                  {% endif %}
+                </div>
 
-              {% else %}
-                <div class="panel-empty">
-                  <p class="text-muted small mb-0">Aún no registrás solicitud de exención.</p>
+                <div class="panel-cell panel-cell-right">
+                  <div class="panel-actions panel-actions-inline justify-content-end">
+                    {% if not exencion %}
+                      <a href="{% url 'exencion:iniciar' %}"
+                         class="btn btn-primary btn-sm btn-pill">
+                        Solicitar
+                      </a>
+                    {% elif exencion.estado == "BORRADOR" %}
+                      <a href="{% url 'exencion:documentacion' exencion.id %}"
+                         class="btn btn-secondary btn-sm btn-pill">
+                        Completar
+                      </a>
+                    {% elif exencion_observaciones_pendientes %}
+                      <a href="{% url 'exencion:subir_documento_subsanado_exencion' exencion.id %}"
+                         class="btn btn-warning btn-sm btn-pill">
+                        Subir docs
+                      </a>
+                    {% elif exencion.estado == "APROBADA" and exencion.certificado_pdf %}
+                      <a href="{{ exencion.certificado_pdf.url }}"
+                         class="btn btn-success btn-sm btn-pill"
+                         download>
+                        Descargar
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              {% if exencion_observaciones_pendientes %}
+                <div class="panel-note alert alert-warning mt-2 mb-0">
+                  <div class="fw-bold mb-2">Observaciones pendientes</div>
+                  <ul class="mb-0">
+                    {% for obsx in exencion_observaciones_pendientes %}
+                      <li>
+                        <strong>{{ obsx.get_tipo_documento_display }}:</strong>
+                        {{ obsx.descripcion }}
+                      </li>
+                    {% endfor %}
+                  </ul>
                 </div>
               {% endif %}
             </div>
           </div>
+          {% endif %}
 
           <!-- ========================= -->
           <!-- ACCIONES -->
@@ -459,23 +509,23 @@
               </div>
             </div>
 
-            <div class="d-grid gap-3 mt-3">
+            <div class="d-flex gap-2 mt-3">
               <a href="{% url 'convocatorias:convocatorias_home' %}"
                  class="btn btn-outline-primary">
-                Ver Convocatorias Disponibles
+                Convocatorias
+              </a>
+              <a href="{% url 'chatbot_inicio' %}"
+                 class="btn btn-outline-secondary">
+                Ayuda
+              </a>
+              <a href="{% url 'usuarios:logout' %}"
+                 class="btn btn-outline-danger">
+                Cerrar sesión
               </a>
             </div>
           </div>
 
         {% endif %}
-
-        <!-- CERRAR SESIÓN (SIEMPRE) -->
-        <div class="mt-4">
-          <a href="{% url 'usuarios:logout' %}"
-             class="btn btn-outline-danger w-100">
-            Cerrar sesión
-          </a>
-        </div>
 
       </div>
 

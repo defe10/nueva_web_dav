@@ -45,21 +45,26 @@
     </div>
   </div>
 
-  <!-- EQUIPO -->
-  {% if integrantes %}
+  <!-- EQUIPO (oculto en doble ciego) -->
+  {% if not doble_ciego and integrantes %}
   <div class="card shadow-sm mb-4" style="border-radius:16px;">
     <div class="card-body">
       <h5 class="fw-bold mb-3">Equipo</h5>
       <table class="table table-sm table-bordered mb-0">
         <thead class="table-light">
-          <tr><th>Rol</th><th>Nombre</th><th>CUIT/CUIL</th></tr>
+          <tr><th>Rol</th><th>Nombre</th><th></th></tr>
         </thead>
         <tbody>
-          {% for i in integrantes %}
+          {% for i, cv_url in integrantes %}
           <tr>
             <td>{{ i.get_rol_display }}</td>
             <td>{{ i.persona_humana.nombre_completo|default:i.nombre_busqueda|default:"—" }}</td>
-            <td class="text-muted">{{ i.persona_humana.cuil_cuit|default:"—" }}</td>
+            <td>
+              {% if cv_url %}
+              <a href="{{ cv_url }}" target="_blank" rel="noopener"
+                 class="btn btn-sm btn-outline-secondary">CV / Biofilmografía</a>
+              {% endif %}
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -68,34 +73,31 @@
   </div>
   {% endif %}
 
-  <!-- DOCUMENTACIÓN -->
-  <div class="card shadow-sm" style="border-radius:16px;">
+  <!-- DOCUMENTACIÓN DEL PROYECTO -->
+  <div class="card shadow-sm mb-4" style="border-radius:16px;">
     <div class="card-body">
-      <h5 class="fw-bold mb-3">Documentación adjunta</h5>
+      <h5 class="fw-bold mb-3">Documentación del proyecto</h5>
 
-      {% if documentos %}
+      {% if documentos_postulacion %}
         <div class="list-group list-group-flush">
-          {% for d in documentos %}
+          {% for d in documentos_postulacion %}
             <div class="list-group-item d-flex justify-content-between align-items-center px-0">
               <div class="me-3">
                 <div class="fw-semibold">{{ d.get_tipo_display }}</div>
                 <div class="text-muted small">Subido: {{ d.fecha_subida|date:"d/m/Y H:i" }}</div>
               </div>
               <a href="{{ d.archivo.url }}" target="_blank" rel="noopener"
-                 class="btn btn-sm btn-outline-primary">
-                Abrir
-              </a>
+                 class="btn btn-sm btn-outline-primary">Abrir</a>
             </div>
           {% endfor %}
         </div>
       {% else %}
-        <div class="alert alert-warning mb-0">
-          No hay documentación enviada para esta postulación.
-        </div>
+        <p class="text-muted mb-0">No hay documentación de proyecto enviada.</p>
       {% endif %}
 
     </div>
   </div>
+
 
 </div>
 {% endblock %}

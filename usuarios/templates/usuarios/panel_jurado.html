@@ -56,9 +56,15 @@
           {% else %}
             {% for grupo in grupos %}
               <div class="mb-4">
-                <div class="fw-semibold mb-2 ps-1">
-                  <i class="bi bi-collection me-1 text-muted"></i>
-                  {{ grupo.convocatoria.titulo }}
+                <div class="d-flex align-items-center justify-content-between mb-2 ps-1">
+                  <div class="fw-semibold">
+                    <i class="bi bi-collection me-1 text-muted"></i>
+                    {{ grupo.convocatoria.titulo }}
+                  </div>
+                  <a href="{% url 'usuarios:evaluacion_lista' grupo.convocatoria.id %}"
+                     class="btn btn-sm btn-primary btn-pill">
+                    <i class="bi bi-star me-1"></i>Evaluar
+                  </a>
                 </div>
 
                 <div class="panel-card">

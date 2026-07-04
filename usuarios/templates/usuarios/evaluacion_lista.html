@@ -1,0 +1,72 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+
+  <div class="mb-4">
+    <a href="{% url 'usuarios:panel_jurado' %}" class="text-decoration-none text-secondary small">
+      ← Volver al panel
+    </a>
+  </div>
+
+  <h1 class="fw-bold mb-1">Evaluación</h1>
+  <p class="text-muted mb-4">{{ convocatoria.titulo }}</p>
+
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+        {{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if not items %}
+    <p class="text-muted">No hay postulaciones en estado de evaluación.</p>
+  {% else %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Proyecto</th>
+            <th class="text-center">Puntaje total<br><small class="text-muted fw-normal">/ {{ puntaje_maximo_total }}</small></th>
+            <th class="text-center">Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td class="fw-semibold">{{ item.postulacion.nombre_proyecto }}</td>
+            <td class="text-center">
+              {% if item.no_puntuar %}
+                <span class="badge bg-secondary">No puntuar</span>
+              {% elif item.puntaje_total is not None %}
+                {{ item.puntaje_total }}
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              {% if item.completa %}
+                <span class="badge bg-success">Completada</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Pendiente</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <a href="{% url 'usuarios:evaluacion_postulacion' item.postulacion.id %}"
+                 class="btn btn-sm btn-outline-primary">
+                {% if item.completa %}Editar{% else %}Evaluar{% endif %}
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

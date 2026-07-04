@@ -1,0 +1,34 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh; padding-bottom: 10vh;">
+  <div class="p-4 shadow" style="width: 100%; max-width: 420px; border-radius: 16px; background: #fff;">
+
+    <h3 class="text-center mb-2">Reenviar email de activación</h3>
+    <p class="text-muted text-center mb-4" style="font-size:14px;">
+      Ingresá tu correo y te enviamos un nuevo enlace para activar tu cuenta.
+    </p>
+
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Correo electrónico</label>
+        <input type="email" name="email" class="form-control" placeholder="tu@email.com" required autofocus>
+      </div>
+      <button type="submit" class="btn btn-dark w-100">Enviar enlace</button>
+    </form>
+
+    <div class="text-center mt-3" style="font-size:13px;">
+      <a href="{% url 'usuarios:login' %}">Volver al inicio de sesión</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
