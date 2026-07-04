@@ -12,13 +12,11 @@
 <div class="container mt-2">
   <div class="row justify-content-center">
     <div class="col-lg-8">
-
       <div class="dav-steps">
         <div class="step">1. Tipo de persona</div>
         <div class="step active">2. Completar datos</div>
         <div class="step">3. Completado</div>
       </div>
-
     </div>
   </div>
 </div>
@@ -29,14 +27,13 @@
     <!-- INFO -->
     <div class="col-lg-4 mb-4">
       <div class="dav-card">
-        <h5 class="mb-3">Completá tus datos personales y fiscales</h5>
+        <h5 class="mb-3">Completá tus datos personales</h5>
         <p>
           Ingresá tus datos tal como figuran en tu DNI. La información que declares tendrá validez legal al postularte a convocatorias.<br><br>
           Mantener estos datos actualizados es clave para validar tu inscripción y agilizar trámites.
         </p>
         <p class="mb-0">
-          Al finalizar, hacé clic en <strong>“Enviar”</strong>. Podrás modificar tu información en cualquier momento desde
-          <em>Mi cuenta</em>.
+          Navegá por las solapas y completá cada sección. Solo podrás enviar el formulario al llegar a la última.
         </p>
       </div>
     </div>
@@ -46,209 +43,273 @@
       <div class="dav-card">
 
         <h3 class="mb-2">Formulario de inscripción</h3>
-        <p class="text-muted mb-4">
+        <p class="text-muted mb-3">
           Datos para personas humanas – inscripción y declaración jurada.
         </p>
 
-        <form method="post" class="row g-3">
+        <!-- SOLAPAS NAV -->
+        <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-personales-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-personales" type="button" role="tab">
+              Datos personales
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-fiscales-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-fiscales" type="button" role="tab">
+              Datos fiscales
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-profesionales-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-profesionales" type="button" role="tab">
+              Datos profesionales
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-presencia-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-presencia" type="button" role="tab">
+              Presencia y trabajos
+            </button>
+          </li>
+        </ul>
+
+        <form method="post" id="formRegistro">
           {% csrf_token %}
           {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
 
-          <!-- DATOS PERSONALES -->
-          <div class="col-12">
-            <h5>Datos personales</h5>
-          </div>
+          <div class="tab-content">
 
-          <div class="col-md-8">
-            <label class="form-label">Nombre/s y apellido/s completo</label>
-            {{ form.nombre_completo }}
-            <small class="text-muted">Debe coincidir con el DNI.</small>
-            {{ form.nombre_completo.errors }}
-          </div>
+            <!-- TAB 1: DATOS PERSONALES -->
+            <div class="tab-pane fade show active" id="tab-personales" role="tabpanel">
+              <div class="row g-3">
 
-          <div class="col-md-4">
-            <label class="form-label">CUIL / CUIT</label>
-            {{ form.cuil_cuit }}
-            <small class="text-muted">Sin espacios ni guiones.</small>
-            {{ form.cuil_cuit.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Nombre/s</label>
+                  {{ form.nombre }}
+                  <small class="text-muted">Debe coincidir con el DNI.</small>
+                  {{ form.nombre.errors }}
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Fecha de nacimiento</label>
-            {{ form.fecha_nacimiento }}
-            {{ form.fecha_nacimiento.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Apellido/s</label>
+                  {{ form.apellido }}
+                  <small class="text-muted">Debe coincidir con el DNI.</small>
+                  {{ form.apellido.errors }}
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Edad</label>
-              <input
-              type="text"
-              id="edad_calculada"
-              class="form-control"
-              readonly
-            >
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">CUIL / CUIT</label>
+                  {{ form.cuil_cuit }}
+                  <small class="text-muted">Sin espacios ni guiones.</small>
+                  {{ form.cuil_cuit.errors }}
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Género</label>
-            {{ form.genero }}
-            {{ form.genero.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Fecha de nacimiento</label>
+                  {{ form.fecha_nacimiento }}
+                  {{ form.fecha_nacimiento.errors }}
+                </div>
 
-          <div class="col-12">
-            <label class="form-label">Domicilio real</label>
-            {{ form.domicilio_real }}
-            <small class="text-muted">Debe coincidir con el DNI.</small>
-            {{ form.domicilio_real.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Edad</label>
+                  <input type="text" id="edad_calculada" class="form-control" readonly>
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Lugar de residencia</label>
-            {{ form.lugar_residencia }}
-            {{ form.lugar_residencia.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Género</label>
+                  {{ form.genero }}
+                  {{ form.genero.errors }}
+                </div>
 
-          <div class="col-md-4" id="otro-lugar-wrapper" style="display:none;">
-            <label class="form-label">Especificar otro lugar</label>
-            {{ form.otro_lugar_residencia }}
-            {{ form.otro_lugar_residencia.errors }}
-          </div>
+                <div class="col-12">
+                  <label class="form-label">Domicilio real</label>
+                  {{ form.domicilio_real }}
+                  <small class="text-muted">Debe coincidir con el DNI.</small>
+                  {{ form.domicilio_real.errors }}
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Código postal</label>
-            {{ form.codigo_postal_real }}
-            {{ form.codigo_postal_real.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Lugar de residencia</label>
+                  {{ form.lugar_residencia }}
+                  {{ form.lugar_residencia.errors }}
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Nivel educativo alcanzado</label>
-            {{ form.nivel_educativo }}
-            {{ form.nivel_educativo.errors }}
-          </div>
+                <div class="col-md-4" id="otro-lugar-wrapper" style="display:none;">
+                  <label class="form-label">Especificar otro lugar</label>
+                  {{ form.otro_lugar_residencia }}
+                  {{ form.otro_lugar_residencia.errors }}
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Teléfono</label>
-            {{ form.telefono }}
-            <small class="text-muted">
-              Ingresá el número con código de área, sin 0 y sin 15.
-            </small>
-            {{ form.telefono.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Código postal</label>
+                  {{ form.codigo_postal_real }}
+                  {{ form.codigo_postal_real.errors }}
+                </div>
 
-          <div class="col-md-8">
-            <label class="form-label">Correo electrónico</label>
-            {{ form.email }}
-             <small class="text-muted">
-              Correo para notificaciones administrativas.
-            </small>
-            {{ form.email.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Nivel educativo alcanzado</label>
+                  {{ form.nivel_educativo }}
+                  {{ form.nivel_educativo.errors }}
+                </div>
 
-          <!-- DATOS FISCALES -->
-          <div class="col-12 mt-4">
-            <h5>Datos fiscales</h5>
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Teléfono</label>
+                  {{ form.telefono }}
+                  <small class="text-muted">Con código de área, sin 0 y sin 15.</small>
+                  {{ form.telefono.errors }}
+                </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Situación ante el IVA</label>
-            {{ form.situacion_iva }}
-            {{ form.situacion_iva.errors }}
-          </div>
+                <div class="col-md-8">
+                  <label class="form-label">Correo electrónico</label>
+                  {{ form.email }}
+                  <small class="text-muted">Correo para notificaciones administrativas.</small>
+                  {{ form.email.errors }}
+                </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Actividad declarada en DGR</label>
-            {{ form.actividad_dgr }}
-            {{ form.actividad_dgr.errors }}
-          </div>
+                <div class="col-12 d-flex justify-content-end mt-2">
+                  <button type="button" class="btn btn-secondary tab-next"
+                          data-target="tab-fiscales-btn">Siguiente</button>
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Domicilio fiscal</label>
-            {{ form.domicilio_fiscal }}
-            {{ form.domicilio_fiscal.errors }}
-          </div>
-
-          <div class="col-md-4">
-            <label class="form-label">Ciudad</label>
-            {{ form.localidad_fiscal }}
-            {{ form.localidad_fiscal.errors }}
-          </div>
-
-          <div class="col-md-4">
-            <label class="form-label">Código postal</label>
-            {{ form.codigo_postal_fiscal }}
-            {{ form.codigo_postal_fiscal.errors }}
-          </div>
-
-          <!-- DATOS PROFESIONALES -->
-          <div class="col-12 mt-4">
-            <h5>Datos profesionales</h5>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Área de desempeño principal</label>
-            {{ form.area_desempeno_1 }}
-            {{ form.area_desempeno_1.errors }}
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Área de desempeño secundaria</label>
-            {{ form.area_desempeno_2 }}
-            {{ form.area_desempeno_2.errors }}
-          </div>
-
-          <div class="col-12">
-            <label class="form-label">Área cultural complementaria</label>
-            {{ form.area_cultural }}
-            {{ form.area_cultural.errors }}
-          </div>
-
-        <div class="col-12 mt-4">
-          <h5 class="mb-3">Presencia y trabajos</h5>
-          <p class="text-muted small">
-          Podés compartir links a tu portfolio, canales, redes profesionales o trabajos destacados.
-          </p>
-        </div>
-
-          <div class="col-12">
-            {{ form.portfolio_web.label_tag }}
-            {{ form.portfolio_web }}
-            {{ form.portfolio_web.errors }}
-          </div>
-
-          <div class="col-12">
-            {{ form.canal_video.label_tag }}
-            {{ form.canal_video }}
-            {{ form.canal_video.errors }}
-          </div>
-
-          <div class="col-12">
-            {{ form.instagram.label_tag }}
-            {{ form.instagram }}
-            {{ form.instagram.errors }}
-          </div>
-
-          <div class="col-12">
-            {{ form.linkedin.label_tag }}
-            {{ form.linkedin }}
-            {{ form.linkedin.errors }}
-          </div>
-
-          <div class="col-12">
-            {{ form.link_trabajo_destacado.label_tag }}
-            {{ form.link_trabajo_destacado }}
-            {{ form.link_trabajo_destacado.errors }}
-          </div>
-
-
-          <!-- BOTÓN -->
-          <div class="col-12 mt-4">
-            <div class="d-flex justify-content-center justify-content-md-end">
-              <button type="submit" class="btn btn-primary">
-                Enviar
-              </button>
+              </div>
             </div>
-          </div>
 
+            <!-- TAB 2: DATOS FISCALES -->
+            <div class="tab-pane fade" id="tab-fiscales" role="tabpanel">
+              <div class="row g-3">
+
+                <div class="col-12">
+                  <div class="alert alert-info py-2 mb-0">
+                    <strong>Sección opcional.</strong> Estos datos no son obligatorios para completar el registro.
+                    Solo son necesarios si vas a solicitar exenciones impositivas.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Situación ante el IVA</label>
+                  {{ form.situacion_iva }}
+                  {{ form.situacion_iva.errors }}
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Actividad declarada en DGR</label>
+                  {{ form.actividad_dgr }}
+                  {{ form.actividad_dgr.errors }}
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Domicilio fiscal</label>
+                  {{ form.domicilio_fiscal }}
+                  {{ form.domicilio_fiscal.errors }}
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Ciudad</label>
+                  {{ form.localidad_fiscal }}
+                  {{ form.localidad_fiscal.errors }}
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Código postal</label>
+                  {{ form.codigo_postal_fiscal }}
+                  {{ form.codigo_postal_fiscal.errors }}
+                </div>
+
+                <div class="col-12 d-flex justify-content-between mt-2">
+                  <button type="button" class="btn btn-outline-secondary tab-prev"
+                          data-target="tab-personales-btn">Anterior</button>
+                  <button type="button" class="btn btn-secondary tab-next"
+                          data-target="tab-profesionales-btn">Siguiente</button>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- TAB 3: DATOS PROFESIONALES -->
+            <div class="tab-pane fade" id="tab-profesionales" role="tabpanel">
+              <div class="row g-3">
+
+                <div class="col-md-6">
+                  <label class="form-label">Área de desempeño principal</label>
+                  {{ form.area_desempeno_1 }}
+                  {{ form.area_desempeno_1.errors }}
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Área de desempeño secundaria</label>
+                  {{ form.area_desempeno_2 }}
+                  {{ form.area_desempeno_2.errors }}
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Área cultural complementaria</label>
+                  {{ form.area_cultural }}
+                  {{ form.area_cultural.errors }}
+                </div>
+
+                <div class="col-12 d-flex justify-content-between mt-2">
+                  <button type="button" class="btn btn-outline-secondary tab-prev"
+                          data-target="tab-fiscales-btn">Anterior</button>
+                  <button type="button" class="btn btn-secondary tab-next"
+                          data-target="tab-presencia-btn">Siguiente</button>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- TAB 4: PRESENCIA Y TRABAJOS (submit aquí) -->
+            <div class="tab-pane fade" id="tab-presencia" role="tabpanel">
+              <div class="row g-3">
+
+                <div class="col-12">
+                  <p class="text-muted small mb-1">
+                    Podés compartir links a tu portfolio, canales, redes profesionales y un trabajo destacado.
+                  </p>
+                </div>
+
+                <div class="col-12">
+                  {{ form.portfolio_web.label_tag }}
+                  {{ form.portfolio_web }}
+                  {{ form.portfolio_web.errors }}
+                </div>
+
+                <div class="col-12">
+                  {{ form.canal_video.label_tag }}
+                  {{ form.canal_video }}
+                  {{ form.canal_video.errors }}
+                </div>
+
+                <div class="col-12">
+                  {{ form.instagram.label_tag }}
+                  {{ form.instagram }}
+                  {{ form.instagram.errors }}
+                </div>
+
+                <div class="col-12">
+                  {{ form.linkedin.label_tag }}
+                  {{ form.linkedin }}
+                  {{ form.linkedin.errors }}
+                </div>
+
+                <div class="col-12">
+                  {{ form.link_trabajo_destacado.label_tag }}
+                  {{ form.link_trabajo_destacado }}
+                  <small class="text-muted">Un solo trabajo destacado.</small>
+                  {{ form.link_trabajo_destacado.errors }}
+                </div>
+
+                <div class="col-12 d-flex justify-content-between mt-2">
+                  <button type="button" class="btn btn-outline-secondary tab-prev"
+                          data-target="tab-profesionales-btn">Anterior</button>
+                  <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+
+              </div>
+            </div>
+
+          </div>{# /tab-content #}
         </form>
 
       </div>
@@ -259,60 +320,63 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  const fechaInput = document.querySelector("#id_fecha_nacimiento");
-  const edadInput = document.querySelector("#edad_calculada");
 
-  if (!fechaInput || !edadInput) return;
+  // Navegación entre solapas con botones Anterior / Siguiente
+  document.querySelectorAll(".tab-next, .tab-prev").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var targetBtn = document.getElementById(btn.getAttribute("data-target"));
+      if (targetBtn) bootstrap.Tab.getOrCreateInstance(targetBtn).show();
+    });
+  });
 
-  function calcularEdad() {
-    if (!fechaInput.value) {
-      edadInput.value = "";
-      return;
-    }
-
-    const fecha = new Date(fechaInput.value);
-    const hoy = new Date();
-
-    let edad = hoy.getFullYear() - fecha.getFullYear();
-    const m = hoy.getMonth() - fecha.getMonth();
-
-    if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
-      edad--;
-    }
-
-    edadInput.value = edad;
+  // Si ?tab=fiscales en la URL, activar esa solapa directamente
+  if (new URLSearchParams(window.location.search).get("tab") === "fiscales") {
+    var fiscalesBtn = document.getElementById("tab-fiscales-btn");
+    if (fiscalesBtn) bootstrap.Tab.getOrCreateInstance(fiscalesBtn).show();
   }
 
-  // 👉 calcular al cargar si ya hay fecha
-  calcularEdad();
-
-  // 👉 recalcular si cambia
-  fechaInput.addEventListener("change", calcularEdad);
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const selectLugar = document.querySelector("#id_lugar_residencia");
-  const wrapperOtro = document.querySelector("#otro-lugar-wrapper");
-
-  if (!selectLugar || !wrapperOtro) return;
-
-  function toggleOtroLugar() {
-    if (selectLugar.value === "otro") {
-      wrapperOtro.style.display = "block";
-    } else {
-      wrapperOtro.style.display = "none";
+  // Si hay errores de validación, activar la primera solapa que los contenga
+  var tabPanes = document.querySelectorAll(".tab-pane");
+  var tabButtons = document.querySelectorAll("#formTabs .nav-link");
+  var firstErrorFound = false;
+  tabPanes.forEach(function (pane, i) {
+    if (!firstErrorFound && pane.querySelector(".errorlist, .is-invalid")) {
+      tabButtons.forEach(function (b) { b.classList.remove("active"); });
+      tabPanes.forEach(function (p) { p.classList.remove("show", "active"); });
+      tabButtons[i].classList.add("active");
+      pane.classList.add("show", "active");
+      firstErrorFound = true;
     }
+  });
+
+  // Calcular edad
+  var fechaInput = document.querySelector("#id_fecha_nacimiento");
+  var edadInput  = document.querySelector("#edad_calculada");
+  if (fechaInput && edadInput) {
+    function calcularEdad() {
+      if (!fechaInput.value) { edadInput.value = ""; return; }
+      var f = new Date(fechaInput.value), h = new Date();
+      var edad = h.getFullYear() - f.getFullYear();
+      var m = h.getMonth() - f.getMonth();
+      if (m < 0 || (m === 0 && h.getDate() < f.getDate())) edad--;
+      edadInput.value = edad;
+    }
+    calcularEdad();
+    fechaInput.addEventListener("change", calcularEdad);
   }
 
-  // 👉 ejecutar al cargar (modo editar)
-  toggleOtroLugar();
+  // Mostrar/ocultar campo "otro lugar de residencia"
+  var selectLugar = document.querySelector("#id_lugar_residencia");
+  var wrapperOtro = document.querySelector("#otro-lugar-wrapper");
+  if (selectLugar && wrapperOtro) {
+    function toggleOtroLugar() {
+      wrapperOtro.style.display = selectLugar.value === "otro" ? "block" : "none";
+    }
+    toggleOtroLugar();
+    selectLugar.addEventListener("change", toggleOtroLugar);
+  }
 
-  // 👉 ejecutar al cambiar
-  selectLugar.addEventListener("change", toggleOtroLugar);
 });
 </script>
-
 
 {% endblock %}

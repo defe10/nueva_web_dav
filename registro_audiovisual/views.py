@@ -14,14 +14,18 @@ from .models import PersonaHumana, PersonaJuridica
 @login_required(login_url="/usuarios/login/")
 def seleccionar_tipo_registro(request):
     next_url = request.GET.get("next", "") or request.POST.get("next", "")
+    suffix = f"?next={next_url}" if next_url else ""
+
+    # Si el usuario ya tiene registro, llevarlo directo a editar
+    if PersonaHumana.objects.filter(user=request.user).exists():
+        return redirect(reverse("registro_audiovisual:editar_persona_humana") + suffix)
+    if PersonaJuridica.objects.filter(user=request.user).exists():
+        return redirect(reverse("registro_audiovisual:editar_persona_juridica") + suffix)
 
     if request.method == "POST":
         tipo = request.POST.get("tipo")
-        suffix = f"?next={next_url}" if next_url else ""
-
         if tipo == "humana":
             return redirect(reverse("registro_audiovisual:editar_persona_humana") + suffix)
-
         if tipo == "juridica":
             return redirect(reverse("registro_audiovisual:editar_persona_juridica") + suffix)
 
@@ -42,9 +46,9 @@ def editar_persona_humana(request):
         form = PersonaHumanaForm(request.POST, instance=persona_existente)
 
         if form.is_valid():
-            persona = form.save()
+            persona = form.save(commit=False)
             persona.user = user
-            persona.save(update_fields=["user"])
+            persona.save()
 
             if next_url:
                 return redirect(next_url)
@@ -81,9 +85,9 @@ def editar_persona_juridica(request):
         form = PersonaJuridicaForm(request.POST, instance=persona_existente)
 
         if form.is_valid():
-            persona = form.save()
+            persona = form.save(commit=False)
             persona.user = user
-            persona.save(update_fields=["user"])
+            persona.save()
 
             if next_url:
                 return redirect(next_url)
@@ -111,15 +115,12 @@ def editar_persona_juridica(request):
 @login_required(login_url="/usuarios/login/")
 def inscripcion_exitosa(request):
     tipo = request.GET.get("tipo")
-    id_persona = request.GET.get("id")
 
     persona = None
-
     if tipo == "humana":
-        persona = PersonaHumana.objects.filter(id=id_persona).first()
-
+        persona = PersonaHumana.objects.filter(user=request.user).first()
     elif tipo == "juridica":
-        persona = PersonaJuridica.objects.filter(id=id_persona).first()
+        persona = PersonaJuridica.objects.filter(user=request.user).first()
 
     return render(
         request,

@@ -1,5 +1,11 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import User
+
+cuil_cuit_validator = RegexValidator(
+    regex=r'^\d{11}$',
+    message='El CUIL/CUIT debe tener exactamente 11 dígitos numéricos, sin guiones ni espacios.'
+)
 
 
 LUGARES_RESIDENCIA = [
@@ -78,7 +84,7 @@ ACTIVIDAD_DGR = [
     ('N', 'Ninguna'),
 ]
 
-AREA_DESEMPENO_1 = [
+AREA_DESEMPENO = [
     ('Productor', 'Productor/a'),
     ('Jefe_prod', 'Jefe/a de producción'),
     ('Asist_prod', 'Asistente de producción'),
@@ -110,39 +116,11 @@ AREA_DESEMPENO_1 = [
     ('otro', 'Otro'),
 ]
 
-AREA_DESEMPENO_2 = [
-    ('Productor', 'Productor/a'),
-    ('Jefe_prod', 'Jefe/a de producción'),
-    ('Asist_prod', 'Asistente de producción'),
-    ('Jefe_loc', 'Jefe/a de locaciones'),
-    ('Director', 'Director/a'),
-    ('Asist_Dir', 'Asistente de dirección'),
-    ('Dir_Cast', 'Director/a de casting'),
-    ('Dir_Foto', 'Director/a de fotografía'),
-    ('Camara', 'Camarógrafo/a'),
-    ('Key_Grip', 'Key Grip'),
-    ('Video_Asist_DIT', 'Video Asist / DIT'),
-    ('Gaffer', 'Gaffer'),
-    ('Guionista', 'Guionista'),
-    ('Reflec', 'Reflectorista'),
-    ('Dir_Arte', 'Dirección de Arte'),
-    ('Escnog', 'Escenógrafo/a'),
-    ('Vest', 'Vestuarista'),
-    ('Maqui', 'Jefe/a de Maquillaje'),
-    ('Dir_Son', 'Dirección de Sonido'),
-    ('Ayu_Son', 'Ayudante de Sonido'),
-    ('Dir_Son_Post', 'Dirección de Sonido Post / Mezclador/a'),
-    ('Post_Prod', 'Postproductor/a'),
-    ('Editor', 'Editor/a'),
-    ('Color', 'Colorista'),
-    ('Animam', 'Animador/a'),
-    ('Realizador', 'Realizador/a integral'),
-    ('Game_Design', 'Game Designer'),
-    ('Game_Artist', 'Game Artist'),
-    ('otro', 'Otro'),
-]
+# Alias para compatibilidad con código existente que los referencia
+AREA_DESEMPENO_1 = AREA_DESEMPENO
+AREA_DESEMPENO_2 = AREA_DESEMPENO
 
-AREA_DESEMPENO_PPJJ_1 = [
+AREA_DESEMPENO_PPJJ = [
     ('Productora', 'Empresa de producción'),
     ('PostProd', 'Empresa de postproducción'),
     ('Serv_Prod', 'Empresa de servicios para la producción'),
@@ -151,14 +129,8 @@ AREA_DESEMPENO_PPJJ_1 = [
     ('otro', 'Otro'),
 ]
 
-AREA_DESEMPENO_PPJJ_2 = [
-    ('Productora', 'Empresa de producción'),
-    ('PostProd', 'Empresa de postproducción'),
-    ('Serv_Prod', 'Empresa de servicios para la producción'),
-    ('PPJJ_Espec', 'Persona jurídica específica audiovisual'),
-    ('PPJJ_Cult', 'Persona jurídica cultural'),
-    ('otro', 'Otro'),
-]
+AREA_DESEMPENO_PPJJ_1 = AREA_DESEMPENO_PPJJ
+AREA_DESEMPENO_PPJJ_2 = AREA_DESEMPENO_PPJJ
 
 AREA_CULTURAL = [
     ('Actor', 'Actor / Actriz'),
@@ -201,10 +173,10 @@ TIPO_PERSONA_JURIDICA_CHOICES = [
 # -------------------------------
 
 class PersonaHumana(models.Model):
-    nombre_completo = models.CharField(max_length=200)
-    cuil_cuit = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=100, verbose_name="Nombre/s")
+    apellido = models.CharField(max_length=100, verbose_name="Apellido/s")
+    cuil_cuit = models.CharField(max_length=11, validators=[cuil_cuit_validator])
     fecha_nacimiento = models.DateField()
-    edad = models.PositiveIntegerField()
 
     genero = models.CharField(
         max_length=10,
@@ -336,6 +308,22 @@ class PersonaHumana(models.Model):
     )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    @property
+    def nombre_completo(self):
+        return f"{self.nombre} {self.apellido}".strip()
+
+    @property
+    def edad(self):
+        if not self.fecha_nacimiento:
+            return None
+        from datetime import date
+        hoy = date.today()
+        return (
+            hoy.year - self.fecha_nacimiento.year
+            - ((hoy.month, hoy.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
+        )
 
     def __str__(self):
         return self.nombre_completo
@@ -351,7 +339,7 @@ class PersonaJuridica(models.Model):
         choices=TIPO_PERSONA_JURIDICA_CHOICES
     )
 
-    cuil_cuit = models.CharField(max_length=20)
+    cuil_cuit = models.CharField(max_length=11, validators=[cuil_cuit_validator])
     razon_social = models.CharField(max_length=200)
     nombre_comercial = models.CharField(
         max_length=200,
@@ -379,14 +367,14 @@ class PersonaJuridica(models.Model):
     )
 
     fecha_constitucion = models.DateField()
-    antiguedad = models.PositiveIntegerField()
 
     telefono = models.CharField(max_length=50)
     email = models.EmailField()
 
-    representante_nombre   = models.CharField(max_length=100, blank=True, null=True, verbose_name="Nombre del representante legal")
-    representante_apellido = models.CharField(max_length=100, blank=True, null=True, verbose_name="Apellido del representante legal")
-    representante_dni      = models.CharField(max_length=20,  blank=True, null=True, verbose_name="DNI del representante legal")
+    representante_nombre   = models.CharField(max_length=100, blank=True, null=True, verbose_name="Nombre del socio/a - gerente o autoridad")
+    representante_apellido = models.CharField(max_length=100, blank=True, null=True, verbose_name="Apellido del socio/a - gerente o autoridad")
+    representante_dni      = models.CharField(max_length=20,  blank=True, null=True, verbose_name="DNI del socio/a - gerente o autoridad")
+    representante_cuil     = models.CharField(max_length=20,  blank=True, null=True, verbose_name="CUIL/CUIT del socio/a - gerente o autoridad")
 
     user = models.OneToOneField(
         User,
@@ -405,6 +393,8 @@ class PersonaJuridica(models.Model):
     area_desempeno_JJPP_2 = models.CharField(
         max_length=50,
         choices=AREA_DESEMPENO_PPJJ_2,
+        blank=True,
+        default="",
         verbose_name="Área de desempeño secundaria"
     )
 
@@ -449,6 +439,18 @@ class PersonaJuridica(models.Model):
     )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    @property
+    def antiguedad(self):
+        if not self.fecha_constitucion:
+            return None
+        from datetime import date
+        hoy = date.today()
+        return (
+            hoy.year - self.fecha_constitucion.year
+            - ((hoy.month, hoy.day) < (self.fecha_constitucion.month, self.fecha_constitucion.day))
+        )
 
     def __str__(self):
         return self.razon_social
