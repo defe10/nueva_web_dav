@@ -420,38 +420,56 @@ def rendicion_detalle(request, rendicion_id):
     postulacion = rendicion.postulacion
     convocatoria = postulacion.convocatoria
 
+    CAMPOS_IMPACTO = [
+        ("honorarios_tecnicos",     "Honorarios técnicos"),
+        ("honorarios_elenco",       "Honorarios elenco"),
+        ("otros_honorarios",        "Otros honorarios"),
+        ("insumos",                 "Insumos"),
+        ("servicios_audiovisuales", "Servicios audiovisuales"),
+        ("servicios_logistica",     "Servicios / logística"),
+    ]
+
     if request.method == "POST":
+        accion = request.POST.get("accion", "guardar")
         link = (request.POST.get("link_documentacion") or "").strip()
-        obs = (request.POST.get("observaciones_usuario") or "").strip()
+        obs  = (request.POST.get("observaciones_usuario") or "").strip()
 
-        if not link:
-            messages.error(request, "Tenés que cargar un link a la documentación.")
-            return redirect("convocatorias:rendicion_detalle", rendicion_id=rendicion.id)
-
-        # Guardar campos
-        rendicion.link_documentacion = link
+        rendicion.link_documentacion  = link
         rendicion.observaciones_usuario = obs
 
-        # Pasar a ENVIADO
-        rendicion.estado = "ENVIADO"
+        # Planilla xlsx
+        if "planilla_xlsx" in request.FILES:
+            rendicion.planilla_xlsx = request.FILES["planilla_xlsx"]
 
-        try:
-            rendicion.full_clean()
+        # Montos impacto económico
+        for campo, _ in CAMPOS_IMPACTO:
+            try:
+                rendicion.__setattr__(campo, request.POST.get(campo) or 0)
+            except (ValueError, TypeError):
+                pass
+
+        if accion == "enviar":
+            if not link and not rendicion.planilla_xlsx:
+                messages.error(request, "Subí la planilla o agregá un link antes de enviar.")
+                rendicion.save()
+                return redirect("convocatorias:rendicion_detalle", rendicion_id=rendicion.id)
+            rendicion.estado = "ENVIADO"
             rendicion.save()
-        except ValidationError:
-            messages.error(request, "Error al guardar la rendición.")
-            return redirect("convocatorias:rendicion_detalle", rendicion_id=rendicion.id)
+            messages.success(request, "Rendición enviada correctamente.")
+            return redirect("usuarios:panel_usuario")
 
-        messages.success(request, "Rendición enviada correctamente.")
-        return redirect("usuarios:panel_usuario")
+        rendicion.save()
+        messages.success(request, "Borrador guardado.")
+        return redirect("convocatorias:rendicion_detalle", rendicion_id=rendicion.id)
 
     return render(
         request,
         "convocatorias/rendicion_detalle.html",
         {
-            "rendicion": rendicion,
-            "postulacion": postulacion,
-            "convocatoria": convocatoria,
+            "rendicion":     rendicion,
+            "postulacion":   postulacion,
+            "convocatoria":  convocatoria,
+            "campos_impacto": CAMPOS_IMPACTO,
         },
     )
 

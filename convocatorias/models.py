@@ -631,8 +631,21 @@ class Rendicion(models.Model):
 
     # Digital
     link_documentacion = models.URLField(blank=True)
+    planilla_xlsx = models.FileField(
+        upload_to="rendiciones/planillas/",
+        blank=True, null=True,
+        verbose_name="Planilla de rendición (.xlsx)",
+    )
     observaciones_usuario = models.TextField(blank=True)
     observaciones_admin = models.TextField(blank=True)
+
+    # Impacto económico — montos por categoría
+    honorarios_tecnicos      = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Honorarios técnicos")
+    honorarios_elenco        = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Honorarios elenco")
+    otros_honorarios         = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Otros honorarios")
+    insumos                  = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Insumos")
+    servicios_audiovisuales  = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Servicios audiovisuales")
+    servicios_logistica      = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Servicios / logística")
 
     estado = models.CharField(max_length=20, choices=ESTADOS, default="BORRADOR")
 

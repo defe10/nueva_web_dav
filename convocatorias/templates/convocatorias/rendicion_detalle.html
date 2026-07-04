@@ -1,57 +1,36 @@
 {% extends "sitio_publico/base.html" %}
-{% load static %}
+{% load static conv_archivo_utils %}
 
 {% block content %}
-
 <div class="container py-5">
-
   <div class="row justify-content-center">
     <div class="col-lg-8">
+      <div class="p-4 shadow" style="border-radius:16px; background:#fff;">
 
-      <div class="p-4 shadow"
-           style="border-radius:16px; background:#fff;">
-
-        <h2 class="fw-bold mb-2">
-          Rendición de fondos
-        </h2>
-
+        <h2 class="fw-bold mb-1">Rendición de fondos</h2>
         <p class="text-muted mb-4">
           Convocatoria: <strong>{{ convocatoria.titulo }}</strong><br>
           Proyecto: <strong>{{ postulacion.nombre_proyecto|default:"(Sin título)" }}</strong>
         </p>
 
-        <!-- ============================= -->
-        <!-- ACLARACIÓN ADMINISTRATIVA -->
-        <!-- ============================= -->
         <div class="alert alert-info">
-          <strong>Importante:</strong><br>
-          La carga digital de esta rendición tiene carácter informativo y administrativo.
-          <u>La rendición de fondos debe presentarse también de manera física</u>,
-          conforme a lo establecido en las bases y condiciones de la convocatoria.
+          <strong>Importante:</strong>
+          La carga digital tiene carácter informativo y administrativo.
+          <u>La rendición también debe presentarse de forma física</u>
+          conforme a las bases y condiciones.
         </div>
 
-        <!-- ============================= -->
-        <!-- ESTADO -->
-        <!-- ============================= -->
+        <!-- Estado -->
         <p class="mb-3">
-          <strong>Estado de la rendición:</strong>
+          <strong>Estado:</strong>
           <span class="badge ms-2
-            {% if rendicion.estado == 'BORRADOR' %}
-              bg-secondary
-            {% elif rendicion.estado == 'ENVIADO' %}
-              bg-info
-            {% elif rendicion.estado == 'OBSERVADO' %}
-              bg-warning text-dark
-            {% elif rendicion.estado == 'SUBSANADO' %}
-              bg-primary
-            {% elif rendicion.estado == 'APROBADO' %}
-              bg-success
-            {% elif rendicion.estado == 'RECHAZADO' %}
-              bg-danger
-            {% else %}
-              bg-secondary
-            {% endif %}
-          ">
+            {% if rendicion.estado == 'BORRADOR' %}bg-secondary
+            {% elif rendicion.estado == 'ENVIADO' %}bg-info
+            {% elif rendicion.estado == 'OBSERVADO' %}bg-warning text-dark
+            {% elif rendicion.estado == 'SUBSANADO' %}bg-primary
+            {% elif rendicion.estado == 'APROBADO' %}bg-success
+            {% elif rendicion.estado == 'RECHAZADO' %}bg-danger
+            {% endif %}">
             {{ rendicion.get_estado_display }}
           </span>
         </p>
@@ -65,66 +44,84 @@
 
         <hr>
 
-        <!-- ============================= -->
-        <!-- FORMULARIO -->
-        <!-- ============================= -->
-        <form method="post" novalidate>
+        <form method="post" enctype="multipart/form-data" novalidate>
           {% csrf_token %}
 
-          <div class="mb-3">
-            <label for="link_documentacion" class="form-label fw-bold">
-              Link a la documentación de rendición
-            </label>
-            <input type="url"
-                   class="form-control"
-                   id="link_documentacion"
-                   name="link_documentacion"
-                   placeholder="https://drive.google.com/..."
-                   value="{{ rendicion.link_documentacion|default:'' }}"
-                   required>
+          <!-- ── 1. Planilla xlsx ─────────────────────────── -->
+          <h5 class="fw-bold mb-3">1. Planilla de rendición</h5>
+          <p class="text-muted small mb-3">
+            Completá la planilla oficial con el detalle de cada ticket o factura y subila acá.
+          </p>
 
-            <div class="form-text">
-              Podés usar Google Drive, OneDrive u otra plataforma similar.
-              Asegurate de que el link tenga permisos de acceso.
+          {% if rendicion.planilla_xlsx %}
+            <div class="mb-2">
+              <a href="{{ rendicion.planilla_xlsx.url }}" class="btn btn-outline-success btn-sm" download>
+                Descargar planilla actual
+              </a>
             </div>
+          {% endif %}
+
+          <div class="mb-4">
+            <input type="file" name="planilla_xlsx" class="form-control" accept=".xlsx,.xls">
+            <div class="form-text">Formato .xlsx. Si ya subiste una, subir otra reemplaza la anterior.</div>
           </div>
 
+          <!-- ── 2. Impacto económico ─────────────────────── -->
+          <h5 class="fw-bold mb-3">2. Impacto económico</h5>
+          <p class="text-muted small mb-3">
+            Completá los montos totales por categoría a partir de tu planilla.
+          </p>
+
+          <div class="row g-3 mb-4">
+            {% for campo, label in campos_impacto %}
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold small">{{ label }}</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" name="{{ campo }}" min="0" step="0.01"
+                       class="form-control"
+                       value="{{ rendicion|get_attr:campo|default:0 }}"
+                       placeholder="0">
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- ── 3. Documentación adicional ──────────────── -->
+          <h5 class="fw-bold mb-3">3. Documentación adicional (opcional)</h5>
+
           <div class="mb-3">
-            <label for="observaciones_usuario" class="form-label fw-bold">
-              Observaciones
-            </label>
-            <textarea class="form-control"
-                      id="observaciones_usuario"
-                      name="observaciones_usuario"
-                      rows="4"
+            <label class="form-label fw-bold">Link a documentación complementaria</label>
+            <input type="url" name="link_documentacion" class="form-control"
+                   placeholder="https://drive.google.com/..."
+                   value="{{ rendicion.link_documentacion|default:'' }}">
+            <div class="form-text">Google Drive, OneDrive u otra plataforma. Asegurate que el link tenga permisos.</div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold">Observaciones</label>
+            <textarea name="observaciones_usuario" class="form-control" rows="3"
                       placeholder="Aclaraciones, referencias o información adicional (opcional)">{{ rendicion.observaciones_usuario|default:'' }}</textarea>
           </div>
 
           <hr>
 
-          <!-- ============================= -->
-          <!-- ACCIONES -->
-          <!-- ============================= -->
+          <!-- Acciones -->
           <div class="d-flex gap-2 flex-wrap">
-
-            <button type="submit"
-                    class="btn btn-primary">
+            <button type="submit" name="accion" value="guardar" class="btn btn-outline-secondary">
+              Guardar borrador
+            </button>
+            <button type="submit" name="accion" value="enviar" class="btn btn-primary">
               Enviar rendición
             </button>
-
-            <a href="{% url 'usuarios:panel_usuario' %}"
-               class="btn btn-outline-secondary">
+            <a href="{% url 'usuarios:panel_usuario' %}" class="btn btn-outline-secondary ms-auto">
               Volver al panel
             </a>
-
           </div>
+
         </form>
-
       </div>
-
     </div>
   </div>
-
 </div>
-
 {% endblock %}

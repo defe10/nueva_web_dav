@@ -975,6 +975,33 @@ class RendicionAdmin(admin.ModelAdmin):
 
     estado_postulacion.short_description = "Estado"
 
+    fieldsets = (
+        ("Postulación", {
+            "fields": ("postulacion", "user", "estado", "fecha_envio"),
+        }),
+        ("Documentación digital", {
+            "fields": ("planilla_xlsx", "link_documentacion", "observaciones_usuario"),
+        }),
+        ("Impacto económico", {
+            "description": "Montos totales por categoría extraídos de la planilla de rendición.",
+            "fields": (
+                "honorarios_tecnicos",
+                "honorarios_elenco",
+                "otros_honorarios",
+                "insumos",
+                "servicios_audiovisuales",
+                "servicios_logistica",
+            ),
+        }),
+        ("Revisión administrativa", {
+            "fields": ("observaciones_admin", "fecha_ultima_revision"),
+        }),
+        ("Estado físico", {
+            "classes": ("collapse",),
+            "fields": ("fisico_estado", "fisico_fecha_recepcion", "fisico_observaciones"),
+        }),
+    )
+
 
 
 

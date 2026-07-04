@@ -1,0 +1,166 @@
+{% extends "sitio_publico/base.html" %}
+{% block title %}Estadísticas · DAV{% endblock %}
+
+{% block content %}
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Estadísticas</h1>
+  <p class="text-white mb-0">Postulaciones y ganadores del Plan de Fomento IDEA</p>
+</section>
+
+<div class="container py-4">
+
+  <!-- ═══ FILTROS ═══════════════════════════════════════════ -->
+  <div class="dav-card mb-4">
+    <form method="get" class="row g-2 align-items-end">
+
+      <div class="col-12 col-md-3">
+        <label class="form-label small mb-1">Convocatoria</label>
+        <select name="conv" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for c in convocatorias %}
+            <option value="{{ c.id }}" {% if filtros.conv == c.id|stringformat:"s" %}selected{% endif %}>
+              {{ c.titulo }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-6 col-md-2">
+        <label class="form-label small mb-1">Año</label>
+        <select name="anio" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for a in anios %}
+            <option value="{{ a }}" {% if filtros.anio == a|stringformat:"s" %}selected{% endif %}>{{ a }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <label class="form-label small mb-1">Tipo de proyecto</label>
+        <select name="tipo" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for val, label in tipos %}
+            {% if val %}
+              <option value="{{ val }}" {% if filtros.tipo == val %}selected{% endif %}>{{ label }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-6 col-md-2 d-flex align-items-end pb-1">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="solo_ganadores" value="1" id="chk_gan"
+                 {% if filtros.solo_ganadores %}checked{% endif %}>
+          <label class="form-check-label small" for="chk_gan">Solo ganadores</label>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filtrar</button>
+        <a href="{% url 'estadisticas:dashboard' %}" class="btn btn-outline-secondary btn-sm">✕</a>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ═══ TOTAL ═══════════════════════════════════════════════ -->
+  <div class="dav-card text-center mb-4 py-3">
+    <div class="fs-1 fw-bold text-primary">{{ total }}</div>
+    <div class="text-muted">{% if filtros.solo_ganadores %}ganadores{% else %}postulaciones{% endif %} encontradas</div>
+  </div>
+
+  {% if total == 0 %}
+    <div class="alert alert-info">No hay postulaciones con los filtros seleccionados.</div>
+  {% else %}
+
+  <div class="row g-4">
+
+    <!-- ─── Por convocatoria ──────────────────────────────── -->
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Por convocatoria" filas=por_conv %}
+    </div>
+
+    <!-- ─── Por tipo de proyecto ─────────────────────────── -->
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Por tipo de proyecto" filas=por_tipo %}
+    </div>
+
+    <!-- ─── Por género del proyecto ──────────────────────── -->
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Género del proyecto" filas=por_genero_proy %}
+    </div>
+
+    <!-- ─── Por estado ───────────────────────────────────── -->
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Estado de postulación" filas=por_estado %}
+    </div>
+
+    <!-- ─── Género de presentantes ───────────────────────── -->
+    <div class="col-12 col-md-4">
+      {% include "estadisticas/_tabla_kv.html" with titulo="Género — presentantes" filas=genero_persona %}
+    </div>
+
+    <!-- ─── Rango etario ─────────────────────────────────── -->
+    <div class="col-12 col-md-4">
+      {% include "estadisticas/_tabla_kv.html" with titulo="Rango etario" filas=rango_etario %}
+    </div>
+
+    <!-- ─── Lugar de residencia ──────────────────────────── -->
+    <div class="col-12 col-md-4">
+      {% include "estadisticas/_tabla_kv.html" with titulo="Lugar de residencia" filas=residencia %}
+    </div>
+
+  </div>
+
+  <!-- ═══ IMPACTO ECONÓMICO ══════════════════════════════════ -->
+  <hr class="my-5">
+  <h4 class="fw-bold mb-1">Impacto económico</h4>
+  <p class="text-muted small mb-4">Basado en rendiciones aprobadas{% if filtros.conv or filtros.anio %} con los filtros aplicados{% endif %}.</p>
+
+  {% if impacto_count == 0 %}
+    <div class="alert alert-secondary">No hay rendiciones aprobadas con los filtros seleccionados.</div>
+  {% else %}
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-4">
+      <div class="dav-card text-center py-3">
+        <div class="fs-4 fw-bold text-success">${{ impacto_total|floatformat:0 }}</div>
+        <div class="text-muted small">Total rendido ({{ impacto_count }} proyectos)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dav-card">
+    <div class="dav-card-body">
+      <table class="table table-sm mb-0">
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th class="text-end">Monto</th>
+            <th class="text-end" style="width:80px">%</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for fila in impacto_filas %}
+          <tr>
+            <td>{{ fila.label }}</td>
+            <td class="text-end">${{ fila.monto|floatformat:0 }}</td>
+            <td class="text-end text-muted small">{{ fila.pct }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ═══ EXPORTAR ════════════════════════════════════════════ -->
+  <div class="text-end mt-4">
+    <a href="{% url 'estadisticas:exportar' %}?conv={{ filtros.conv }}&anio={{ filtros.anio }}&tipo={{ filtros.tipo }}&solo_ganadores={% if filtros.solo_ganadores %}1{% endif %}"
+       class="btn btn-outline-success">
+      Descargar informe (.xlsx)
+    </a>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}

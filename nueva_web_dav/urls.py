@@ -30,6 +30,9 @@ urlpatterns = [
     
     # Chatbot
     path('chatbot/', include('chatbot.urls')),
+
+    # Estadísticas (solo staff)
+    path('estadisticas/', include('estadisticas.urls')),
 ]
 
 if settings.DEBUG:
