@@ -3,7 +3,8 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.core.files.base import ContentFile
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 
 from convocatorias.models import Convocatoria
@@ -33,6 +34,7 @@ def validar_tamano_5mb(archivo):
 ESTADOS_EXENCION = [
     ("BORRADOR", "Borrador"),
     ("ENVIADA", "Enviada"),
+    ("OBSERVADA", "Observada — requiere subsanación"),
     ("APROBADA", "Aprobada"),
     ("RECHAZADA", "Rechazada"),
 ]
@@ -117,10 +119,11 @@ class Exencion(models.Model):
         Marca la exención como aprobada y setea fechas.
         NO genera PDF ni envía mails.
         """
+        import datetime
         hoy = timezone.now().date()
         self.estado = "APROBADA"
         self.fecha_emision = hoy
-        self.fecha_vencimiento = hoy.replace(year=hoy.year + 1)
+        self.fecha_vencimiento = datetime.date(hoy.year + 1, 1, 1)
         self.save(update_fields=["estado", "fecha_emision", "fecha_vencimiento"])
 
     def aprobar_y_generar_pdf(self):
@@ -141,17 +144,30 @@ class Exencion(models.Model):
         )
 
         # 3) Enviar correo
-        if self.email:
-            email = EmailMessage(
-                subject=f"Constancia de exención {self.numero_constancia}",
-                body=(
-                    f"Hola {self.nombre_razon_social},\n\n"
-                    "Tu solicitud de exención impositiva fue aprobada.\n"
-                    "Adjuntamos la constancia en formato PDF.\n\n"
-                    "Secretaría de Cultura de Salta"
-                ),
-                to=[self.user.email],
+        destinatario = self.user.email or self.email
+        if destinatario:
+            asunto = f"Constancia de exención {self.numero_constancia}"
+            texto = (
+                f"Hola {self.nombre_razon_social},\n\n"
+                "Tu solicitud de exención impositiva fue aprobada.\n"
+                "Adjuntamos la constancia en formato PDF.\n\n"
+                "Dirección de Audiovisuales · Secretaría de Cultura · Provincia de Salta"
             )
+            try:
+                html = render_to_string(
+                    "exencion/aprobacion_email.html",
+                    {"exencion": self, "user": self.user},
+                )
+            except Exception:
+                html = None
+
+            email = EmailMultiAlternatives(
+                subject=asunto,
+                body=texto,
+                to=[destinatario],
+            )
+            if html:
+                email.attach_alternative(html, "text/html")
             email.attach(filename, pdf_content, "application/pdf")
             email.send()
 
@@ -222,10 +238,23 @@ class ExencionDocumento(models.Model):
         ("ENVIADO", "Enviado"),
     ]
 
+    TIPOS = [
+        ("CV", "Curriculum Vitae"),
+        ("DNI", "DNI (frente y dorso)"),
+        ("CONSTANCIA_ARCA", "Constancia de inscripción en ARCA"),
+    ]
+
     exencion = models.ForeignKey(
         Exencion,
         on_delete=models.CASCADE,
         related_name="documentos"
+    )
+
+    tipo = models.CharField(
+        max_length=20,
+        choices=TIPOS,
+        blank=True,
+        null=True,
     )
 
     archivo = models.FileField(

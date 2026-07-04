@@ -8,6 +8,28 @@ from django.utils.html import format_html, format_html_join
 
 from .models import Exencion, ExencionDocumento, ObservacionAdministrativaExencion
 
+# ============================================================
+# INLINE DOCUMENTOS (readonly)
+# ============================================================
+class ExencionDocumentoInline(admin.TabularInline):
+    model = ExencionDocumento
+    extra = 0
+    can_delete = False
+    show_change_link = False
+
+    fields = ("tipo", "es_subsanacion", "estado", "fecha_subida", "fecha_envio", "archivo_link")
+    readonly_fields = ("tipo", "es_subsanacion", "estado", "fecha_subida", "fecha_envio", "archivo_link")
+
+    def archivo_link(self, obj):
+        if obj.archivo:
+            nombre = obj.archivo.name.split("/")[-1]
+            return format_html('<a href="{}" target="_blank">{}</a>', obj.archivo.url, nombre)
+        return "—"
+    archivo_link.short_description = "Archivo"
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
 
 # ============================================================
 # ADMIN EXENCIÓN
@@ -28,10 +50,9 @@ class ExencionAdmin(admin.ModelAdmin):
     list_filter = ("estado", "fecha_creacion")
     search_fields = ("nombre_razon_social", "cuit", "email")
 
-    actions = ["aprobar_exencion_y_emitir_pdf"]
+    actions = ["aprobar_exencion_y_emitir_pdf", "rechazar_exencion"]
 
-    # OJO: NO hay inlines -> no aparece “Documentos de exención”
-    # inlines = [...]
+    inlines = [ExencionDocumentoInline]
 
     readonly_fields = (
         "id",
@@ -239,6 +260,54 @@ class ExencionAdmin(admin.ModelAdmin):
             level=messages.SUCCESS
         )
 
+    @admin.action(description="Rechazar exención y notificar al usuario")
+    def rechazar_exencion(self, request, queryset):
+        from django.core.mail import EmailMultiAlternatives
+        from django.template.loader import render_to_string
+
+        procesadas = 0
+        for exencion in queryset:
+            if exencion.estado not in ("ENVIADA", "OBSERVADA"):
+                self.message_user(
+                    request,
+                    f"Exención #{exencion.id} no fue rechazada (estado: {exencion.estado}).",
+                    level=messages.WARNING,
+                )
+                continue
+
+            exencion.estado = "RECHAZADA"
+            exencion.save(update_fields=["estado"])
+
+            destinatario = (getattr(exencion.user, "email", "") or exencion.email or "").strip()
+            if destinatario:
+                asunto = f"Solicitud de exención #{exencion.id} rechazada"
+                texto = (
+                    f"Hola {exencion.nombre_razon_social},\n\n"
+                    "Lamentablemente tu solicitud de exención impositiva fue rechazada.\n"
+                    "Podés iniciar una nueva solicitud desde el portal cuando lo desees.\n\n"
+                    "Dirección de Audiovisuales · Secretaría de Cultura · Provincia de Salta"
+                )
+                try:
+                    html = render_to_string(
+                        "exencion/rechazo_email.html",
+                        {"exencion": exencion, "user": exencion.user, "anio": timezone.now().year},
+                    )
+                except Exception:
+                    html = None
+
+                try:
+                    email = EmailMultiAlternatives(subject=asunto, body=texto, to=[destinatario])
+                    if html:
+                        email.attach_alternative(html, "text/html")
+                    email.send(fail_silently=True)
+                except Exception as e:
+                    self.message_user(request, f"Error enviando email para #{exencion.id}: {e}", level=messages.WARNING)
+
+            self.message_user(request, f"Exención #{exencion.id} rechazada.", level=messages.SUCCESS)
+            procesadas += 1
+
+        if procesadas:
+            self.message_user(request, f"{procesadas} exención/es rechazada/s.", level=messages.SUCCESS)
 
 
 # ============================================================
@@ -266,6 +335,13 @@ class ObservacionAdministrativaExencionAdmin(admin.ModelAdmin):
             anterior = ObservacionAdministrativaExencion.objects.filter(pk=obj.pk).first()
 
         super().save_model(request, obj, form, change)
+
+        # Marcar la exención como OBSERVADA al crear una nueva observación pendiente
+        if es_nueva and not obj.subsanada:
+            exencion_obj = obj.exencion
+            if exencion_obj.estado not in ("APROBADA", "RECHAZADA"):
+                exencion_obj.estado = "OBSERVADA"
+                exencion_obj.save(update_fields=["estado"])
 
         if obj.subsanada:
             return

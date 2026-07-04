@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+  <body style="margin:0; padding:0; background:#f5f5f5; font-family: Arial, Helvetica, sans-serif; color:#111;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f5f5; padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                 style="max-width:560px; background:#ffffff; border:1px solid #e6e6e6; border-radius:14px; overflow:hidden;">
+
+            <!-- HEADER -->
+            <tr>
+              <td style="padding:22px 22px 10px;">
+                <div style="font-size:12px; letter-spacing:.4px; text-transform:uppercase; color:#666;">
+                  Dirección de Audiovisuales · Secretaría de Cultura · Provincia de Salta
+                </div>
+                <h1 style="margin:10px 0 6px; font-size:20px; line-height:1.25;">
+                  Tu constancia de exención fue aprobada
+                </h1>
+                <p style="margin:0; color:#444; font-size:14px; line-height:1.5;">
+                  Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+                  tu solicitud de exención impositiva fue aprobada. Encontrás la constancia adjunta a este correo.
+                </p>
+              </td>
+            </tr>
+
+            <!-- CUERPO -->
+            <tr>
+              <td style="padding:0 22px 18px;">
+                <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:14px; margin-top:12px;">
+                  <p style="margin:0 0 8px; font-size:14px;">
+                    <strong>Constancia:</strong> {{ exencion.numero_constancia }}
+                  </p>
+                  <p style="margin:0 0 8px; font-size:14px;">
+                    <strong>Solicitante:</strong> {{ exencion.nombre_razon_social }}
+                  </p>
+                  <p style="margin:0 0 8px; font-size:14px;">
+                    <strong>CUIT:</strong> {{ exencion.cuit }}
+                  </p>
+                  {% if exencion.fecha_emision %}
+                  <p style="margin:0 0 8px; font-size:14px;">
+                    <strong>Fecha de emisión:</strong> {{ exencion.fecha_emision|date:"d/m/Y" }}
+                  </p>
+                  {% endif %}
+                  {% if exencion.fecha_vencimiento %}
+                  <p style="margin:0; font-size:14px;">
+                    <strong>Válida hasta:</strong> {{ exencion.fecha_vencimiento|date:"d/m/Y" }}
+                  </p>
+                  {% endif %}
+                </div>
+
+                <p style="margin:16px 0 0; font-size:13px; color:#555; line-height:1.5;">
+                  La constancia en formato PDF se encuentra adjunta a este correo. También podés descargarla en cualquier momento desde tu panel de usuario.
+                </p>
+              </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td style="padding:14px 22px; background:#fcfcfc; border-top:1px solid #eee;
+                         color:#777; font-size:12px; line-height:1.4;">
+                Este es un mensaje automático. Por favor, no respondas a este correo.<br>
+                © {% now "Y" %} Secretaría de Cultura · Provincia de Salta
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
