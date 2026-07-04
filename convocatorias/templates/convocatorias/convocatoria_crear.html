@@ -5,260 +5,349 @@
 
 {% block content %}
 
-<!-- HERO UNIFICADO -->
 <section class="fomento-hero text-center">
   <h1 class="fw-bold mb-2">Crear convocatoria</h1>
-  <p class="text-white mb-0">
-    Administración del sistema
-  </p>
+  <p class="text-white mb-0">Administración del sistema</p>
 </section>
 
 <div class="container py-4">
   <div class="row justify-content-center">
     <div class="col-lg-10">
-
       <div class="dav-card mb-5">
 
-        <h3 class="mb-3">Nueva convocatoria</h3>
+        <h3 class="mb-1">Nueva convocatoria</h3>
         <p class="text-muted mb-4">
           Completá los campos para crear una nueva convocatoria.
           Los datos cargados se mostrarán automáticamente en la web pública.
         </p>
 
-        <form method="post" enctype="multipart/form-data" class="row g-3">
+        <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
 
-          <!-- ORDEN / CATEGORÍA / LÍNEA -->
-          <div class="col-md-3">
-            <label class="form-label">Orden en el carrusel</label>
-            {{ form.orden }}
-          </div>
-
-          <div class="col-md-4">
-            <label class="form-label">Categoría</label>
-            {{ form.categoria }}
-          </div>
-
-          <div class="col-md-5">
-            <label class="form-label">Línea</label>
-            {{ form.linea }}
-          </div>
-
-          <!-- TÍTULO -->
-          <div class="col-12">
-            <label class="form-label">Título</label>
-            {{ form.titulo }}
-          </div>
-
-          <!-- DESCRIPCIONES -->
-          <div class="col-12">
-            <label class="form-label">Descripción corta</label>
-            {{ form.descripcion_corta }}
-          </div>
-
-          <div class="col-12">
-            <label class="form-label">Descripción completa</label>
-            {{ form.descripcion_larga }}
-          </div>
-
-          <!-- TEMÁTICA -->
-          <div class="col-12">
-            <label class="form-label">Temática / Género</label>
-            {{ form.tematica_genero }}
-          </div>
-
-          <!-- REQUISITOS / BENEFICIOS -->
-          <div class="col-12">
-            <label class="form-label">Requisitos</label>
-            {{ form.requisitos }}
-          </div>
-
-          <div class="col-12">
-            <label class="form-label">Beneficios</label>
-            {{ form.beneficios }}
-          </div>
-
-          <!-- ARCHIVOS -->
-          <div class="col-md-6">
-            <label class="form-label">Bases y condiciones (PDF)</label>
-            {{ form.bases_pdf }}
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Imagen (JPG/PNG)</label>
-            {{ form.imagen }}
-          </div>
-
-          <!-- URL DESTINO -->
-          {% if form.url_destino %}
-          <div class="col-12">
-            <label class="form-label">URL destino (opcional)</label>
-            {{ form.url_destino }}
-            <small class="text-muted d-block">
-              Si completás esta URL, el botón puede enviarte a una página externa.
-            </small>
-          </div>
-          {% endif %}
-
-          <!-- FECHAS -->
-          <div class="col-md-6">
-            <label class="form-label">Fecha de inicio</label>
-            {{ form.fecha_inicio }}
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Fecha de cierre</label>
-            {{ form.fecha_fin }}
-          </div>
-
-          <!-- BLOQUE PERSONAS -->
-          <div class="col-12 mt-4">
-            <h4 class="fw-bold"> Evaluación / Tutorías</h4>
-          </div>
-
-          <div class="col-12">
-            <label class="form-label">Título del bloque</label>
-            {{ form.bloque_personas }}
-            <small class="text-muted d-block">
-              Elegí cómo se mostrará este bloque.
-            </small>
-          </div>
-
-          <!-- FORMSET JURADO -->
-          <div class="col-12">
-            {{ jurado_formset.management_form }}
-            <div id="jurado-container">
-              {% for jform in jurado_formset %}
-              <div class="jurado-row border rounded p-3 mb-3 position-relative">
-                {% if jform.instance.pk %}{{ jform.id }}{% endif %}
-                <div class="row g-2 align-items-start">
-                  <div class="col-md-5">
-                    <label class="form-label small fw-semibold">Nombre</label>
-                    {{ jform.nombre }}
-                  </div>
-                  <div class="col-md-1">
-                    <label class="form-label small fw-semibold">Orden</label>
-                    {{ jform.orden }}
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label small fw-semibold">Foto (opcional)</label>
-                    {{ jform.foto }}
-                  </div>
-                  <div class="col-12">
-                    <label class="form-label small fw-semibold">Bio (opcional)</label>
-                    {{ jform.bio }}
-                  </div>
-                  {% if jform.non_field_errors %}
-                  <div class="col-12">
-                    <div class="alert alert-danger py-1">{{ jform.non_field_errors }}</div>
-                  </div>
-                  {% endif %}
-                </div>
-                <div class="mt-2">
-                  {% if jform.DELETE %}
-                  <div class="form-check">
-                    {{ jform.DELETE }}
-                    <label class="form-check-label text-danger small" for="{{ jform.DELETE.id_for_label }}">Eliminar este miembro</label>
-                  </div>
-                  {% else %}
-                  <button type="button" class="btn btn-sm btn-outline-danger remove-jurado">Quitar</button>
-                  {% endif %}
-                </div>
-              </div>
-              {% endfor %}
+          <!-- STEPPER DE PROGRESO -->
+          <div class="d-flex align-items-center mb-4 gap-0" id="tab-stepper">
+            <div class="stepper-step active" data-target="tab-general">
+              <span class="stepper-num">1</span>
+              <span class="stepper-label">General</span>
             </div>
-
-            <button type="button" id="add-jurado" class="btn btn-outline-secondary btn-sm mt-1">
-              + Agregar miembro
-            </button>
+            <div class="stepper-line"></div>
+            <div class="stepper-step" data-target="tab-postulacion">
+              <span class="stepper-num">2</span>
+              <span class="stepper-label">Postulación</span>
+            </div>
+            <div class="stepper-line"></div>
+            <div class="stepper-step" data-target="tab-jurado">
+              <span class="stepper-num">3</span>
+              <span class="stepper-label">Evaluadores</span>
+            </div>
+            <div class="stepper-line"></div>
+            <div class="stepper-step" data-target="tab-criterios">
+              <span class="stepper-num">4</span>
+              <span class="stepper-label">Criterios</span>
+            </div>
           </div>
 
-          <!-- CONFIGURACIÓN DE POSTULACIÓN -->
-          <div class="col-12 mt-4">
-            <hr>
-            <h4 class="fw-bold mb-1">Configuración de postulación</h4>
-            <p class="text-muted mb-3">Definí quién puede postularse y qué se solicita.</p>
+          <!-- TABS NAV (oculto, usado solo por Bootstrap) -->
+          <ul class="nav nav-tabs mb-4 d-none" id="convocatoriaTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="tab-general" data-bs-toggle="tab" data-bs-target="#pane-general" type="button" role="tab">General</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tab-postulacion" data-bs-toggle="tab" data-bs-target="#pane-postulacion" type="button" role="tab">Postulación</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tab-jurado" data-bs-toggle="tab" data-bs-target="#pane-jurado" type="button" role="tab">Evaluadores</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tab-criterios" data-bs-toggle="tab" data-bs-target="#pane-criterios" type="button" role="tab">Criterios de evaluación</button>
+            </li>
+          </ul>
 
-            <div class="row g-4">
+          <!-- TAB PANES -->
+          <div class="tab-content">
 
-              <!-- TIPO DE POSTULANTE -->
-              <div class="col-12">
-                <h6 class="fw-semibold mb-2">Tipo de postulante</h6>
-                <div style="max-width:380px">
-                  <label class="form-label small text-muted">{{ config_form.tipo_postulante.label }}</label>
-                  {{ config_form.tipo_postulante }}
+            <!-- ── GENERAL ── -->
+            <div class="tab-pane fade show active" id="pane-general" role="tabpanel">
+              <div class="row g-3">
+
+                <div class="col-md-3">
+                  <label class="form-label">Orden en el carrusel</label>
+                  {{ form.orden }}
                 </div>
-              </div>
-
-              <!-- EQUIPO -->
-              <div class="col-md-6">
-                <h6 class="fw-semibold mb-2">Equipo requerido</h6>
-                <p class="text-muted small mb-2">El/la productor/a presentante siempre es quien se inscribe.</p>
-                {% for f in config_form %}{% if f.name in "requiere_director,director_puede_coincidir,requiere_guionista,requiere_realizador,requiere_cbu" %}
-                <div class="form-check mb-2">
-                  {{ f }}<label class="form-check-label ms-1" for="{{ f.id_for_label }}">{{ f.label }}</label>
+                <div class="col-md-4">
+                  <label class="form-label">Categoría</label>
+                  {{ form.categoria }}
                 </div>
-                {% endif %}{% endfor %}
-              </div>
-
-              <!-- CAMPOS DEL PROYECTO -->
-              <div class="col-md-6">
-                <h6 class="fw-semibold mb-2">Campos del proyecto</h6>
-                {% for f in config_form %}{% if f.name in "mostrar_titulo,mostrar_formato,mostrar_genero,requiere_sinopsis,requiere_link_pitch" %}
-                <div class="form-check mb-2">
-                  {{ f }}<label class="form-check-label ms-1" for="{{ f.id_for_label }}">{{ f.label }}</label>
+                <div class="col-md-5">
+                  <label class="form-label">Línea</label>
+                  {{ form.linea }}
                 </div>
-                {% endif %}{% endfor %}
-              </div>
 
-              <!-- DOCUMENTOS DEL PROYECTO -->
-              <div class="col-12">
-                <h6 class="fw-semibold mb-2">Documentos del proyecto</h6>
-                <p class="text-muted small mb-2">Si se activan, el postulante <strong>debe</strong> subirlos para continuar.</p>
-                <div class="row g-2 mb-3">
-                  {% for f in config_form %}{% if f.name in "mostrar_guion,mostrar_dossier,mostrar_planilla_oficial,mostrar_dnda,mostrar_constancia_invitacion,mostrar_nota_intencion,mostrar_documentacion" %}
-                  <div class="col-md-4">
-                    <div class="form-check">
-                      {{ f }}<label class="form-check-label ms-1" for="{{ f.id_for_label }}">{{ f.label|cut:"Mostrar sección: " }}</label>
-                    </div>
+                <div class="col-12">
+                  <label class="form-label">Título</label>
+                  {{ form.titulo }}
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Descripción corta</label>
+                  {{ form.descripcion_corta }}
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Descripción completa</label>
+                  {{ form.descripcion_larga }}
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Temática / Género</label>
+                  {{ form.tematica_genero }}
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Requisitos</label>
+                  {{ form.requisitos }}
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Beneficios</label>
+                  {{ form.beneficios }}
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Bases y condiciones (PDF)</label>
+                  {{ form.bases_pdf }}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Planilla oficial (.xlsx)</label>
+                  {{ config_form.planilla_archivo }}
+                  <small class="text-muted d-block mt-1">El presentante la descarga desde el detalle de la convocatoria.</small>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Imagen (JPG/PNG)</label>
+                  {{ form.imagen }}
+                  <div id="imagen-preview-wrap" class="mt-2 d-none">
+                    <img id="imagen-preview" src="#" alt="Vista previa"
+                         class="img-thumbnail" style="max-height:160px; object-fit:cover;">
+                  </div>
+                </div>
+
+                {% if form.url_destino %}
+                <div class="col-12">
+                  <label class="form-label">URL destino (opcional)</label>
+                  {{ form.url_destino }}
+                  <small class="text-muted d-block">
+                    Si completás esta URL, el botón puede enviarte a una página externa.
+                  </small>
+                </div>
+                {% endif %}
+
+                <div class="col-md-6">
+                  <label class="form-label">Fecha de inicio</label>
+                  {{ form.fecha_inicio }}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Fecha de cierre</label>
+                  {{ form.fecha_fin }}
+                </div>
+
+              </div>
+            </div><!-- /pane-general -->
+
+            <!-- ── POSTULACIÓN ── -->
+            <div class="tab-pane fade" id="pane-postulacion" role="tabpanel">
+              <div class="row g-4">
+
+                <!-- TIPO DE POSTULANTE -->
+                <div class="col-12">
+                  <h6 class="fw-semibold mb-2">Tipo de postulante</h6>
+                  <div style="max-width:380px">
+                    <label class="form-label small text-muted">{{ config_form.tipo_postulante.label }}</label>
+                    {{ config_form.tipo_postulante }}
+                  </div>
+                </div>
+
+                <!-- EQUIPO -->
+                <div class="col-md-6">
+                  <h6 class="fw-semibold mb-2">Equipo requerido</h6>
+                  <p class="text-muted small mb-2">El/la productor/a presentante siempre es quien se inscribe.</p>
+
+                  <div class="form-check mb-1">
+                    {{ config_form.requiere_director }}
+                    <label class="form-check-label ms-1" for="{{ config_form.requiere_director.id_for_label }}">Requiere director/a</label>
+                  </div>
+                  <div class="form-check mb-2 ms-4">
+                    {{ config_form.director_puede_coincidir }}
+                    <label class="form-check-label ms-1 text-muted small" for="{{ config_form.director_puede_coincidir.id_for_label }}">
+                      Puede ser el/la mismo/a que el/la productor/a presentante
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    {{ config_form.requiere_guionista }}
+                    <label class="form-check-label ms-1" for="{{ config_form.requiere_guionista.id_for_label }}">Requiere guionista</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    {{ config_form.requiere_realizador }}
+                    <label class="form-check-label ms-1" for="{{ config_form.requiere_realizador.id_for_label }}">Requiere realizador/a</label>
+                  </div>
+                  <div class="form-check mb-3">
+                    {{ config_form.requiere_productor_responsable }}
+                    <label class="form-check-label ms-1" for="{{ config_form.requiere_productor_responsable.id_for_label }}">Requiere productor/a responsable (Persona jurídica)</label>
+                  </div>
+
+                  <hr class="my-2">
+
+                  <div class="form-check mb-2">
+                    {{ config_form.requiere_cbu }}
+                    <label class="form-check-label ms-1" for="{{ config_form.requiere_cbu.id_for_label }}">Requiere CBU</label>
+                  </div>
+                  <p class="text-muted small ms-4 mb-0">Si no se activa, tampoco se pedirá el comprobante de CBU en el formulario.</p>
+                </div>
+
+                <!-- CAMPOS DEL PROYECTO -->
+                <div class="col-md-6">
+                  <h6 class="fw-semibold mb-2">Campos del proyecto</h6>
+                  {% for f in config_form %}{% if f.name in "mostrar_titulo,mostrar_formato,mostrar_genero,requiere_sinopsis,requiere_link_pitch" %}
+                  <div class="form-check mb-2">
+                    {{ f }}<label class="form-check-label ms-1" for="{{ f.id_for_label }}">{{ f.label }}</label>
                   </div>
                   {% endif %}{% endfor %}
                 </div>
-                <p class="text-muted small mb-2">Si se activan, el postulante <strong>puede</strong> subirlos (opcionales).</p>
-                <div class="row g-2">
-                  {% for f in config_form %}{% if f.name in "mostrar_material_adicional,mostrar_autorizacion_derechos" %}
-                  <div class="col-md-4">
-                    <div class="form-check">
-                      {{ f }}<label class="form-check-label ms-1" for="{{ f.id_for_label }}">{{ f.label|cut:"Mostrar sección: " }}</label>
+
+                <!-- DOCUMENTOS DEL PROYECTO -->
+                <div class="col-12">
+                  <h6 class="fw-semibold mb-2">Documentos del proyecto</h6>
+                  <p class="text-muted small mb-2">Si se activan, el postulante <strong>debe</strong> subirlos para continuar.</p>
+                  <div class="row g-2 mb-3">
+                    {% for f in config_form %}{% if f.name in "mostrar_guion,mostrar_dossier,mostrar_planilla_oficial,mostrar_dnda,mostrar_constancia_invitacion,mostrar_nota_intencion,mostrar_documentacion" %}
+                    <div class="col-md-4">
+                      <div class="form-check">
+                        {{ f }}<label class="form-check-label ms-1" for="{{ f.id_for_label }}">{{ f.label|cut:"Mostrar sección: " }}</label>
+                      </div>
                     </div>
+                    {% endif %}{% endfor %}
                   </div>
-                  {% endif %}{% endfor %}
+                  <p class="text-muted small mb-2">Si se activan, el postulante <strong>puede</strong> subirlos (opcionales).</p>
+                  <div class="row g-2">
+                    {% for f in config_form %}{% if f.name in "mostrar_material_adicional,mostrar_autorizacion_derechos" %}
+                    <div class="col-md-4">
+                      <div class="form-check">
+                        {{ f }}<label class="form-check-label ms-1" for="{{ f.id_for_label }}">{{ f.label|cut:"Mostrar sección: " }}</label>
+                      </div>
+                    </div>
+                    {% endif %}{% endfor %}
+                  </div>
                 </div>
+
+              </div>
+            </div><!-- /pane-postulacion -->
+
+            <!-- ── EVALUADORES ── -->
+            <div class="tab-pane fade" id="pane-jurado" role="tabpanel">
+              <div class="mb-3">
+                <label class="form-label">Título del bloque</label>
+                {{ form.bloque_personas }}
+                <small class="text-muted d-block">Elegí cómo se mostrará este bloque.</small>
               </div>
 
-            </div>
-          </div>
+              {{ jurado_formset.management_form }}
+              <div id="jurado-container">
+                {% for jform in jurado_formset %}
+                <div class="jurado-row border rounded p-3 mb-3 position-relative">
+                  {% if jform.instance.pk %}{{ jform.id }}{% endif %}
+                  <div class="row g-2 align-items-start">
+                    <div class="col-md-5">
+                      <label class="form-label small fw-semibold">Nombre</label>
+                      {{ jform.nombre }}
+                    </div>
+                    <div class="col-md-1">
+                      <label class="form-label small fw-semibold">Orden</label>
+                      {{ jform.orden }}
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-semibold">Foto (opcional)</label>
+                      {{ jform.foto }}
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label small fw-semibold">Bio (opcional)</label>
+                      {{ jform.bio }}
+                    </div>
+                    {% if jform.non_field_errors %}
+                    <div class="col-12">
+                      <div class="alert alert-danger py-1">{{ jform.non_field_errors }}</div>
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="mt-2">
+                    {% if jform.DELETE %}
+                    <div class="form-check">
+                      {{ jform.DELETE }}
+                      <label class="form-check-label text-danger small" for="{{ jform.DELETE.id_for_label }}">Eliminar este miembro</label>
+                    </div>
+                    {% else %}
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-jurado">Quitar</button>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              <button type="button" id="add-jurado" class="btn btn-outline-secondary btn-sm mt-1">
+                + Agregar miembro
+              </button>
+            </div><!-- /pane-jurado -->
+
+            <!-- ── CRITERIOS DE EVALUACIÓN ── -->
+            <div class="tab-pane fade" id="pane-criterios" role="tabpanel">
+              <p class="text-muted mb-3">
+                Definí los criterios con los que el comité evaluará cada postulación y el puntaje máximo de cada uno.
+              </p>
+
+              {{ criterio_formset.management_form }}
+              <div id="criterio-container">
+                {% for cform in criterio_formset %}
+                <div class="criterio-row border rounded p-3 mb-3">
+                  {% if cform.instance.pk %}{{ cform.id }}{% endif %}
+                  <div class="row g-2 align-items-end">
+                    <div class="col-md-7">
+                      <label class="form-label small fw-semibold">Nombre del criterio</label>
+                      {{ cform.nombre }}
+                    </div>
+                    <div class="col-md-2">
+                      <label class="form-label small fw-semibold">Puntaje máx.</label>
+                      {{ cform.puntaje_maximo }}
+                    </div>
+                    <div class="col-md-1">
+                      <label class="form-label small fw-semibold">Orden</label>
+                      {{ cform.orden }}
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                      {% if cform.DELETE %}
+                      <div class="form-check mb-1">
+                        {{ cform.DELETE }}
+                        <label class="form-check-label text-danger small" for="{{ cform.DELETE.id_for_label }}">Eliminar</label>
+                      </div>
+                      {% else %}
+                      <button type="button" class="btn btn-sm btn-outline-danger remove-criterio w-100">Quitar</button>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              <button type="button" id="add-criterio" class="btn btn-outline-secondary btn-sm mt-1">
+                + Agregar criterio
+              </button>
+            </div><!-- /pane-criterios -->
+
+          </div><!-- /tab-content -->
 
           <!-- BOTONES -->
-          <div class="col-12 mt-4">
+          <div class="col-12 mt-4 pt-3 border-top">
             <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end gap-3">
-
-              <button type="submit" class="btn btn-primary">
-                Crear convocatoria
-              </button>
-
-              <a href="{% url 'convocatorias:convocatorias_home' %}"
-                class="btn btn-outline-secondary">
-                Volver
-              </a>
-
+              <button type="submit" class="btn btn-primary">Crear convocatoria</button>
+              <a href="{% url 'convocatorias:convocatorias_home' %}" class="btn btn-outline-secondary">Volver</a>
             </div>
           </div>
 
         </form>
-
       </div>
-
     </div>
   </div>
 </div>
@@ -266,13 +355,120 @@
 {% endblock %}
 
 {% block extra_js %}
+<style>
+/* ── Stepper ── */
+#tab-stepper { flex-wrap: nowrap; }
+.stepper-step {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; min-width: 72px;
+}
+.stepper-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .85rem;
+  border: 2px solid #dee2e6; background: #fff; color: #6c757d;
+  transition: background .2s, border-color .2s, color .2s;
+  position: relative;
+}
+.stepper-label {
+  font-size: .75rem; color: #6c757d; white-space: nowrap;
+  transition: color .2s;
+}
+.stepper-step.active .stepper-num  { background: var(--bs-primary, #0d6efd); border-color: var(--bs-primary, #0d6efd); color: #fff; }
+.stepper-step.active .stepper-label { color: var(--bs-primary, #0d6efd); font-weight: 600; }
+.stepper-step.done .stepper-num   { background: #198754; border-color: #198754; color: #fff; }
+.stepper-step.done .stepper-label { color: #198754; }
+.stepper-step.has-error .stepper-num  { background: #dc3545; border-color: #dc3545; color: #fff; }
+.stepper-step.has-error .stepper-label { color: #dc3545; font-weight: 600; }
+.stepper-line { flex: 1; height: 2px; background: #dee2e6; margin: 0 4px; margin-bottom: 20px; min-width: 16px; }
+/* badge de error sobre el número */
+.stepper-num .err-badge {
+  position: absolute; top: -5px; right: -5px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #dc3545; border: 2px solid #fff;
+  display: none;
+}
+.stepper-step.has-error .stepper-num .err-badge { display: block; }
+</style>
+
 <script>
 (function () {
-  const container  = document.getElementById('jurado-container');
-  const addBtn     = document.getElementById('add-jurado');
-  const totalInput = document.getElementById('id_miembros_jurado-TOTAL_FORMS');
 
-  function buildEmptyRow(index) {
+  // ── Stepper ──
+  const steps   = document.querySelectorAll('.stepper-step');
+  const tabOrder = ['tab-general','tab-postulacion','tab-jurado','tab-criterios'];
+
+  function activateTab(tabId) {
+    const tabEl = document.getElementById(tabId);
+    if (!tabEl) return;
+    bootstrap.Tab.getOrCreateInstance(tabEl).show();
+    steps.forEach(s => {
+      s.classList.remove('active');
+      if (!s.classList.contains('has-error')) s.classList.remove('done');
+    });
+    let reached = false;
+    steps.forEach(s => {
+      if (s.dataset.target === tabId) { s.classList.add('active'); reached = true; }
+      else if (!reached && !s.classList.contains('has-error')) s.classList.add('done');
+    });
+  }
+
+  steps.forEach(step => {
+    // Agrega el badge de error al número
+    step.querySelector('.stepper-num').insertAdjacentHTML('beforeend', '<span class="err-badge"></span>');
+    step.addEventListener('click', () => activateTab(step.dataset.target));
+  });
+
+  // Mantener stepper sincronizado cuando Bootstrap cambia el tab
+  document.querySelectorAll('#convocatoriaTabs .nav-link').forEach(link => {
+    link.addEventListener('shown.bs.tab', function () {
+      const tabId = this.id;
+      steps.forEach(s => {
+        s.classList.remove('active');
+        if (!s.classList.contains('has-error')) s.classList.remove('done');
+      });
+      let reached = false;
+      steps.forEach(s => {
+        if (s.dataset.target === tabId) { s.classList.add('active'); reached = true; }
+        else if (!reached && !s.classList.contains('has-error')) s.classList.add('done');
+      });
+    });
+  });
+
+  // ── Errores de validación: badge + saltar al primer pane con error ──
+  let firstErrorTab = null;
+  document.querySelectorAll('.tab-pane').forEach(function(pane) {
+    if (pane.querySelector('.is-invalid, .errorlist')) {
+      const tabId = pane.id.replace('pane-', 'tab-');
+      const step = document.querySelector(`.stepper-step[data-target="${tabId}"]`);
+      if (step) step.classList.add('has-error');
+      if (!firstErrorTab) firstErrorTab = tabId;
+    }
+  });
+  if (firstErrorTab) activateTab(firstErrorTab);
+
+  // ── Preview de imagen ──
+  const imagenInput   = document.getElementById('{{ form.imagen.id_for_label }}');
+  const previewWrap   = document.getElementById('imagen-preview-wrap');
+  const previewImg    = document.getElementById('imagen-preview');
+  if (imagenInput) {
+    imagenInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = e => { previewImg.src = e.target.result; previewWrap.classList.remove('d-none'); };
+        reader.readAsDataURL(file);
+      } else {
+        previewWrap.classList.add('d-none');
+      }
+    });
+  }
+
+  // ── Jurado ──
+  const juradoContainer = document.getElementById('jurado-container');
+  const juradoTotal     = document.getElementById('id_miembros_jurado-TOTAL_FORMS');
+
+  function buildJuradoRow(index) {
     const prefix = `miembros_jurado-${index}`;
     return `
       <div class="jurado-row border rounded p-3 mb-3 position-relative">
@@ -300,22 +496,56 @@
       </div>`;
   }
 
-  addBtn.addEventListener('click', function () {
-    const idx = parseInt(totalInput.value, 10);
-    container.insertAdjacentHTML('beforeend', buildEmptyRow(idx));
-    totalInput.value = idx + 1;
-    container.querySelector('.jurado-row:last-child .remove-jurado')
-      .addEventListener('click', removeRow);
+  document.getElementById('add-jurado').addEventListener('click', function () {
+    const idx = parseInt(juradoTotal.value, 10);
+    juradoContainer.insertAdjacentHTML('beforeend', buildJuradoRow(idx));
+    juradoTotal.value = idx + 1;
+    juradoContainer.querySelector('.jurado-row:last-child .remove-jurado')
+      .addEventListener('click', removeJurado);
   });
 
-  function removeRow() {
-    this.closest('.jurado-row').remove();
-    totalInput.value = container.querySelectorAll('.jurado-row').length;
+  function removeJurado() { this.closest('.jurado-row').remove(); }
+  juradoContainer.querySelectorAll('.remove-jurado').forEach(btn => btn.addEventListener('click', removeJurado));
+
+  // ── Criterios ──
+  const criterioContainer = document.getElementById('criterio-container');
+  const criterioTotal     = document.getElementById('id_criterios_evaluacion-TOTAL_FORMS');
+
+  function buildCriterioRow(index) {
+    const prefix = `criterios_evaluacion-${index}`;
+    return `
+      <div class="criterio-row border rounded p-3 mb-3">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-7">
+            <label class="form-label small fw-semibold">Nombre del criterio</label>
+            <input type="text" name="${prefix}-nombre" maxlength="200" class="form-control" placeholder="Ej: Originalidad" id="id_${prefix}-nombre">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small fw-semibold">Puntaje máx.</label>
+            <input type="number" name="${prefix}-puntaje_maximo" value="10" min="1" class="form-control" style="width:90px" id="id_${prefix}-puntaje_maximo">
+          </div>
+          <div class="col-md-1">
+            <label class="form-label small fw-semibold">Orden</label>
+            <input type="number" name="${prefix}-orden" value="0" min="0" class="form-control" style="width:80px" id="id_${prefix}-orden">
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-criterio w-100">Quitar</button>
+          </div>
+        </div>
+      </div>`;
   }
 
-  container.querySelectorAll('.remove-jurado').forEach(btn =>
-    btn.addEventListener('click', removeRow)
-  );
+  document.getElementById('add-criterio').addEventListener('click', function () {
+    const idx = parseInt(criterioTotal.value, 10);
+    criterioContainer.insertAdjacentHTML('beforeend', buildCriterioRow(idx));
+    criterioTotal.value = idx + 1;
+    criterioContainer.querySelector('.criterio-row:last-child .remove-criterio')
+      .addEventListener('click', removeCriterio);
+  });
+
+  function removeCriterio() { this.closest('.criterio-row').remove(); }
+  criterioContainer.querySelectorAll('.remove-criterio').forEach(btn => btn.addEventListener('click', removeCriterio));
+
 })();
 </script>
 {% endblock %}

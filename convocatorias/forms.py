@@ -10,6 +10,7 @@ from .models import (
     DocumentoPostulacion,
     DocumentoIntegrante,
     IntegrantePostulacion,
+    CriterioEvaluacion,
 )
 
 
@@ -91,7 +92,6 @@ class ConvocatoriaForm(forms.ModelForm):
             "requisitos": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "beneficios": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
 
-            "url_curso": forms.URLInput(attrs={"class": "form-control"}),
             "url_destino": forms.TextInput(attrs={"class": "form-control"}),
 
             "fecha_inicio": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
@@ -117,6 +117,7 @@ class ConfiguracionPostulacionForm(forms.ModelForm):
             "tipo_postulante": forms.Select(attrs={"class": "form-select"}),
             **{f: forms.CheckboxInput(attrs={"class": "form-check-input"})
                for f in [
+                   "requiere_productor_responsable",
                    "requiere_director", "director_puede_coincidir",
                    "requiere_guionista", "requiere_realizador", "requiere_cbu",
                    "mostrar_titulo", "mostrar_formato", "mostrar_genero",
@@ -283,6 +284,26 @@ MiembroJuradoFormSet = inlineformset_factory(
     Convocatoria,
     MiembroJurado,
     form=MiembroJuradoForm,
+    extra=0,
+    can_delete=True,
+)
+
+
+class CriterioEvaluacionForm(forms.ModelForm):
+    class Meta:
+        model = CriterioEvaluacion
+        fields = ["nombre", "puntaje_maximo", "orden"]
+        widgets = {
+            "nombre": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: Originalidad"}),
+            "puntaje_maximo": forms.NumberInput(attrs={"class": "form-control", "style": "width:90px", "min": 1}),
+            "orden": forms.NumberInput(attrs={"class": "form-control", "style": "width:80px", "min": 0}),
+        }
+
+
+CriterioEvaluacionFormSet = inlineformset_factory(
+    Convocatoria,
+    CriterioEvaluacion,
+    form=CriterioEvaluacionForm,
     extra=0,
     can_delete=True,
 )

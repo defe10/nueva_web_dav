@@ -97,6 +97,15 @@ urlpatterns = [
     ),
 
     # --------------------------------
+    # DESCARGA DE PLANILLA OFICIAL PRE-COMPLETADA
+    # --------------------------------
+    path(
+        "postulacion/<int:postulacion_id>/planilla/",
+        views.descargar_planilla_oficial,
+        name="descargar_planilla_oficial",
+    ),
+
+    # --------------------------------
     # DETALLE DE CONVOCATORIA (SIEMPRE ÚLTIMO)
     # --------------------------------
     path(

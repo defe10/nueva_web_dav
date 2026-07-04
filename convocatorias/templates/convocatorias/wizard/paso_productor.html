@@ -16,8 +16,8 @@
     <!-- DATOS DEL REGISTRO (solo lectura) -->
     <div class="row g-3 mb-4">
       <div class="col-md-6">
-        <label class="form-label fw-semibold small text-muted">Nombre completo</label>
-        <p class="form-control-plaintext">{{ persona.nombre_completo }}</p>
+        <label class="form-label fw-semibold small text-muted">Nombre / Razón social</label>
+        <p class="form-control-plaintext">{% if persona.nombre_completo %}{{ persona.nombre_completo }}{% else %}{{ persona.razon_social|default:"—" }}{% endif %}</p>
       </div>
       <div class="col-md-6">
         <label class="form-label fw-semibold small text-muted">CUIT / CUIL</label>
@@ -35,85 +35,27 @@
 
     <hr>
 
-    <!-- CBU (si la convocatoria lo requiere) — form cerrado antes del resto -->
-    {% if requiere_cbu %}
-    <h5 class="mb-3">Datos bancarios</h5>
-    <form method="post" id="form-cbu">
-      {% csrf_token %}
-      <div class="mb-3">
-        <label class="form-label">CBU <span class="text-danger">*</span></label>
-        {{ form.cbu }}
-        {% if form.cbu.errors %}
-          <div class="text-danger small mt-1">{{ form.cbu.errors }}</div>
-        {% endif %}
-        <div class="form-text">22 dígitos. Lo usaremos para transferir el beneficio si resultás seleccionado/a.</div>
-      </div>
-    </form>
-    {% else %}
-    <form method="post" id="form-cbu">
-      {% csrf_token %}
-      {{ form.cbu }}
-    </form>
-    {% endif %}
-
-    <hr>
-
     <!-- DOCUMENTACIÓN DEL PRODUCTOR -->
-    <h5 class="mb-3">Documentación requerida</h5>
+    <h5 class="mb-3" id="docs">Documentación requerida</h5>
 
-    <!-- DNI — form independiente -->
-    <div class="mb-4">
-      <div class="d-flex align-items-center justify-content-between mb-2">
-        <span class="fw-semibold">DNI anverso y reverso</span>
-        {% if docs_dni %}
-          <span class="badge bg-success">✓ Subido</span>
-        {% else %}
-          <span class="badge bg-warning text-dark">Pendiente</span>
-        {% endif %}
-      </div>
-      <form id="form-dni-prod" method="post" enctype="multipart/form-data"
-            action="{% url 'convocatorias:subir_doc_integrante' postulacion.id 'PRODUCTOR' %}">
-        {% csrf_token %}
-        <input type="hidden" name="tipo" value="DNI">
-        <input type="file" id="archivo-dni-prod" name="archivo"
-               accept=".pdf,.jpg,.jpeg,.png" style="display:none"
-               onchange="document.getElementById('form-dni-prod').submit()">
-        <button type="button" class="btn btn-sm btn-outline-primary"
-                onclick="document.getElementById('archivo-dni-prod').click()">
-          {% if docs_dni %}Reemplazar DNI{% else %}Subir DNI{% endif %}
-        </button>
-        {% if docs_dni %}
-          <span class="text-muted small ms-2">{{ docs_dni.archivo.name|slice:"-40:" }}</span>
-        {% endif %}
-      </form>
-    </div>
+    {% if es_juridica %}
 
-    <!-- CONSTANCIA ARCA — form independiente -->
-    <div class="mb-4">
-      <div class="d-flex align-items-center justify-content-between mb-2">
-        <span class="fw-semibold">Constancia de inscripción en ARCA (CUIT/CUIL)</span>
-        {% if docs_arca %}
-          <span class="badge bg-success">✓ Subido</span>
-        {% else %}
-          <span class="badge bg-warning text-dark">Pendiente</span>
-        {% endif %}
-      </div>
-      <form id="form-arca-prod" method="post" enctype="multipart/form-data"
-            action="{% url 'convocatorias:subir_doc_integrante' postulacion.id 'PRODUCTOR' %}">
-        {% csrf_token %}
-        <input type="hidden" name="tipo" value="CONSTANCIA_ARCA">
-        <input type="file" id="archivo-arca-prod" name="archivo"
-               accept=".pdf,.jpg,.jpeg,.png" style="display:none"
-               onchange="document.getElementById('form-arca-prod').submit()">
-        <button type="button" class="btn btn-sm btn-outline-primary"
-                onclick="document.getElementById('archivo-arca-prod').click()">
-          {% if docs_arca %}Reemplazar constancia ARCA{% else %}Subir constancia ARCA{% endif %}
-        </button>
-        {% if docs_arca %}
-          <span class="text-muted small ms-2">{{ docs_arca.archivo.name|slice:"-40:" }}</span>
-        {% endif %}
-      </form>
-    </div>
+      {% include "convocatorias/wizard/_doc_upload_row.html" with form_id="form-estatuto" tipo="ESTATUTO" label="Estatuto de la empresa" doc=docs_estatuto %}
+      {% include "convocatorias/wizard/_doc_upload_row.html" with form_id="form-arca-jur" tipo="CONSTANCIA_ARCA_JUR" label="Constancia de inscripción en ARCA (empresa)" doc=docs_arca_jur %}
+      {% include "convocatorias/wizard/_doc_upload_row.html" with form_id="form-dni-rep" tipo="DNI_REPRESENTANTE" label="DNI del socio/a - gerente o autoridad" doc=docs_dni_representante %}
+      {% if requiere_productor_responsable %}
+      {% include "convocatorias/wizard/_doc_upload_row.html" with form_id="form-dni-prod" tipo="DNI_PRODUCTOR_RESP" label="DNI del productor/a responsable" doc=docs_dni_productor %}
+      {% endif %}
+      {% include "convocatorias/wizard/_doc_upload_row.html" with form_id="form-acta" tipo="ACTA_AUTORIDADES" label="Última acta de designación de autoridades" doc=docs_acta %}
+      {% include "convocatorias/wizard/_doc_upload_row.html" with form_id="form-contrato" tipo="CONTRATO_COPRODUCTORA" label="Contrato con empresa coproductora (si corresponde)" doc=docs_contrato opcional=True %}
+
+    {% else %}
+
+      {% include "convocatorias/wizard/_doc_upload_row.html" with form_id="form-dni-prod" tipo="DNI" label="DNI anverso y reverso" doc=docs_dni %}
+      {% include "convocatorias/wizard/_doc_upload_row.html" with form_id="form-arca-prod" tipo="CONSTANCIA_ARCA" label="Constancia de inscripción en ARCA" doc=docs_arca %}
+      {% include "convocatorias/wizard/_doc_upload_row.html" with form_id="form-cv-prod" tipo="CV_BIOFILMOGRAFIA" label="CV / Biofilmografía" doc=docs_cv accept=".pdf,.doc,.docx" %}
+
+    {% endif %}
 
     <!-- COMPROBANTE CBU — form independiente (solo si aplica) -->
     {% if requiere_cbu %}
@@ -147,6 +89,29 @@
         {% endif %}
       </form>
     </div>
+    {% endif %}
+
+    <hr>
+
+    <!-- DATOS BANCARIOS (al final, para no perderse con otros uploads) -->
+    {% if requiere_cbu %}
+    <h5 class="mb-3">Datos bancarios</h5>
+    <form method="post" id="form-cbu">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">CBU <span class="text-danger">*</span></label>
+        {{ form.cbu }}
+        {% if form.cbu.errors %}
+          <div class="text-danger small mt-1">{{ form.cbu.errors }}</div>
+        {% endif %}
+        <div class="form-text">22 dígitos. Lo usaremos para transferir el beneficio si resultás seleccionado/a.</div>
+      </div>
+    </form>
+    {% else %}
+    <form method="post" id="form-cbu">
+      {% csrf_token %}
+      {{ form.cbu }}
+    </form>
     {% endif %}
 
     <!-- BOTÓN SIGUIENTE — referencia a form-cbu por atributo HTML5 form= -->

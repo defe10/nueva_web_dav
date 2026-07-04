@@ -38,10 +38,9 @@
     <div id="convocatorias-grid">
 
       <!-- ABIERTAS -->
-      {% with abiertas=fomento|add:formacion|add:cash_rebate|add:exencion %}
-      {% if abiertas %}
+      {% if vigentes %}
         <div class="row g-3">
-          {% for c in abiertas %}
+          {% for c in vigentes %}
             {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
               <div class="col-md-6 col-lg-4">
                 <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="convocatoria-card-mubi">
@@ -62,10 +61,8 @@
           No hay convocatorias abiertas en este momento.
         </div>
       {% endif %}
-      {% endwith %}
 
       <!-- CERRADAS -->
-      {% with cerradas=fomento_cerradas|add:formacion_cerradas|add:cash_rebate_cerradas|add:exencion_cerradas %}
       {% if cerradas %}
         <div class="mt-5">
           <h3 class="fw-bold mb-0">Convocatorias cerradas</h3>
@@ -90,7 +87,6 @@
           </div>
         </div>
       {% endif %}
-      {% endwith %}
 
     </div>
 

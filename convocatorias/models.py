@@ -3,10 +3,17 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.conf import settings
-
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 from .validators import validar_documento_admitido, validar_tamano_archivo
+
+cbu_validator = RegexValidator(
+    regex=r'^\d{22}$',
+    message='El CBU debe tener exactamente 22 dígitos numéricos.',
+)
 
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 
@@ -15,10 +22,9 @@ from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 # LÍNEAS DE CONVOCATORIA
 # ==========================================
 LINEAS = [
-    ("fomento", "Fomento"),
-    ("cash_rebate", "Cash Rebate"),
-    ("formacion", "Formación"),  # gestionado por la app formacion
-    ("exencion", "Exención impositiva"),  # gestionado por la app exencion
+    ("fomento",    "Fomento"),
+    ("cash_rebate","Cash Rebate"),
+    ("exencion",   "Exención impositiva"),  # gestionado por la app exencion
 ]
 
 
@@ -26,12 +32,11 @@ LINEAS = [
 # CATEGORÍAS
 # ==========================================
 CATEGORIAS = [
-    ("CONCURSO",  "Concurso"),
-    ("PROGRAMA",  "Programa"),
-    ("SUBSIDIO",  "Subsidio"),
-    ("CURSO",     "Curso / Capacitación"),
-    ("FORMACION", "Formación"),
-    ("BENEFICIO", "Beneficio"),
+    ("CONCURSO", "Concurso"),
+    ("PROGRAMA", "Programa"),
+    ("SUBSIDIO", "Subsidio"),
+    ("CURSO",    "Curso / Capacitación"),
+    ("BENEFICIO","Beneficio"),
 ]
 
 
@@ -39,9 +44,10 @@ CATEGORIAS = [
 # BLOQUE PERSONAS (jurado / formadores)
 # ==========================================
 BLOQUE_PERSONAS_TITULO = [
-    ("JURADO", "Jurado"),
-    ("TUTORES", "Tutores"),
-    ("NINGUNO", "Sin título"),
+    ("JURADO",      "Jurado"),
+    ("FORMADORES",  "Formadores/as"),
+    ("TUTORES",     "Tutores/as"),
+    ("NINGUNO",     "Sin título"),
 ]
 
 
@@ -55,27 +61,6 @@ class Convocatoria(models.Model):
 
     descripcion_corta = models.TextField(blank=True)
     descripcion_larga = models.TextField(blank=True)
-
-    TIPO_FORMACION = [
-        ("ASINCRONICA",         "Asincrónica (link público al curso)"),
-        ("INSCRIPCION_LIBRE",   "Inscripción sin registro audiovisual"),
-        ("INSCRIPCION_REGISTRO","Inscripción con registro audiovisual"),
-    ]
-    tipo_formacion = models.CharField(
-        "Tipo de formación",
-        max_length=25,
-        choices=TIPO_FORMACION,
-        blank=True,
-        default="",
-        help_text="Solo para convocatorias de línea Formación.",
-    )
-
-    url_curso = models.URLField(
-        "URL del curso asincrónico",
-        blank=True,
-        null=True,
-        help_text="Completar si el tipo es Asincrónica.",
-    )
 
     categoria = models.CharField(max_length=20, choices=CATEGORIAS)
     tematica_genero = models.CharField(max_length=200, blank=True)
@@ -182,7 +167,7 @@ class Postulacion(models.Model):
         ("serie_web", "Serie Web"),
         ("", "- Animacion -"),
         ("corto_animacion", "Cortometraje animación"),
-        ("largo_animacion", "Largoometraje animación"),
+        ("largo_animacion", "Largometraje animación"),
         ("serie_animacion", "Serie animación"),
         ("serieweb_animacion", "Serie web animación"),
         ("videoclip_animacion", "Videoclip animación"),
@@ -211,15 +196,17 @@ class Postulacion(models.Model):
     # ── Datos del equipo ────────────────────────────────────
     cbu = models.CharField(
         "CBU",
-        max_length=30,
+        max_length=22,
         blank=True,
-        help_text="CBU del productor/presentante. Solo requerido si la convocatoria lo exige.",
+        validators=[cbu_validator],
+        help_text="CBU del productor/presentante (22 dígitos). Solo requerido si la convocatoria lo exige.",
     )
 
     # ── Datos del proyecto ───────────────────────────────────
     sinopsis_corta = models.TextField(
         "Logline / Sinopsis corta",
         blank=True,
+        max_length=3000,
         help_text="Máximo 3000 caracteres.",
     )
 
@@ -241,6 +228,7 @@ class Postulacion(models.Model):
         ("revision_admin", "En revisión administrativa"),
         ("observado", "Observado (requiere subsanación)"),
         ("admitido", "Admitido"),
+        ("no_admitido", "No admitido"),
         ("evaluacion_jurado", "En evaluación por jurado"),
         ("seleccionado", "Seleccionado"),
         ("no_seleccionado", "No seleccionado"),
@@ -260,6 +248,8 @@ class Postulacion(models.Model):
 
     def clean(self):
         super().clean()
+        if self.declaracion_jurada is False and self.estado == "enviado":
+            raise ValidationError("No se puede enviar la postulación sin aceptar la declaración jurada.")
 
     def __str__(self):
         nombre = self.nombre_proyecto or "(Sin título)"
@@ -362,6 +352,7 @@ class ObservacionAdministrativa(models.Model):
 
     TIPOS_DOCUMENTO = [
         ("PERSONAL", "Documentación personal"),
+        ("CBU",      "Comprobante de CBU"),
         ("PROYECTO", "Documentación del proyecto"),
     ]
 
@@ -413,6 +404,11 @@ class AsignacionJuradoConvocatoria(models.Model):
         verbose_name="Convocatoria asignada"
     )
 
+    doble_ciego      = models.BooleanField(
+        "Doble ciego",
+        default=False,
+        help_text="Si está activo, el jurado no ve el equipo de la postulación.",
+    )
     fecha_asignacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -453,6 +449,7 @@ class ConfiguracionPostulacion(models.Model):
     )
 
     # ── Equipo ───────────────────────────────────────────────
+    requiere_productor_responsable = models.BooleanField(default=False, verbose_name="Requiere productor/a responsable (persona jurídica)")
     requiere_director        = models.BooleanField(default=False, verbose_name="Requiere director/a")
     director_puede_coincidir = models.BooleanField(default=False, verbose_name="El/la director/a puede ser la misma persona que el/la productor/a presentante")
     requiere_guionista       = models.BooleanField(default=False, verbose_name="Requiere guionista")
@@ -477,6 +474,15 @@ class ConfiguracionPostulacion(models.Model):
     mostrar_carta_intencion         = models.BooleanField(default=False, verbose_name="Mostrar sección: Carta de intención")
     mostrar_constancia_invitacion   = models.BooleanField(default=False, verbose_name="Mostrar sección: Constancia de invitación")
     mostrar_documentacion           = models.BooleanField(default=False, verbose_name="Mostrar sección: Documentación (genérica)")
+
+    # ── Planilla oficial ─────────────────────────────────────
+    planilla_archivo = models.FileField(
+        upload_to="convocatorias/planillas/",
+        blank=True,
+        null=True,
+        verbose_name="Archivo de planilla oficial (.xlsx)",
+        help_text="Planilla xlsx que el presentante descarga, completa offline y sube al postularse.",
+    )
 
     class Meta:
         verbose_name = "Configuración de postulación"
@@ -552,8 +558,9 @@ class DocumentoIntegrante(models.Model):
     """
 
     TIPOS = [
-        ("DNI",             "DNI anverso y reverso"),
-        ("CONSTANCIA_ARCA", "Constancia de inscripción en ARCA"),
+        ("DNI",                "DNI anverso y reverso"),
+        ("CONSTANCIA_ARCA",    "Constancia de inscripción en ARCA"),
+        ("CV_BIOFILMOGRAFIA",  "CV / Biofilmografía"),
     ]
 
     ESTADOS = [
@@ -658,3 +665,105 @@ class Rendicion(models.Model):
 
     def __str__(self):
         return f"Rendición - Postulación {self.postulacion_id} ({self.estado})"
+
+
+# ==========================================
+# EVALUACIÓN DEL COMITÉ / JURADO
+# ==========================================
+
+class CriterioEvaluacion(models.Model):
+    convocatoria    = models.ForeignKey(
+        "Convocatoria",
+        on_delete=models.CASCADE,
+        related_name="criterios_evaluacion",
+    )
+    nombre          = models.CharField(max_length=200)
+    puntaje_maximo  = models.PositiveIntegerField(default=10)
+    orden           = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["orden"]
+        verbose_name = "Criterio de evaluación"
+        verbose_name_plural = "Criterios de evaluación"
+
+    def __str__(self):
+        return f"{self.nombre} (max {self.puntaje_maximo}) — {self.convocatoria.titulo}"
+
+
+class EvaluacionPostulacion(models.Model):
+    postulacion         = models.OneToOneField(
+        "Postulacion",
+        on_delete=models.CASCADE,
+        related_name="evaluacion",
+    )
+    no_puntuar          = models.BooleanField(
+        default=False,
+        help_text="Marcar si el comité decide no evaluar este proyecto.",
+    )
+    fundamentacion      = models.TextField(
+        blank=True,
+        help_text="Fundamentación del comité sobre el proyecto.",
+    )
+    ultima_edicion_por  = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name="evaluaciones_cargadas",
+    )
+    fecha_modificacion  = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Evaluación de postulación"
+        verbose_name_plural = "Evaluaciones de postulaciones"
+
+    @property
+    def puntaje_total(self):
+        if self.no_puntuar:
+            return None
+        return sum(p.puntaje for p in self.puntajes.all() if p.puntaje is not None)
+
+    def __str__(self):
+        return f"Evaluación — {self.postulacion}"
+
+
+class PuntajeCriterio(models.Model):
+    evaluacion  = models.ForeignKey(
+        EvaluacionPostulacion,
+        on_delete=models.CASCADE,
+        related_name="puntajes",
+    )
+    criterio    = models.ForeignKey(
+        CriterioEvaluacion,
+        on_delete=models.CASCADE,
+        related_name="puntajes",
+    )
+    puntaje     = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("evaluacion", "criterio")
+        verbose_name = "Puntaje por criterio"
+        verbose_name_plural = "Puntajes por criterio"
+
+    def clean(self):
+        if self.puntaje is not None and self.puntaje > self.criterio.puntaje_maximo:
+            raise ValidationError(
+                f"El puntaje no puede superar el máximo de {self.criterio.puntaje_maximo}."
+            )
+
+    def __str__(self):
+        return f"{self.criterio.nombre}: {self.puntaje}"
+
+
+# ==========================================
+# SEÑALES — limpieza de archivos al borrar
+# ==========================================
+@receiver(post_delete, sender=DocumentoPostulacion)
+def borrar_archivo_documento_postulacion(sender, instance, **kwargs):
+    if instance.archivo:
+        instance.archivo.delete(save=False)
+
+
+@receiver(post_delete, sender=DocumentoIntegrante)
+def borrar_archivo_documento_integrante(sender, instance, **kwargs):
+    if instance.archivo:
+        instance.archivo.delete(save=False)

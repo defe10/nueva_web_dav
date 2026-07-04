@@ -17,6 +17,13 @@ import io
 import os
 import zipfile
 
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
+
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 
 from .models import (
@@ -30,6 +37,9 @@ from .models import (
     ConfiguracionPostulacion,
     IntegrantePostulacion,
     DocumentoIntegrante,
+    CriterioEvaluacion,
+    EvaluacionPostulacion,
+    PuntajeCriterio,
 )
 
 
@@ -172,8 +182,12 @@ class PostulacionAdmin(admin.ModelAdmin):
     actions = [
         "descargar_documentacion_zip",
         "exportar_excel_postulaciones",
-        "crear_rendicion_para_seleccionados",   # ✅ NUEVO
-        "marcar_seleccionado_y_crear_rendicion" # ✅ NUEVO
+        "marcar_admitido",
+        "marcar_no_admitido",
+        "marcar_evaluacion_jurado",
+        "crear_rendicion_para_seleccionados",
+        "marcar_seleccionado_y_crear_rendicion",
+        "marcar_ganador_y_notificar",
     ]
 
     # -------------------------
@@ -251,13 +265,81 @@ class PostulacionAdmin(admin.ModelAdmin):
         return ro
 
     # ==================================================
-    # HELPERS PERSONA
+    # QUERYSET CON SELECT_RELATED PARA EVITAR N+1
+    # ==================================================
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("user", "convocatoria", "user__persona_humana", "user__persona_juridica")
+        )
+
+    # ==================================================
+    # SISTEMA DE EMAILS POR CAMBIO DE ESTADO
+    # ==================================================
+    _EMAIL_POR_ESTADO = {
+        "enviado":           ("convocatorias/email_postulacion_enviada.html", "Tu postulación fue recibida"),
+        "admitido":          ("convocatorias/email_admitido.html",            "Tu postulación fue admitida"),
+        "no_admitido":       ("convocatorias/email_no_admitido.html",         "Tu postulación no fue admitida"),
+        "evaluacion_jurado": ("convocatorias/email_evaluacion_jurado.html",   "Tu postulación está en evaluación"),
+        "seleccionado":      ("convocatorias/email_seleccionado.html",        "Tu proyecto fue seleccionado"),
+        "no_seleccionado":   ("convocatorias/email_no_seleccionado.html",     "Resultado de tu postulación"),
+    }
+
+    def _enviar_email_estado(self, request, postulacion):
+        config = self._EMAIL_POR_ESTADO.get(postulacion.estado)
+        if not config:
+            return
+        template, asunto = config
+        user = postulacion.user
+        if not user or not user.email:
+            return
+        convocatoria_titulo = postulacion.convocatoria.titulo if postulacion.convocatoria else ""
+        panel_url = request.build_absolute_uri(reverse("usuarios:panel_usuario"))
+        contexto = {
+            "user": user,
+            "postulacion": postulacion,
+            "convocatoria_titulo": convocatoria_titulo,
+            "panel_url": panel_url,
+            "anio": timezone.now().year,
+        }
+        texto = f"{asunto}\n\nConvocatoria: {convocatoria_titulo or '—'}\n\nIngresá al panel: {panel_url}"
+        try:
+            html = render_to_string(template, contexto)
+            email = EmailMultiAlternatives(
+                subject=asunto,
+                body=texto,
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                to=[user.email],
+            )
+            email.attach_alternative(html, "text/html")
+            email.send(fail_silently=False)
+            messages.success(request, f"Email enviado a {user.email}: {asunto}.")
+        except Exception as e:
+            messages.error(request, f"No se pudo enviar el email: {e}")
+
+    def save_model(self, request, obj, form, change):
+        estado_anterior = None
+        if change and obj.pk:
+            estado_anterior = Postulacion.objects.filter(pk=obj.pk).values_list("estado", flat=True).first()
+        super().save_model(request, obj, form, change)
+        if obj.estado != estado_anterior:
+            self._enviar_email_estado(request, obj)
+
+    # ==================================================
+    # HELPERS PERSONA (usan el caché del select_related)
     # ==================================================
     def _persona_humana(self, user):
-        return PersonaHumana.objects.filter(user=user).first()
+        try:
+            return user.persona_humana
+        except Exception:
+            return None
 
     def _persona_juridica(self, user):
-        return PersonaJuridica.objects.filter(user=user).first()
+        try:
+            return user.persona_juridica
+        except Exception:
+            return None
 
     # ==================================================
     # CAMPOS CALCULADOS
@@ -429,6 +511,49 @@ class PostulacionAdmin(admin.ModelAdmin):
     marcar_seleccionado_y_crear_rendicion.short_description = "🏆 Marcar como SELECCIONADO + crear Rendición"
 
     # ==================================================
+    # ACCIONES DE ESTADO CON EMAIL
+    # ==================================================
+    def marcar_ganador_y_notificar(self, request, queryset):
+        for p in queryset.select_related("user", "convocatoria"):
+            if p.estado != "seleccionado":
+                p.estado = "seleccionado"
+                p.save(update_fields=["estado"])
+            self._enviar_email_estado(request, p)
+        self.message_user(request, f"{queryset.count()} proyecto(s) marcado(s) como seleccionado/s y notificado/s.")
+
+    marcar_ganador_y_notificar.short_description = "✉️ Marcar como SELECCIONADO y enviar email"
+
+    def marcar_admitido(self, request, queryset):
+        for p in queryset.select_related("user", "convocatoria"):
+            if p.estado != "admitido":
+                p.estado = "admitido"
+                p.save(update_fields=["estado"])
+                self._enviar_email_estado(request, p)
+        self.message_user(request, f"{queryset.count()} postulación/es marcada/s como admitida/s.")
+
+    marcar_admitido.short_description = "✅ Marcar como ADMITIDO y notificar"
+
+    def marcar_no_admitido(self, request, queryset):
+        for p in queryset.select_related("user", "convocatoria"):
+            if p.estado != "no_admitido":
+                p.estado = "no_admitido"
+                p.save(update_fields=["estado"])
+                self._enviar_email_estado(request, p)
+        self.message_user(request, f"{queryset.count()} postulación/es marcada/s como no admitida/s.")
+
+    marcar_no_admitido.short_description = "❌ Marcar como NO ADMITIDO y notificar"
+
+    def marcar_evaluacion_jurado(self, request, queryset):
+        for p in queryset.select_related("user", "convocatoria"):
+            if p.estado != "evaluacion_jurado":
+                p.estado = "evaluacion_jurado"
+                p.save(update_fields=["estado"])
+                self._enviar_email_estado(request, p)
+        self.message_user(request, f"{queryset.count()} postulación/es enviada/s a evaluación por jurado.")
+
+    marcar_evaluacion_jurado.short_description = "⚖️ Enviar a EVALUACIÓN POR JURADO y notificar"
+
+    # ==================================================
     # ACCIÓN ZIP
     # ==================================================
     def descargar_documentacion_zip(self, request, queryset):
@@ -535,7 +660,7 @@ class PostulacionAdmin(admin.ModelAdmin):
         ]
         ws.append(headers)
 
-        queryset = queryset.select_related("user", "convocatoria")
+        queryset = queryset.select_related("user", "convocatoria", "user__persona_humana", "user__persona_juridica")
 
         for p in queryset:
             ws.append([
@@ -669,9 +794,6 @@ class ObservacionAdministrativaAdmin(admin.ModelAdmin):
 
     presentante_link.short_description = "Presentante"
 
-    # -------------------------
-    # TU save_model QUEDA IGUAL
-    # -------------------------
     def save_model(self, request, obj, form, change):
         """
         Envía email cuando:
@@ -776,8 +898,9 @@ class ObservacionAdministrativaAdmin(admin.ModelAdmin):
 # ============================================================
 @admin.register(AsignacionJuradoConvocatoria)
 class AsignacionJuradoConvocatoriaAdmin(admin.ModelAdmin):
-    list_display = ("jurado", "convocatoria", "fecha_asignacion")
-    list_filter = ("convocatoria",)
+    list_display  = ("jurado", "convocatoria", "doble_ciego", "fecha_asignacion")
+    list_filter   = ("convocatoria", "doble_ciego")
+    list_editable = ("doble_ciego",)
     search_fields = ("jurado__username", "convocatoria__titulo")
 
 
@@ -866,7 +989,10 @@ class ConfiguracionPostulacionInline(admin.StackedInline):
     fieldsets = (
         ("Equipo", {
             "fields": (
+                "tipo_postulante",
+                "requiere_productor_responsable",
                 "requiere_director",
+                "director_puede_coincidir",
                 "requiere_guionista",
                 "requiere_realizador",
                 "requiere_cbu",
@@ -890,7 +1016,12 @@ class ConfiguracionPostulacionInline(admin.StackedInline):
                 "mostrar_nota_intencion",
                 "mostrar_carta_intencion",
                 "mostrar_constancia_invitacion",
+                "mostrar_documentacion",
             )
+        }),
+        ("Planilla oficial", {
+            "description": "Archivo xlsx que el presentante descarga, completa offline y sube al postularse.",
+            "fields": ("planilla_archivo",),
         }),
     )
 
@@ -900,8 +1031,8 @@ class ConfiguracionPostulacionInline(admin.StackedInline):
 # ============================================================
 @admin.register(ConfiguracionPostulacion)
 class ConfiguracionPostulacionAdmin(admin.ModelAdmin):
-    list_display  = ("convocatoria", "requiere_director", "requiere_guionista", "requiere_realizador")
-    list_filter   = ("requiere_director", "requiere_guionista")
+    list_display  = ("convocatoria", "tipo_postulante", "requiere_productor_responsable", "requiere_director", "requiere_guionista", "requiere_realizador")
+    list_filter   = ("tipo_postulante", "requiere_productor_responsable", "requiere_director", "requiere_guionista")
     search_fields = ("convocatoria__titulo",)
 
 
@@ -922,10 +1053,19 @@ class MiembroJuradoInline(admin.TabularInline):
     fields = ("orden", "nombre", "foto", "bio")
 
 
+class CriterioEvaluacionInline(admin.TabularInline):
+    model = CriterioEvaluacion
+    extra = 1
+    fields = ("orden", "nombre", "puntaje_maximo")
+    ordering = ("orden",)
+    verbose_name = "Criterio de evaluación"
+    verbose_name_plural = "Criterios de evaluación"
+
+
 # ============================================================
 # CONVOCATORIA — agregar inlines
 # ============================================================
-ConvocatoriaAdmin.inlines = [ConfiguracionPostulacionInline, MiembroJuradoInline]
+ConvocatoriaAdmin.inlines = [ConfiguracionPostulacionInline, MiembroJuradoInline, CriterioEvaluacionInline]
 
 
 # @admin.register(DocumentoPostulacion)
@@ -960,4 +1100,249 @@ ConvocatoriaAdmin.inlines = [ConfiguracionPostulacionInline, MiembroJuradoInline
 #             return  # corta el guardado
 
 #         super().save_model(request, obj, form, change)
+
+
+# ============================================================
+#  EVALUACIÓN DEL COMITÉ
+# ============================================================
+
+class PuntajeCriterioInline(admin.TabularInline):
+    model = PuntajeCriterio
+    extra = 0
+    fields = ("criterio", "puntaje")
+    readonly_fields = ()
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "criterio" and hasattr(request, "_evaluacion_obj"):
+            kwargs["queryset"] = CriterioEvaluacion.objects.filter(
+                convocatoria=request._evaluacion_obj.postulacion.convocatoria
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+class CriterioEvaluacionAdmin(admin.ModelAdmin):
+    list_display  = ("convocatoria", "orden", "nombre", "puntaje_maximo")
+    list_filter   = ("convocatoria",)
+    ordering      = ("convocatoria", "orden")
+
+
+@admin.register(EvaluacionPostulacion)
+class EvaluacionPostulacionAdmin(admin.ModelAdmin):
+    list_display  = ("postulacion", "puntaje_total", "no_puntuar", "fecha_modificacion", "ultima_edicion_por")
+    list_filter   = ("postulacion__convocatoria", "no_puntuar")
+    search_fields = ("postulacion__nombre_proyecto",)
+    readonly_fields = ("ultima_edicion_por", "fecha_modificacion", "puntaje_total")
+    inlines       = [PuntajeCriterioInline]
+    actions       = ["marcar_ganador_y_notificar", "descargar_acta_jurado"]
+
+    def get_form(self, request, obj=None, **kwargs):
+        if obj:
+            request._evaluacion_obj = obj
+        return super().get_form(request, obj, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        obj.ultima_edicion_por = request.user
+        super().save_model(request, obj, form, change)
+
+    def puntaje_total(self, obj):
+        return obj.puntaje_total
+    puntaje_total.short_description = "Puntaje total"
+
+    def marcar_ganador_y_notificar(self, request, queryset):
+        from django.template.loader import render_to_string
+        from django.core.mail import EmailMultiAlternatives
+        from django.urls import reverse
+
+        EMAIL_TEMPLATE = "convocatorias/email_seleccionado.html"
+        ASUNTO = "Tu proyecto fue seleccionado"
+
+        for ev in queryset.select_related("postulacion__user", "postulacion__convocatoria"):
+            p = ev.postulacion
+            if p.estado != "seleccionado":
+                p.estado = "seleccionado"
+                p.save(update_fields=["estado"])
+
+            user = p.user
+            if not user or not user.email:
+                continue
+
+            convocatoria_titulo = p.convocatoria.titulo if p.convocatoria else ""
+            panel_url = request.build_absolute_uri(reverse("usuarios:panel_usuario"))
+            contexto = {
+                "user": user,
+                "postulacion": p,
+                "convocatoria_titulo": convocatoria_titulo,
+                "panel_url": panel_url,
+                "anio": timezone.now().year,
+            }
+            texto = f"{ASUNTO}\n\nConvocatoria: {convocatoria_titulo}\n\nIngresá al panel: {panel_url}"
+            try:
+                html = render_to_string(EMAIL_TEMPLATE, contexto)
+                email = EmailMultiAlternatives(
+                    subject=ASUNTO,
+                    body=texto,
+                    from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                    to=[user.email],
+                )
+                email.attach_alternative(html, "text/html")
+                email.send(fail_silently=False)
+                messages.success(request, f"Email enviado a {user.email}.")
+            except Exception as e:
+                messages.error(request, f"Error enviando email a {user.email}: {e}")
+
+    marcar_ganador_y_notificar.short_description = "Marcar como ganador y enviar email"
+
+    def descargar_acta_jurado(self, request, queryset):
+        convocatorias = queryset.values_list(
+            "postulacion__convocatoria", flat=True
+        ).distinct()
+        if convocatorias.count() > 1:
+            self.message_user(
+                request,
+                "Seleccioná evaluaciones de una sola convocatoria para generar el acta.",
+                level=messages.ERROR,
+            )
+            return
+
+        from .models import MiembroJurado
+        convocatoria = queryset.first().postulacion.convocatoria
+        jurados = MiembroJurado.objects.filter(convocatoria=convocatoria).order_by("orden")
+
+        evaluaciones = list(
+            queryset
+            .select_related("postulacion")
+            .prefetch_related("puntajes")
+        )
+        evaluaciones.sort(key=lambda e: (e.no_puntuar, -(e.puntaje_total or 0)))
+
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(
+            buffer, pagesize=A4,
+            leftMargin=3*cm, rightMargin=3*cm,
+            topMargin=2.5*cm, bottomMargin=2.5*cm,
+        )
+
+        styles = getSampleStyleSheet()
+        titulo_style = ParagraphStyle("titulo", parent=styles["Title"],
+            fontSize=14, spaceAfter=6, alignment=TA_CENTER)
+        subtitulo_style = ParagraphStyle("subtitulo", parent=styles["Normal"],
+            fontSize=11, spaceAfter=4, alignment=TA_CENTER)
+        cuerpo_style = ParagraphStyle("cuerpo", parent=styles["Normal"],
+            fontSize=10, spaceAfter=6, leading=14, alignment=TA_JUSTIFY)
+        proyecto_style = ParagraphStyle("proyecto", parent=styles["Normal"],
+            fontSize=11, spaceBefore=10, spaceAfter=2,
+            textColor=colors.HexColor("#1a1a2e"), fontName="Helvetica-Bold")
+        fundamentacion_style = ParagraphStyle("fundamentacion", parent=styles["Normal"],
+            fontSize=9, leading=13, leftIndent=10, alignment=TA_JUSTIFY,
+            textColor=colors.HexColor("#444444"))
+        firma_style = ParagraphStyle("firma", parent=styles["Normal"],
+            fontSize=9, alignment=TA_CENTER)
+
+        from django.utils.formats import date_format
+        fecha_hoy = timezone.localtime(timezone.now()).strftime("%-d de %B de %Y")
+        nombres_jurados = ", ".join(j.nombre for j in jurados) if jurados else "el comité evaluador"
+
+        LOGO_PATH = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "static", "exencion", "img", "sec_cultura_color.png"
+        )
+
+        story = []
+
+        # Logo
+        if os.path.exists(LOGO_PATH):
+            logo = Image(LOGO_PATH, hAlign="LEFT")
+            logo.drawWidth = 7*cm
+            logo.drawHeight = logo.drawWidth * (150 / 1040)
+            story.append(logo)
+            story.append(Spacer(1, 0.8*cm))
+
+        encabezado_style = ParagraphStyle(
+            "encabezado", parent=styles["Normal"],
+            fontSize=13, fontName="Helvetica-Bold",
+            alignment=TA_CENTER, leading=16, spaceAfter=2,
+        )
+        subencabezado_style = ParagraphStyle(
+            "subencabezado", parent=styles["Normal"],
+            fontSize=10, alignment=TA_CENTER, leading=13, spaceAfter=0,
+        )
+        story.append(Paragraph("Dirección de Audiovisuales", encabezado_style))
+        story.append(Paragraph("Secretaría de Cultura de la Provincia de Salta", subencabezado_style))
+        story.append(Spacer(1, 0.3*cm))
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.black))
+        story.append(Spacer(1, 0.4*cm))
+        story.append(Paragraph("ACTA DE EVALUACIÓN — COMITÉ DE JURADO", titulo_style))
+        story.append(Spacer(1, 0.3*cm))
+        story.append(Paragraph(f"Convocatoria: <b>{convocatoria.titulo}</b>", cuerpo_style))
+        story.append(Paragraph(f"Fecha: {fecha_hoy}", cuerpo_style))
+        story.append(Spacer(1, 0.4*cm))
+        story.append(Paragraph(
+            f"Los integrantes del Comité Evaluador, <b>{nombres_jurados}</b>, reunidos en el marco "
+            f"de la convocatoria <b>{convocatoria.titulo}</b>, habiendo analizado los proyectos postulados "
+            f"conforme a los criterios de evaluación establecidos en las Bases y Condiciones, proceden "
+            f"a establecer el siguiente orden de mérito:",
+            cuerpo_style,
+        ))
+        story.append(Spacer(1, 0.5*cm))
+        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey))
+        story.append(Spacer(1, 0.4*cm))
+
+        label_style = ParagraphStyle(
+            "label", parent=styles["Normal"],
+            fontSize=9, leading=13, leftIndent=10,
+            textColor=colors.HexColor("#444444"),
+        )
+
+        puesto = 1
+        for ev in evaluaciones:
+            p = ev.postulacion
+            user = p.user
+            ph = PersonaHumana.objects.filter(user=user).first()
+            pj = PersonaJuridica.objects.filter(user=user).first()
+            nombre_presentante = (
+                ph.nombre_completo if ph else
+                pj.razon_social if pj else
+                user.get_full_name() or user.username
+            )
+
+            if ev.no_puntuar:
+                titulo_linea = f"— {p.nombre_proyecto}  [No puntuado]"
+            else:
+                puntaje = ev.puntaje_total if ev.puntaje_total is not None else "—"
+                titulo_linea = f"{puesto}. {p.nombre_proyecto}"
+                puesto += 1
+
+            story.append(Paragraph(titulo_linea, proyecto_style))
+            story.append(Paragraph(f"<b>Presentante:</b> {nombre_presentante}", label_style))
+            if not ev.no_puntuar:
+                story.append(Paragraph(f"<b>Puntaje obtenido:</b> {puntaje} pts", label_style))
+            if ev.fundamentacion:
+                story.append(Spacer(1, 0.15*cm))
+                story.append(Paragraph(f"<b>Fundamentación:</b> {ev.fundamentacion}", fundamentacion_style))
+            story.append(Spacer(1, 0.4*cm))
+
+        story.append(Spacer(1, 1.5*cm))
+        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey))
+        story.append(Spacer(1, 1*cm))
+
+        if jurados:
+            ancho_col = (A4[0] - 6*cm) / max(len(jurados), 1)
+            firma_data = [[Paragraph(j.nombre, firma_style) for j in jurados]]
+            tabla_firmas = Table(firma_data, colWidths=[ancho_col] * len(jurados))
+            tabla_firmas.setStyle(TableStyle([
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("LINEABOVE", (0, 0), (-1, 0), 0.5, colors.black),
+                ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ]))
+            story.append(tabla_firmas)
+
+        doc.build(story)
+        buffer.seek(0)
+
+        nombre_archivo = f"acta_jurado_{slugify(convocatoria.titulo)}.pdf"
+        response = HttpResponse(buffer, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{nombre_archivo}"'
+        return response
+
+    descargar_acta_jurado.short_description = "Descargar acta de jurado (PDF)"
 

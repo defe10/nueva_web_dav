@@ -36,7 +36,7 @@
 
     {% if mostrar_docs %}
     <!-- Documentación del integrante -->
-    <h5 class="mb-3">Documentación requerida</h5>
+    <h5 class="mb-3" id="docs">Documentación requerida</h5>
 
     {% if es_mismo_que_productor %}
     <div class="alert alert-info py-2 mb-3">
@@ -55,9 +55,18 @@
     <!-- ARCA (solo lectura) -->
     <div class="mb-4">
       <div class="d-flex align-items-center justify-content-between mb-2">
-        <span class="fw-semibold">Constancia de inscripción en ARCA</span>
+        <span class="fw-semibold">Constancia tributaria</span>
         {% if docs_arca %}<span class="badge bg-success">✓ Subido</span>
         {% else %}<span class="badge bg-warning text-dark">Pendiente (subila en el paso Productor)</span>{% endif %}
+      </div>
+    </div>
+
+    <!-- CV (solo lectura) -->
+    <div class="mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="fw-semibold">CV / Biofilmografía</span>
+        {% if docs_cv %}<span class="badge bg-success">✓ Subido</span>
+        {% else %}<span class="badge bg-warning text-dark">Pendiente (subilo en el paso Productor)</span>{% endif %}
       </div>
     </div>
 
@@ -88,7 +97,7 @@
     <!-- ARCA -->
     <div class="mb-4">
       <div class="d-flex align-items-center justify-content-between mb-2">
-        <span class="fw-semibold">Constancia de inscripción en ARCA</span>
+        <span class="fw-semibold">Constancia tributaria</span>
         {% if docs_arca %}<span class="badge bg-success">✓ Subido</span>
         {% else %}<span class="badge bg-warning text-dark">Pendiente</span>{% endif %}
       </div>
@@ -104,6 +113,28 @@
           {% if docs_arca %}Reemplazar constancia ARCA{% else %}Subir constancia ARCA{% endif %}
         </button>
         {% if docs_arca %}<span class="text-muted small ms-2">{{ docs_arca.archivo.name|slice:"30:" }}</span>{% endif %}
+      </form>
+    </div>
+
+    <!-- CV / BIOFILMOGRAFÍA -->
+    <div class="mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="fw-semibold">CV / Biofilmografía</span>
+        {% if docs_cv %}<span class="badge bg-success">✓ Subido</span>
+        {% else %}<span class="badge bg-warning text-dark">Pendiente</span>{% endif %}
+      </div>
+      <form id="form-cv-{{ rol }}" method="post" enctype="multipart/form-data"
+            action="{% url 'convocatorias:subir_doc_integrante' postulacion.id rol %}">
+        {% csrf_token %}
+        <input type="hidden" name="tipo" value="CV_BIOFILMOGRAFIA">
+        <input type="file" id="archivo-cv-{{ rol }}" name="archivo"
+               accept=".pdf,.doc,.docx" style="display:none"
+               onchange="document.getElementById('form-cv-{{ rol }}').submit()">
+        <button type="button" class="btn btn-sm btn-outline-primary"
+                onclick="document.getElementById('archivo-cv-{{ rol }}').click()">
+          {% if docs_cv %}Reemplazar CV{% else %}Subir CV{% endif %}
+        </button>
+        {% if docs_cv %}<span class="text-muted small ms-2">{{ docs_cv.archivo.name|slice:"-40:" }}</span>{% endif %}
       </form>
     </div>
 

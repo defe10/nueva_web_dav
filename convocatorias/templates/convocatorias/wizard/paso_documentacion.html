@@ -4,7 +4,7 @@
 <div class="dav-card">
   <div class="dav-card-body">
 
-    <h3 class="mb-1">Documentación del proyecto</h3>
+    <h3 class="mb-1" id="docs">Documentación del proyecto</h3>
     <p class="text-muted mb-4">Subí todos los documentos requeridos para poder continuar.</p>
 
     {% if messages %}
@@ -40,7 +40,7 @@
           {% endfor %}
         {% endif %}{% endfor %}
 
-        <form method="post" enctype="multipart/form-data" id="form-doc-{{ tipo }}">
+<form method="post" enctype="multipart/form-data" id="form-doc-{{ tipo }}">
           {% csrf_token %}
           <input type="hidden" name="accion" value="subir">
           <input type="hidden" name="tipo" value="{{ tipo }}">

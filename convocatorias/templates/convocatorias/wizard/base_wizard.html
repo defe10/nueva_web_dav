@@ -43,10 +43,36 @@
     <div class="col-lg-4 mb-4 order-lg-first">
       <div class="dav-card">
         <div class="dav-card-body">
-          <h6 class="fw-bold mb-2">Convocatoria</h6>
-          <p class="mb-1 small">{{ convocatoria.titulo }}</p>
+          <h6 class="fw-bold mb-3">Convocatoria</h6>
+
+          <p class="fw-semibold mb-1">{{ convocatoria.titulo }}</p>
           {% if convocatoria.fecha_fin %}
-            <p class="mb-0 small text-muted">Cierre: {{ convocatoria.fecha_fin|date:"d/m/Y" }}</p>
+            <p class="small text-muted mb-3">Cierre: {{ convocatoria.fecha_fin|date:"d/m/Y" }}</p>
+          {% endif %}
+
+          {% if convocatoria.descripcion_corta %}
+            <p class="small mb-3" style="white-space: pre-line;">{{ convocatoria.descripcion_corta }}</p>
+          {% endif %}
+
+          {% if convocatoria.tematica_genero %}
+            <div class="mb-3">
+              <div class="small fw-semibold text-muted text-uppercase mb-1">Temática / Género</div>
+              <p class="small mb-0" style="white-space: pre-line;">{{ convocatoria.tematica_genero }}</p>
+            </div>
+          {% endif %}
+
+          {% if convocatoria.requisitos %}
+            <div class="mb-3">
+              <div class="small fw-semibold text-muted text-uppercase mb-1">Requisitos</div>
+              <p class="small mb-0" style="white-space: pre-line;">{{ convocatoria.requisitos }}</p>
+            </div>
+          {% endif %}
+
+          {% if convocatoria.beneficios %}
+            <div class="mb-0">
+              <div class="small fw-semibold text-muted text-uppercase mb-1">Beneficios</div>
+              <p class="small mb-0" style="white-space: pre-line;">{{ convocatoria.beneficios }}</p>
+            </div>
           {% endif %}
         </div>
       </div>

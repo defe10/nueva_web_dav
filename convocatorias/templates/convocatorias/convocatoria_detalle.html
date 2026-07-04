@@ -164,65 +164,18 @@
 
           <div class="d-grid gap-2">
             {% if convocatoria.vigente %}
-
-              {% if convocatoria.linea == "formacion" %}
-
-                {# FORMACIÓN: el tipo define el CTA #}
-                {% if convocatoria.tipo_formacion == "ASINCRONICA" %}
-                  {% if convocatoria.url_curso %}
-                    <a href="{{ convocatoria.url_curso }}"
-                       target="_blank" rel="noopener"
-                       class="btn btn-warning btn-sm">
-                      Acceder al curso
-                    </a>
-                  {% endif %}
-
-                {% elif convocatoria.tipo_formacion == "INSCRIPCION_LIBRE" or convocatoria.tipo_formacion == "INSCRIPCION_REGISTRO" %}
-                  <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}"
-                     class="btn btn-primary btn-sm">
-                    Inscribirme
-                  </a>
-
-                {% else %}
-                  {# tipo_formacion no seteado: fallback genérico #}
-                  {% if convocatoria.url_curso %}
-                    <a href="{{ convocatoria.url_curso }}"
-                       target="_blank" rel="noopener"
-                       class="btn btn-warning btn-sm">
-                      Acceder al curso
-                    </a>
-                  {% else %}
-                    <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}"
-                       class="btn btn-primary btn-sm">
-                      Inscribirme
-                    </a>
-                  {% endif %}
-                {% endif %}
-
+              {% if convocatoria.url_destino %}
+                <a href="{{ convocatoria.url_destino }}"
+                   target="_blank" rel="noopener"
+                   class="btn btn-primary btn-sm">
+                  Acceder
+                </a>
               {% else %}
-
-                {# OTRAS LÍNEAS: lógica original #}
-                {% if convocatoria.url_destino %}
-                  <a href="{{ convocatoria.url_destino }}"
-                     target="_blank" rel="noopener"
-                     class="btn btn-primary btn-sm">
-                    Acceder
-                  </a>
-                {% elif convocatoria.url_curso %}
-                  <a href="{{ convocatoria.url_curso }}"
-                     target="_blank" rel="noopener"
-                     class="btn btn-warning btn-sm">
-                    Acceder al curso
-                  </a>
-                {% else %}
-                  <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}"
-                     class="btn btn-primary btn-sm">
-                    Inscribirme
-                  </a>
-                {% endif %}
-
+                <a href="{% url 'convocatorias:inscribirse_convocatoria' convocatoria.slug %}"
+                   class="btn btn-primary btn-sm">
+                  Inscribirme
+                </a>
               {% endif %}
-
             {% endif %}
 
   {% if convocatoria.bases_pdf %}
@@ -231,6 +184,14 @@
        rel="noopener"
        class="btn btn-outline-primary btn-sm">
       Bases y condiciones
+    </a>
+  {% endif %}
+
+  {% if convocatoria.configuracion.planilla_archivo %}
+    <a href="{{ convocatoria.configuracion.planilla_archivo.url }}"
+       download
+       class="btn btn-outline-success btn-sm">
+      Descargar planilla oficial
     </a>
   {% endif %}
 </div>

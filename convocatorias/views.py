@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.http import JsonResponse
 from django.urls import reverse
 from django.utils import timezone
@@ -23,6 +24,7 @@ from .forms import (
     PostulacionForm,
     ConvocatoriaForm,
     MiembroJuradoFormSet,
+    CriterioEvaluacionFormSet,
     ConfiguracionPostulacionForm,
     ProductorCBUForm,
     IntegranteSearchForm,
@@ -122,24 +124,16 @@ def convocatorias_home(request):
 
         return vigentes, cerradas
 
-    fomento_vig, fomento_cer = separar_por_linea("fomento")
-    formacion_vig, formacion_cer = separar_por_linea("formacion")
-    cash_rebate_vig, cash_rebate_cer = separar_por_linea("cash_rebate")
-    exencion_vig, exencion_cer = separar_por_linea("exencion")
+    vigentes = qs.filter(fecha_inicio__lte=hoy, fecha_fin__gte=hoy)
+    cerradas = qs.filter(fecha_fin__lt=hoy)
 
     return render(
         request,
         "convocatorias/convocatoria_home.html",
         {
             "hoy": hoy,
-            "fomento": fomento_vig,
-            "fomento_cerradas": fomento_cer,
-            "formacion": formacion_vig,
-            "formacion_cerradas": formacion_cer,
-            "cash_rebate": cash_rebate_vig,
-            "cash_rebate_cerradas": cash_rebate_cer,
-            "exencion": exencion_vig,
-            "exencion_cerradas": exencion_cer,
+            "vigentes": vigentes,
+            "cerradas": cerradas,
         },
     )
 
@@ -166,21 +160,28 @@ def inscribirse_convocatoria(request, slug):
         return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
 
     # ========================================================
-    # FORMACIÓN — delegado a la app formacion
-    # ========================================================
-    if linea == "formacion":
-        return redirect("formacion:inscribirse", convocatoria_id=convocatoria.id)
-
-    # ========================================================
     # FOMENTO / CASH REBATE — flujo IDEA
     # ========================================================
     if linea in ["fomento", "cash_rebate"]:
         persona_humana = PersonaHumana.objects.filter(user=request.user).first()
         persona_juridica = PersonaJuridica.objects.filter(user=request.user).first()
         postular_url = reverse("convocatorias:postular_convocatoria", kwargs={"convocatoria_id": convocatoria.id})
+
         if not (persona_humana or persona_juridica):
             messages.warning(request, "Para postularte a esta convocatoria primero debés completar tu Registro Audiovisual.")
             return redirect(reverse("registro_audiovisual:seleccionar_tipo_registro") + f"?next={postular_url}")
+
+        # Validar tipo de postulante según configuración
+        config = getattr(convocatoria, "configuracion", None)
+        if config:
+            tipo = config.tipo_postulante
+            if tipo == "HUMANA" and not persona_humana:
+                messages.error(request, "Esta convocatoria es solo para personas humanas. Debés completar tu registro como persona humana.")
+                return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
+            elif tipo == "JURIDICA" and not persona_juridica:
+                messages.error(request, "Esta convocatoria es solo para personas jurídicas. Debés completar tu registro como empresa/institución.")
+                return redirect("convocatorias:convocatoria_detalle", slug=convocatoria.slug)
+
         if not request.GET.get("confirmed"):
             return redirect(reverse("registro_audiovisual:confirmar_datos") + f"?next={postular_url}")
         return redirect(postular_url)
@@ -259,25 +260,30 @@ def postulacion_confirmada(request, postulacion_id):
 def crear_convocatoria(request):
     if request.method == "POST":
         form = ConvocatoriaForm(request.POST, request.FILES)
-        config_form = ConfiguracionPostulacionForm(request.POST)
+        config_form = ConfiguracionPostulacionForm(request.POST, request.FILES)
         jurado_formset = MiembroJuradoFormSet(request.POST, request.FILES)
-        if form.is_valid() and config_form.is_valid() and jurado_formset.is_valid():
+        criterio_formset = CriterioEvaluacionFormSet(request.POST)
+        if form.is_valid() and config_form.is_valid() and jurado_formset.is_valid() and criterio_formset.is_valid():
             convocatoria = form.save()
             config = config_form.save(commit=False)
             config.convocatoria = convocatoria
             config.save()
             jurado_formset.instance = convocatoria
             jurado_formset.save()
+            criterio_formset.instance = convocatoria
+            criterio_formset.save()
             return redirect("convocatorias:convocatorias_home")
     else:
         form = ConvocatoriaForm()
         config_form = ConfiguracionPostulacionForm()
         jurado_formset = MiembroJuradoFormSet()
+        criterio_formset = CriterioEvaluacionFormSet()
 
     return render(request, "convocatorias/convocatoria_crear.html", {
         "form": form,
         "config_form": config_form,
         "jurado_formset": jurado_formset,
+        "criterio_formset": criterio_formset,
     })
 
 
@@ -492,6 +498,10 @@ def _get_persona_productor(user):
     try:
         return user.persona_humana
     except PersonaHumana.DoesNotExist:
+        pass
+    try:
+        return user.persona_juridica
+    except PersonaJuridica.DoesNotExist:
         return None
 
 
@@ -510,11 +520,27 @@ def _docs_proyecto_activos(config):
 @login_required(login_url="/usuarios/login/")
 def wizard_inicio(request, convocatoria_id):
     convocatoria = get_object_or_404(Convocatoria, pk=convocatoria_id)
+    config = getattr(convocatoria, "configuracion", None)
+    tipo_postulante = config.tipo_postulante if config else "HUMANA"
 
-    persona_humana = _get_persona_productor(request.user)
-    if not persona_humana:
-        messages.error(request, "Debés completar tu Registro Audiovisual antes de postularte.")
-        return redirect("registro_audiovisual:mi_registro")
+    persona_humana = PersonaHumana.objects.filter(user=request.user).first()
+    persona_juridica = PersonaJuridica.objects.filter(user=request.user).first()
+
+    if tipo_postulante == "HUMANA":
+        persona = persona_humana
+        if not persona:
+            messages.error(request, "Esta convocatoria es solo para personas humanas. Debés completar tu registro antes de postularte.")
+            return redirect("registro_audiovisual:seleccionar_tipo_registro")
+    elif tipo_postulante == "JURIDICA":
+        persona = persona_juridica
+        if not persona:
+            messages.error(request, "Esta convocatoria es solo para personas jurídicas. Debés completar tu registro como empresa/institución.")
+            return redirect("registro_audiovisual:seleccionar_tipo_registro")
+    else:  # AMBAS
+        persona = persona_humana or persona_juridica
+        if not persona:
+            messages.error(request, "Debés completar tu Registro Audiovisual antes de postularte.")
+            return redirect("registro_audiovisual:seleccionar_tipo_registro")
 
     postulacion = Postulacion.objects.filter(
         user=request.user,
@@ -523,17 +549,18 @@ def wizard_inicio(request, convocatoria_id):
     ).first()
 
     if not postulacion:
-        postulacion = Postulacion.objects.create(
-            user=request.user,
-            convocatoria=convocatoria,
-            estado="borrador",
-        )
-        IntegrantePostulacion.objects.create(
-            postulacion=postulacion,
-            rol="PRODUCTOR",
-            persona_humana=persona_humana,
-            verificado=True,
-        )
+        with transaction.atomic():
+            postulacion = Postulacion.objects.create(
+                user=request.user,
+                convocatoria=convocatoria,
+                estado="borrador",
+            )
+            IntegrantePostulacion.objects.create(
+                postulacion=postulacion,
+                rol="PRODUCTOR",
+                persona_humana=persona if isinstance(persona, PersonaHumana) else None,
+                verificado=True,
+            )
 
     config = getattr(convocatoria, "configuracion", None)
     pasos = _get_pasos(config)
@@ -586,12 +613,16 @@ def _paso_productor(request, postulacion, config, ctx):
     persona = _get_persona_productor(request.user)
 
     # Garantizar que el productor tiene su IntegrantePostulacion para poder subir docs
+    nombre_productor = ""
+    if persona:
+        nombre_productor = getattr(persona, "nombre_completo", None) or getattr(persona, "razon_social", "")
+
     integrante, _ = IntegrantePostulacion.objects.get_or_create(
         postulacion=postulacion,
         rol="PRODUCTOR",
         defaults={
-            "persona_humana": persona,
-            "nombre_busqueda": persona.nombre_completo if persona else "",
+            "persona_humana": persona if isinstance(persona, PersonaHumana) else None,
+            "nombre_busqueda": nombre_productor,
             "verificado": True,
         },
     )
@@ -614,20 +645,40 @@ def _paso_productor(request, postulacion, config, ctx):
                     tipo="COMPROBANTE_CBU",
                     defaults={"archivo": archivo, "estado": "ENVIADO"},
                 )
-            return redirect("convocatorias:wizard_paso", postulacion_id=postulacion.id, paso=ctx["paso_actual"])
+            return redirect(
+                reverse("convocatorias:wizard_paso", kwargs={"postulacion_id": postulacion.id, "paso": ctx["paso_actual"]}) + "#docs"
+            )
 
         form = ProductorCBUForm(request.POST, instance=postulacion, requiere_cbu=requiere_cbu)
         if form.is_valid():
             form.save()
             return redirect("convocatorias:wizard_paso", postulacion_id=postulacion.id, paso=ctx["paso_siguiente"])
 
+    es_juridica = isinstance(persona, PersonaJuridica)
+    requiere_productor_responsable = es_juridica and bool(config and config.requiere_productor_responsable)
+
+    def doc(tipo):
+        return integrante.documentos.filter(tipo=tipo).first() if integrante else None
+
     ctx.update({
         "persona":      persona,
         "integrante":   integrante,
         "form":         form,
         "requiere_cbu": requiere_cbu,
-        "docs_dni":     integrante.documentos.filter(tipo="DNI").first() if integrante else None,
-        "docs_arca":    integrante.documentos.filter(tipo="CONSTANCIA_ARCA").first() if integrante else None,
+        "es_juridica":  es_juridica,
+        "requiere_productor_responsable": requiere_productor_responsable,
+        # docs persona humana
+        "docs_dni":     doc("DNI"),
+        "docs_arca":    doc("CONSTANCIA_ARCA"),
+        "docs_cv":      doc("CV_BIOFILMOGRAFIA"),
+        # docs persona jurídica
+        "docs_estatuto":          doc("ESTATUTO"),
+        "docs_arca_jur":          doc("CONSTANCIA_ARCA_JUR"),
+        "docs_dni_representante": doc("DNI_REPRESENTANTE"),
+        "docs_dni_productor":     doc("DNI_PRODUCTOR_RESP"),
+        "docs_acta":              doc("ACTA_AUTORIDADES"),
+        "docs_contrato":          doc("CONTRATO_COPRODUCTORA"),
+        # comprobante CBU (ambos tipos)
         "docs_cbu":     postulacion.documentos.filter(tipo="COMPROBANTE_CBU").first() if requiere_cbu else None,
     })
     return render(request, "convocatorias/wizard/paso_productor.html", ctx)
@@ -650,7 +701,9 @@ def subir_doc_integrante(request, postulacion_id, rol):
             )
         else:
             messages.error(request, "No se recibió ningún archivo. Intentá de nuevo.")
-    return redirect(request.META.get("HTTP_REFERER", "/"))
+    referer = request.META.get("HTTP_REFERER", "/")
+    sep = "&" if "?" in referer else "#"
+    return redirect(referer.split("#")[0] + "#docs")
 
 
 # ── Pasos 2/3/4: Integrante (director, guionista, realizador) ─────────────────
@@ -696,8 +749,14 @@ def _paso_integrante(request, postulacion, config, ctx, rol):
             form = IntegranteSearchForm(request.POST)
             if form.is_valid():
                 nombre = form.cleaned_data["nombre_busqueda"]
-                resultados = PersonaHumana.objects.filter(nombre_completo__icontains=nombre)[:10]
-                buscado = True
+                if len(nombre) < 3:
+                    messages.error(request, "Ingresá al menos 3 caracteres para buscar.")
+                    buscado = True
+                else:
+                    resultados = PersonaHumana.objects.filter(
+                        Q(nombre__icontains=nombre) | Q(apellido__icontains=nombre)
+                    )[:10]
+                    buscado = True
 
         elif accion == "seleccionar":
             persona_id = request.POST.get("persona_id")
@@ -716,7 +775,7 @@ def _paso_integrante(request, postulacion, config, ctx, rol):
                         "mostrar_docs": mostrar_docs,
                         "puede_coincidir_con_productor": puede_coincidir_con_productor,
                         "persona_productor": persona_productor,
-                        "docs_dni": None, "docs_arca": None,
+                        "docs_dni": None, "docs_arca": None, "docs_cv": None,
                     })
                     return render(request, "convocatorias/wizard/paso_integrante.html", ctx)
 
@@ -750,9 +809,11 @@ def _paso_integrante(request, postulacion, config, ctx, rol):
     if es_mismo_que_productor and integrante_productor:
         docs_dni  = integrante_productor.documentos.filter(tipo="DNI").first()
         docs_arca = integrante_productor.documentos.filter(tipo="CONSTANCIA_ARCA").first()
+        docs_cv   = integrante_productor.documentos.filter(tipo="CV_BIOFILMOGRAFIA").first()
     else:
         docs_dni  = integrante.documentos.filter(tipo="DNI").first() if integrante and mostrar_docs else None
         docs_arca = integrante.documentos.filter(tipo="CONSTANCIA_ARCA").first() if integrante and mostrar_docs else None
+        docs_cv   = integrante.documentos.filter(tipo="CV_BIOFILMOGRAFIA").first() if integrante and mostrar_docs else None
 
     ctx.update({
         "rol":                       rol,
@@ -767,6 +828,7 @@ def _paso_integrante(request, postulacion, config, ctx, rol):
         "es_mismo_que_productor":    es_mismo_que_productor,
         "docs_dni":                  docs_dni,
         "docs_arca":                 docs_arca,
+        "docs_cv":                   docs_cv,
     })
     return render(request, "convocatorias/wizard/paso_integrante.html", ctx)
 
@@ -805,6 +867,9 @@ def _paso_documentacion(request, postulacion, config, ctx):
                     )
                 else:
                     messages.error(request, msg)
+            return redirect(
+                reverse("convocatorias:wizard_paso", kwargs={"postulacion_id": postulacion.id, "paso": ctx["paso_actual"]}) + "#docs"
+            )
 
         elif accion == "siguiente":
             faltantes = [
@@ -836,23 +901,23 @@ def _paso_confirmacion(request, postulacion, config, ctx):
     if request.method == "POST":
         form = DeclaracionJuradaForm(request.POST)
         if form.is_valid():
-            postulacion.declaracion_jurada = True
-            postulacion.estado = "enviado"
-            postulacion.fecha_envio = timezone.now()
+            with transaction.atomic():
+                ahora = timezone.now()
+                postulacion.declaracion_jurada = True
+                postulacion.estado = "enviado"
+                postulacion.fecha_envio = ahora
+                postulacion.save()
 
-            # Marcar todos los documentos pendientes como enviados
-            postulacion.documentos.filter(estado="PENDIENTE").update(
-                estado="ENVIADO",
-                fecha_envio=timezone.now(),
-            )
-            postulacion.integrantes.prefetch_related("documentos")
-            for integrante in postulacion.integrantes.all():
-                integrante.documentos.filter(estado="PENDIENTE").update(
+                postulacion.documentos.filter(estado="PENDIENTE").update(
                     estado="ENVIADO",
-                    fecha_envio=timezone.now(),
+                    fecha_envio=ahora,
                 )
+                for integrante in postulacion.integrantes.all():
+                    integrante.documentos.filter(estado="PENDIENTE").update(
+                        estado="ENVIADO",
+                        fecha_envio=ahora,
+                    )
 
-            postulacion.save()
             return redirect("convocatorias:postulacion_confirmada", postulacion_id=postulacion.id)
 
     # Resumen para mostrar antes de confirmar
@@ -872,6 +937,33 @@ def _paso_confirmacion(request, postulacion, config, ctx):
         "docs_subidos": docs_subidos,
     })
     return render(request, "convocatorias/wizard/paso_confirmacion.html", ctx)
+
+
+# ============================================================
+# DESCARGA DE PLANILLA OFICIAL PRE-COMPLETADA
+# ============================================================
+
+@login_required
+def descargar_planilla_oficial(request, postulacion_id):
+    from django.http import HttpResponse
+    from convocatorias.planilla_generator import generar_planilla_postulacion
+
+    postulacion = get_object_or_404(Postulacion, id=postulacion_id, user=request.user)
+
+    try:
+        xlsx_bytes, filename = generar_planilla_postulacion(postulacion)
+    except (ValueError, FileNotFoundError) as e:
+        messages.error(request, str(e))
+        return redirect(
+            reverse("convocatorias:wizard_paso", args=[postulacion_id, "documentacion"])
+        )
+
+    response = HttpResponse(
+        xlsx_bytes,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return response
 
 
 # ============================================================
