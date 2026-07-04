@@ -159,7 +159,7 @@
             <label class="form-label fw-semibold" for="id_documentacion">Documentación</label>
             {{ form.documentacion }}
             {% if form.documentacion.errors %}<div class="text-danger small">{{ form.documentacion.errors }}</div>{% endif %}
-            <small class="text-muted d-block mt-1">PDF, Word o imagen. Máximo 10 MB.</small>
+            <small class="text-muted d-block mt-1">PDF, Excel o planilla (.ods). Máximo 25 MB.</small>
           </div>
           {% endif %}
 
@@ -176,7 +176,7 @@
           <div class="col-12 mt-4">
             <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end gap-3">
               <button type="submit" class="btn btn-primary">Enviar inscripción</button>
-              <a href="{% url 'convocatorias:convocatoria_detalle' convocatoria.slug %}" class="btn btn-outline-secondary">Volver</a>
+              <a href="{% url 'formacion:detalle' convocatoria.slug %}" class="btn btn-outline-secondary">Volver</a>
             </div>
           </div>
 

@@ -107,10 +107,66 @@
             {{ form.fecha_fin }}
           </div>
 
-          <div class="col-12 mt-2">
-            <label class="form-label">Título del bloque de personas</label>
+          <!-- BLOQUE PERSONAS -->
+          <div class="col-12 mt-4">
+            <h4 class="fw-bold">Formación / Tutorías</h4>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Título del bloque</label>
             {{ form.bloque_personas }}
-            <small class="text-muted d-block">Los miembros se cargan desde el admin de Django.</small>
+            <small class="text-muted d-block">
+              Elegí cómo se mostrará este bloque.
+            </small>
+          </div>
+
+          <!-- FORMSET FORMADORES -->
+          <div class="col-12">
+            {{ formset.management_form }}
+            <div id="jurado-container">
+              {% for jform in formset %}
+              <div class="jurado-row border rounded p-3 mb-3 position-relative">
+                {% if jform.instance.pk %}{{ jform.id }}{% endif %}
+                <div class="row g-2 align-items-start">
+                  <div class="col-md-5">
+                    <label class="form-label small fw-semibold">Nombre</label>
+                    {{ jform.nombre }}
+                  </div>
+                  <div class="col-md-1">
+                    <label class="form-label small fw-semibold">Orden</label>
+                    {{ jform.orden }}
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Foto (opcional)</label>
+                    {{ jform.foto }}
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small fw-semibold">Bio (opcional)</label>
+                    {{ jform.bio }}
+                  </div>
+                  {% if jform.non_field_errors %}
+                  <div class="col-12">
+                    <div class="alert alert-danger py-1">{{ jform.non_field_errors }}</div>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="mt-2">
+                  {% if jform.DELETE %}
+                  <div class="form-check">
+                    {{ jform.DELETE }}
+                    <label class="form-check-label text-danger small" for="{{ jform.DELETE.id_for_label }}">Eliminar este miembro</label>
+                  </div>
+                  {% else %}
+                  <button type="button" class="btn btn-sm btn-outline-danger remove-jurado">Quitar</button>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <button type="button" id="add-jurado" class="btn btn-outline-secondary btn-sm mt-1">
+              + Agregar miembro
+            </button>
           </div>
 
           <!-- ================================================= -->
@@ -172,6 +228,92 @@
 
   tipoSelect && tipoSelect.addEventListener("change", actualizar);
   actualizar();
+})();
+
+// Formset dinámico de formadores/tutores
+(function () {
+  const container   = document.getElementById("jurado-container");
+  const addBtn      = document.getElementById("add-jurado");
+  const totalInput  = document.getElementById("id_miembros-TOTAL_FORMS");
+
+  if (!container || !addBtn || !totalInput) return;
+
+  function getTotal() { return parseInt(totalInput.value, 10); }
+
+  function buildRow(idx) {
+    const tpl = container.querySelector(".jurado-row");
+    if (!tpl) {
+      // no hay filas previas: construir desde cero
+      const div = document.createElement("div");
+      div.className = "jurado-row border rounded p-3 mb-3 position-relative";
+      div.innerHTML = `
+        <div class="row g-2 align-items-start">
+          <div class="col-md-5">
+            <label class="form-label small fw-semibold">Nombre</label>
+            <input type="text" name="miembros-${idx}-nombre" class="form-control" placeholder="Nombre completo">
+          </div>
+          <div class="col-md-1">
+            <label class="form-label small fw-semibold">Orden</label>
+            <input type="number" name="miembros-${idx}-orden" class="form-control" style="width:80px" value="${idx + 1}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Foto (opcional)</label>
+            <input type="file" name="miembros-${idx}-foto" class="form-control">
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-semibold">Bio (opcional)</label>
+            <textarea name="miembros-${idx}-bio" class="form-control" rows="2" placeholder="Breve descripción (opcional)"></textarea>
+          </div>
+        </div>
+        <div class="mt-2">
+          <button type="button" class="btn btn-sm btn-outline-danger remove-jurado">Quitar</button>
+        </div>
+        <input type="hidden" name="miembros-${idx}-id" value="">
+        <input type="hidden" name="miembros-${idx}-convocatoria" value="">
+      `;
+      return div;
+    }
+
+    const clone = tpl.cloneNode(true);
+    clone.querySelectorAll("[name]").forEach(el => {
+      el.name = el.name.replace(/-\d+-/, `-${idx}-`);
+      if (el.id) el.id = el.id.replace(/-\d+-/, `-${idx}-`);
+      if (el.tagName !== "INPUT" || el.type !== "hidden") {
+        if (el.tagName === "INPUT" && el.type !== "file") el.value = "";
+        if (el.tagName === "TEXTAREA") el.value = "";
+      }
+    });
+    // Quitar el checkbox DELETE clonado si aparece
+    const delCheck = clone.querySelector("[name*=DELETE]");
+    if (delCheck) {
+      delCheck.closest(".form-check")?.remove();
+      const quitBtn = document.createElement("div");
+      quitBtn.className = "mt-2";
+      quitBtn.innerHTML = `<button type="button" class="btn btn-sm btn-outline-danger remove-jurado">Quitar</button>`;
+      clone.appendChild(quitBtn);
+    }
+    return clone;
+  }
+
+  addBtn.addEventListener("click", function () {
+    const idx = getTotal();
+    container.appendChild(buildRow(idx));
+    totalInput.value = idx + 1;
+  });
+
+  container.addEventListener("click", function (e) {
+    if (e.target.classList.contains("remove-jurado")) {
+      e.target.closest(".jurado-row").remove();
+      // reindexar
+      container.querySelectorAll(".jurado-row").forEach((row, i) => {
+        row.querySelectorAll("[name]").forEach(el => {
+          el.name = el.name.replace(/-\d+-/, `-${i}-`);
+          if (el.id) el.id = el.id.replace(/-\d+-/, `-${i}-`);
+        });
+      });
+      totalInput.value = container.querySelectorAll(".jurado-row").length;
+    }
+  });
 })();
 </script>
 {% endblock %}
