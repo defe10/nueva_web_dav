@@ -1,10 +1,13 @@
+import re
 import unicodedata
 
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
-from .models import Nodo, Opcion, PalabraClave
+from .models import Nodo, Opcion, PalabraClave, ConfiguracionChatbot, ConsultaLog
+
+_MAX_HISTORIAL = 50
 
 
 def normalizar_texto(texto):
@@ -14,21 +17,32 @@ def normalizar_texto(texto):
     return texto
 
 
-def inicio_chatbot(request):
-    nodo = Nodo.objects.get(es_inicio=True)
+def _get_nodo_inicio():
+    return Nodo.objects.filter(es_inicio=True, activo=True).first()
 
-    historial = [
-        {
-            "tipo": "bot",
-            "texto": nodo.mensaje
-        }
-    ]
+
+def _entry_bot(nodo):
+    return {"tipo": "bot", "texto": nodo.mensaje, "nodo_id": nodo.id}
+
+
+def _nodo_desde_historial(historial):
+    """Devuelve el nodo correspondiente a la última entrada bot del historial."""
+    for entry in reversed(historial):
+        if entry.get("tipo") == "bot":
+            nodo_id = entry.get("nodo_id")
+            if nodo_id:
+                nodo = Nodo.objects.filter(id=nodo_id).first()
+                if nodo:
+                    return nodo
+    return _get_nodo_inicio()
+
+
+def inicio_chatbot(request):
+    nodo = _get_nodo_inicio()
+    historial = [_entry_bot(nodo)]
     request.session["chat_historial"] = historial
 
-    contexto = {
-        "nodo": nodo,
-        "historial": historial
-    }
+    contexto = {"nodo": nodo, "historial": historial}
 
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         widget_html = render_to_string("chatbot/_widget.html", contexto, request=request)
@@ -42,23 +56,16 @@ def ver_nodo(request, opcion_id):
     nodo = opcion.nodo_destino
 
     historial = request.session.get("chat_historial", [])
+    historial.append({"tipo": "usuario", "texto": opcion.texto})
+    historial.append(_entry_bot(nodo))
 
-    historial.append({
-        "tipo": "usuario",
-        "texto": opcion.texto
-    })
-
-    historial.append({
-        "tipo": "bot",
-        "texto": nodo.mensaje
-    })
+    # Limitar tamaño del historial para no saturar la sesión
+    if len(historial) > _MAX_HISTORIAL:
+        historial = historial[-_MAX_HISTORIAL:]
 
     request.session["chat_historial"] = historial
 
-    contexto = {
-        "nodo": nodo,
-        "historial": historial
-    }
+    contexto = {"nodo": nodo, "historial": historial}
 
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         widget_html = render_to_string("chatbot/_widget.html", contexto, request=request)
@@ -76,19 +83,13 @@ def volver(request):
     request.session["chat_historial"] = historial
 
     if historial:
-        ultimo_mensaje = historial[-1]["texto"]
-        nodo = Nodo.objects.filter(mensaje=ultimo_mensaje).first()
-        if not nodo:
-            nodo = Nodo.objects.get(es_inicio=True)
+        nodo = _nodo_desde_historial(historial)
     else:
-        nodo = Nodo.objects.get(es_inicio=True)
-        historial = [{"tipo": "bot", "texto": nodo.mensaje}]
+        nodo = _get_nodo_inicio()
+        historial = [_entry_bot(nodo)]
         request.session["chat_historial"] = historial
 
-    contexto = {
-        "nodo": nodo,
-        "historial": historial
-    }
+    contexto = {"nodo": nodo, "historial": historial}
 
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         widget_html = render_to_string("chatbot/_widget.html", contexto, request=request)
@@ -107,76 +108,69 @@ def buscar_consulta(request):
     historial = request.session.get("chat_historial", [])
 
     if consulta:
-        historial.append({
-            "tipo": "usuario",
-            "texto": consulta
-        })
-
-    coincidencias = []
+        historial.append({"tipo": "usuario", "texto": consulta})
 
     palabras_clave = PalabraClave.objects.filter(activo=True).select_related("nodo_destino")
 
-    for palabra in palabras_clave:
-        palabra_normalizada = normalizar_texto(palabra.texto)
+    # B: word boundary — la keyword debe ser una palabra completa, no substring
+    def _matchea(kw_normalizada, texto_normalizado):
+        patron = r'\b' + re.escape(kw_normalizada) + r'\b'
+        return bool(re.search(patron, texto_normalizado))
 
-        if palabra_normalizada and palabra_normalizada in consulta_normalizada:
-            coincidencias.append(palabra)
+    coincidencias = [
+        p for p in palabras_clave
+        if p.texto and _matchea(normalizar_texto(p.texto), consulta_normalizada)
+    ]
 
+    keyword_matcheada = None
     if coincidencias:
-        mejor_coincidencia = max(
-            coincidencias,
-            key=lambda p: (p.prioridad, len(normalizar_texto(p.texto)))
-        )
-        nodo = mejor_coincidencia.nodo_destino
-
-        historial.append({
-            "tipo": "bot",
-            "texto": nodo.mensaje
-        })
+        mejor = max(coincidencias, key=lambda p: (p.prioridad, len(normalizar_texto(p.texto))))
+        keyword_matcheada = mejor.texto
+        nodo = mejor.nodo_destino
+        historial.append(_entry_bot(nodo))
     else:
-        nodo = Nodo.objects.get(es_inicio=True)
-
+        nodo = _get_nodo_inicio()
+        config = ConfiguracionChatbot.get()
+        msg_no_encontrado = (
+            config.mensaje_no_encontrado if config
+            else "No estoy seguro de haber entendido. Podés reformular la consulta o elegir una de las opciones disponibles."
+        )
         historial.append({
             "tipo": "bot",
-            "texto": (
-                "No estoy seguro de haber entendido. "
-                "Podés reformular la consulta o elegir una de las opciones disponibles."
-            )
+            "texto": msg_no_encontrado,
+            "nodo_id": nodo.id if nodo else None,
         })
+
+    # F: registrar consulta
+    if consulta:
+        ConsultaLog.objects.create(
+            texto_consulta=consulta[:500],
+            keyword_matcheada=keyword_matcheada,
+            nodo_destino=nodo,
+            encontrado=bool(coincidencias),
+        )
+
+    if len(historial) > _MAX_HISTORIAL:
+        historial = historial[-_MAX_HISTORIAL:]
 
     request.session["chat_historial"] = historial
 
-    contexto = {
-        "nodo": nodo,
-        "historial": historial
-    }
+    contexto = {"nodo": nodo, "historial": historial}
 
     widget_html = render_to_string("chatbot/_widget.html", contexto, request=request)
     return JsonResponse({"widget_html": widget_html})
 
 
 def widget_chatbot(request):
-    nodo = Nodo.objects.get(es_inicio=True)
-
     historial = request.session.get("chat_historial")
 
     if not historial:
-        historial = [
-            {
-                "tipo": "bot",
-                "texto": nodo.mensaje
-            }
-        ]
+        nodo = _get_nodo_inicio()
+        historial = [_entry_bot(nodo)]
         request.session["chat_historial"] = historial
     else:
-        ultimo_mensaje = historial[-1]["texto"]
-        nodo_encontrado = Nodo.objects.filter(mensaje=ultimo_mensaje).first()
-        if nodo_encontrado:
-            nodo = nodo_encontrado
+        nodo = _nodo_desde_historial(historial)
 
-    contexto = {
-        "nodo": nodo,
-        "historial": historial
-    }
+    contexto = {"nodo": nodo, "historial": historial}
 
     return render(request, "chatbot/_widget_shell.html", contexto)
