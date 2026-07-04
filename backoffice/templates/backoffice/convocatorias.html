@@ -1,4 +1,6 @@
 {% extends "sitio_publico/base.html" %}
+{% block title %}Convocatorias · Backoffice{% endblock %}
+
 {% block content %}
 
 <section class="fomento-hero text-center">
@@ -8,15 +10,72 @@
 
 <div class="container py-4">
 
-  <!-- POSTULACIONES -->
-  <div class="dav-card mb-4">
-    <h4 class="fw-bold mb-3">Postulaciones</h4>
+  <!-- ═══════════════════════════════════════════════
+       POSTULACIONES
+  ════════════════════════════════════════════════ -->
+  <h4 class="fw-bold mb-3">Postulaciones</h4>
 
+  <!-- F: Resumen por estado -->
+  {% if resumen_post %}
+  <div class="row g-2 mb-3">
+    {% for r in resumen_post %}
+    <div class="col-6 col-md-3 col-lg-2">
+      <div class="dav-card text-center py-2">
+        <div class="fs-4 fw-bold">{{ r.total }}</div>
+        <div class="text-muted small">{{ r.estado }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Filtros -->
+  <div class="dav-card mb-3">
+    <form method="get" class="row g-2 align-items-end">
+      <!-- mantener filtros de formación al filtrar postulaciones -->
+      {% if conv_form_id %}<input type="hidden" name="conv_form_id" value="{{ conv_form_id }}">{% endif %}
+      {% if estado_form %}<input type="hidden" name="estado_form" value="{{ estado_form }}">{% endif %}
+
+      <div class="col-12 col-md-4">
+        <label class="form-label small mb-1">Buscar</label>
+        <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm"
+               placeholder="Proyecto o email">
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label small mb-1">Convocatoria</label>
+        <select name="conv_id" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for c in convocatorias_list %}
+            <option value="{{ c.id }}" {% if conv_id == c.id|stringformat:"s" %}selected{% endif %}>{{ c.titulo }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label small mb-1">Estado</label>
+        <select name="estado" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for val, label in estados_post_choices %}
+            <option value="{{ val }}" {% if estado == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-dark btn-sm">Filtrar</button>
+      </div>
+      <div class="col-auto">
+        <a href="{% url 'backoffice:convocatorias' %}" class="btn btn-outline-secondary btn-sm">Limpiar</a>
+      </div>
+    </form>
+  </div>
+
+  <p class="text-muted small mb-2">{{ page_post.paginator.count }} postulación{{ page_post.paginator.count|pluralize:"es" }}</p>
+
+  <div class="dav-card mb-3">
     <div class="table-responsive">
-      <table class="table align-middle">
+      <table class="table align-middle mb-0">
         <thead>
           <tr>
-            <th>Id</th>
+            <th>ID</th>
             <th>Presentante</th>
             <th>Nombre proyecto</th>
             <th>Convocatoria</th>
@@ -26,54 +85,156 @@
           </tr>
         </thead>
         <tbody>
-          {% for r in rows_postulaciones %}
+          {% for r in page_post %}
           <tr>
-            <td>{{ r.id }}</td>
-            <td>{{ r.presentante|safe }}</td>
-            <td>{{ r.proyecto|safe }}</td>
+            <td class="text-muted">#{{ r.id }}</td>
+            <td>{{ r.presentante }}</td>
+            <td>{{ r.proyecto }}</td>
             <td>{{ r.convocatoria }}</td>
             <td>{{ r.linea }}</td>
-            <td>{{ r.fecha_envio|date:"d/m/Y" }}</td>
+            <td>{% if r.fecha_envio %}{{ r.fecha_envio|date:"d/m/Y" }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
             <td>{{ r.estado }}</td>
           </tr>
           {% empty %}
-          <tr><td colspan="7">No hay postulaciones.</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-3">No hay postulaciones.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- FORMACIÓN -->
-  <div class="dav-card">
-    <h4 class="fw-bold mb-3">Inscripciones a formación</h4>
+  <!-- Paginación postulaciones -->
+  {% if page_post.paginator.num_pages > 1 %}
+  <nav class="mb-4">
+    <ul class="pagination justify-content-center">
+      {% if page_post.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?q={{ q|urlencode }}&conv_id={{ conv_id }}&estado={{ estado }}&ppost={{ page_post.previous_page_number }}&conv_form_id={{ conv_form_id }}&estado_form={{ estado_form }}">‹ Anterior</a>
+        </li>
+      {% endif %}
+      <li class="page-item disabled">
+        <span class="page-link">Pág. {{ page_post.number }} / {{ page_post.paginator.num_pages }}</span>
+      </li>
+      {% if page_post.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?q={{ q|urlencode }}&conv_id={{ conv_id }}&estado={{ estado }}&ppost={{ page_post.next_page_number }}&conv_form_id={{ conv_form_id }}&estado_form={{ estado_form }}">Siguiente ›</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
 
+
+  <!-- ═══════════════════════════════════════════════
+       FORMACIÓN
+  ════════════════════════════════════════════════ -->
+  <h4 class="fw-bold mb-3">Inscripciones a formación</h4>
+
+  <!-- F: Resumen por estado -->
+  {% if resumen_form %}
+  <div class="row g-2 mb-3">
+    {% for r in resumen_form %}
+    <div class="col-6 col-md-3 col-lg-2">
+      <div class="dav-card text-center py-2">
+        <div class="fs-4 fw-bold">{{ r.total }}</div>
+        <div class="text-muted small">{{ r.estado }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Filtros formación -->
+  <div class="dav-card mb-3">
+    <form method="get" class="row g-2 align-items-end">
+      {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+      {% if conv_id %}<input type="hidden" name="conv_id" value="{{ conv_id }}">{% endif %}
+      {% if estado %}<input type="hidden" name="estado" value="{{ estado }}">{% endif %}
+
+      <div class="col-12 col-md-4">
+        <label class="form-label small mb-1">Convocatoria de formación</label>
+        <select name="conv_form_id" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for c in conv_formacion_list %}
+            <option value="{{ c.id }}" {% if conv_form_id == c.id|stringformat:"s" %}selected{% endif %}>{{ c.titulo }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label small mb-1">Estado</label>
+        <select name="estado_form" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for val, label in estados_form_choices %}
+            <option value="{{ val }}" {% if estado_form == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-dark btn-sm">Filtrar</button>
+      </div>
+      <div class="col-auto">
+        <a href="{% url 'backoffice:convocatorias' %}" class="btn btn-outline-secondary btn-sm">Limpiar</a>
+      </div>
+    </form>
+  </div>
+
+  <p class="text-muted small mb-2">{{ page_form.paginator.count }} inscripción{{ page_form.paginator.count|pluralize:"es" }}</p>
+
+  <div class="dav-card mb-3">
     <div class="table-responsive">
-      <table class="table align-middle">
+      <table class="table align-middle mb-0">
         <thead>
           <tr>
-            <th>Id</th>
+            <th>ID</th>
+            <th>Presentante</th>
+            <th>Email</th>
             <th>Convocatoria</th>
-            <th>Fecha envío</th>
+            <th>Fecha</th>
             <th>Estado</th>
           </tr>
         </thead>
         <tbody>
-          {% for r in rows_formacion %}
+          {% for r in page_form %}
           <tr>
-            <td>{{ r.id|safe }}</td>
+            <td class="text-muted">{{ r.id }}</td>
+            <td>{{ r.presentante }}</td>
+            <td>
+              {% if r.email != "—" %}
+                <a href="mailto:{{ r.email }}" class="text-decoration-none small">{{ r.email }}</a>
+              {% else %}—{% endif %}
+            </td>
             <td>{{ r.convocatoria }}</td>
-            <td>{{ r.fecha|date:"d/m/Y" }}</td>
+            <td>{% if r.fecha %}{{ r.fecha|date:"d/m/Y" }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
             <td>{{ r.estado }}</td>
           </tr>
           {% empty %}
-          <tr><td colspan="4">No hay inscripciones.</td></tr>
+          <tr><td colspan="6" class="text-center text-muted py-3">No hay inscripciones.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-
   </div>
+
+  <!-- Paginación formación -->
+  {% if page_form.paginator.num_pages > 1 %}
+  <nav>
+    <ul class="pagination justify-content-center">
+      {% if page_form.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?q={{ q|urlencode }}&conv_id={{ conv_id }}&estado={{ estado }}&conv_form_id={{ conv_form_id }}&estado_form={{ estado_form }}&pform={{ page_form.previous_page_number }}">‹ Anterior</a>
+        </li>
+      {% endif %}
+      <li class="page-item disabled">
+        <span class="page-link">Pág. {{ page_form.number }} / {{ page_form.paginator.num_pages }}</span>
+      </li>
+      {% if page_form.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?q={{ q|urlencode }}&conv_id={{ conv_id }}&estado={{ estado }}&conv_form_id={{ conv_form_id }}&estado_form={{ estado_form }}&pform={{ page_form.next_page_number }}">Siguiente ›</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
 
 </div>
 

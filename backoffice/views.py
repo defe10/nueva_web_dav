@@ -1,5 +1,6 @@
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Q
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.urls import reverse
@@ -9,117 +10,113 @@ from django.utils.html import format_html
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
+from convocatorias.models import Convocatoria, Postulacion
+from exencion.models import Exencion
+from formacion.models import ConvocatoriaFormacion, InscripcionFormacion
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
-from convocatorias.models import Postulacion
-from formacion.models import InscripcionFormacion
 
 
-def _admin_change_url_for(obj):
-    """
-    Devuelve la URL del change form del admin para un objeto (PersonaHumana o PersonaJuridica).
-    """
+POR_PAGINA = 50
+
+
+# ============================================================
+# HELPERS
+# ============================================================
+
+def _admin_url(obj):
     return reverse(
         f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change",
-        args=[obj.pk]
+        args=[obj.pk],
     )
 
 
-def _get_fecha(obj):
-    """
-    Intenta obtener una fecha de registro/renovación con nombres comunes.
-    Ajustá acá si vos tenés un campo definitivo (ej: fecha_registro).
-    """
-    return (
-        getattr(obj, "fecha_renovacion", None)
-        or getattr(obj, "fecha_registro", None)
-        or getattr(obj, "fecha_creacion", None)
-        or getattr(obj, "created_at", None)
-    )
+def _fmt_fecha(v):
+    if v is None:
+        return ""
+    try:
+        return timezone.localtime(v).strftime("%d/%m/%Y %H:%M")
+    except Exception:
+        pass
+    try:
+        return v.strftime("%d/%m/%Y")
+    except Exception:
+        pass
+    return str(v)
 
 
-@staff_member_required
-def nomina_registro(request):
-    q = (request.GET.get("q") or "").strip()
-
+# B: helper único para filtrar personas (evita duplicación)
+def _filtrar_personas(q):
+    # A: usa nombre/apellido en lugar de nombre_completo (que es @property)
     humanas_qs = PersonaHumana.objects.select_related("user").all()
     juridicas_qs = PersonaJuridica.objects.select_related("user").all()
 
     if q:
         humanas_qs = humanas_qs.filter(
-            Q(nombre_completo__icontains=q) |
-            Q(user__email__icontains=q)
+            Q(nombre__icontains=q) | Q(apellido__icontains=q) | Q(user__email__icontains=q)
         )
         juridicas_qs = juridicas_qs.filter(
-            Q(razon_social__icontains=q) |
-            Q(user__email__icontains=q)
+            Q(razon_social__icontains=q) | Q(user__email__icontains=q)
         )
 
+    return humanas_qs, juridicas_qs
+
+
+def _personas_a_rows(humanas_qs, juridicas_qs):
     rows = []
-
-    # Persona Humana
     for ph in humanas_qs:
-        display = (getattr(ph, "nombre_completo", "") or "").strip()
-        email = getattr(getattr(ph, "user", None), "email", "") or ""
-        fecha = _get_fecha(ph)
-
         rows.append({
-            "id": ph.id,
-            "display": display or "(sin nombre)",
-            "tipo": "Persona humana",
-            "email": email,
-            "fecha": fecha,
-            "url_admin": _admin_change_url_for(ph),
+            "id":       ph.id,
+            "display":  f"{ph.nombre} {ph.apellido}".strip() or "(sin nombre)",
+            "tipo":     "Persona humana",
+            "email":    getattr(ph.user, "email", "") or "",
+            "fecha":    ph.fecha_creacion,
+            "url_admin": _admin_url(ph),
         })
-
-    # Persona Jurídica
     for pj in juridicas_qs:
-        display = (getattr(pj, "razon_social", "") or "").strip()
-        email = getattr(getattr(pj, "user", None), "email", "") or ""
-        fecha = _get_fecha(pj)
-
         rows.append({
-            "id": pj.id,
-            "display": display or "(sin razón social)",
-            "tipo": "Persona jurídica",
-            "email": email,
-            "fecha": fecha,
-            "url_admin": _admin_change_url_for(pj),
+            "id":       pj.id,
+            "display":  pj.razon_social or "(sin razón social)",
+            "tipo":     "Persona jurídica",
+            "email":    getattr(pj.user, "email", "") or "",
+            "fecha":    pj.fecha_creacion,
+            "url_admin": _admin_url(pj),
         })
-
-    # Orden por fecha (más reciente primero). Los None al final.
     rows.sort(key=lambda r: (r["fecha"] is None, r["fecha"]), reverse=True)
+    return rows
+
+
+# ============================================================
+# NÓMINA REGISTRO
+# ============================================================
+
+@staff_member_required
+def nomina_registro(request):
+    q = (request.GET.get("q") or "").strip()
+    humanas_qs, juridicas_qs = _filtrar_personas(q)
+    rows = _personas_a_rows(humanas_qs, juridicas_qs)
+
+    # E: paginación
+    paginator = Paginator(rows, POR_PAGINA)
+    page_obj  = paginator.get_page(request.GET.get("page"))
 
     return render(request, "backoffice/nomina_registro.html", {
-        "q": q,
-        "rows": rows,
+        "q":        q,
+        "page_obj": page_obj,
+        "total":    paginator.count,
     })
 
 
 @staff_member_required
 def nomina_registro_excel(request):
     q = (request.GET.get("q") or "").strip()
-
-    humanas_qs = PersonaHumana.objects.select_related("user").all()
-    juridicas_qs = PersonaJuridica.objects.select_related("user").all()
-
-    if q:
-        humanas_qs = humanas_qs.filter(
-            Q(nombre_completo__icontains=q) |
-            Q(user__email__icontains=q)
-        )
-        juridicas_qs = juridicas_qs.filter(
-            Q(razon_social__icontains=q) |
-            Q(user__email__icontains=q)
-        )
+    humanas_qs, juridicas_qs = _filtrar_personas(q)  # B: helper reutilizado
 
     wb = Workbook()
-    # quitamos la hoja por defecto
     wb.remove(wb.active)
 
-    def fmt_value(v):
+    def fmt(v):
         if v is None:
             return ""
-        # datetimes / dates
         try:
             return timezone.localtime(v).strftime("%d/%m/%Y %H:%M")
         except Exception:
@@ -128,153 +125,243 @@ def nomina_registro_excel(request):
             return v.strftime("%d/%m/%Y")
         except Exception:
             pass
-        # archivos
-        try:
-            # FileField puede ser FieldFile
-            if hasattr(v, "url") or hasattr(v, "name"):
-                return getattr(v, "name", "") or ""
-        except Exception:
-            pass
+        if hasattr(v, "name"):
+            return v.name or ""
         return str(v)
 
-    def model_field_names(model_cls):
-        """
-        Exporta TODOS los campos concretos del modelo (columnas reales de la DB).
-        Excluye relaciones (FK se exporta como su id automáticamente por Django con attname).
-        """
-        names = []
-        for f in model_cls._meta.fields:
-            # _meta.fields ya son campos concretos; para FK, usamos attname (ej: user_id)
-            names.append(getattr(f, "attname", f.name))
-        return names
+    def field_names(model_cls):
+        return [getattr(f, "attname", f.name) for f in model_cls._meta.fields]
 
-    def write_sheet(title, qs, model_cls, extra_cols_fn=None):
+    def write_sheet(title, qs, model_cls):
         ws = wb.create_sheet(title=title)
-
-        field_names = model_field_names(model_cls)
-
-        # Extras (por ejemplo user_email)
-        extra_headers = []
-        if extra_cols_fn:
-            extra_headers = list(extra_cols_fn()["headers"])
-
-        headers = field_names + extra_headers
-        ws.append(headers)
-
-        # filas
+        names = field_names(model_cls)
+        ws.append(names + ["user_email"])
         for obj in qs:
-            row = []
-            for name in field_names:
-                row.append(fmt_value(getattr(obj, name, "")))
-
-            if extra_cols_fn:
-                extras = extra_cols_fn(obj)["values"]
-                row.extend([fmt_value(x) for x in extras])
-
+            row = [fmt(getattr(obj, n, "")) for n in names]
+            row.append(getattr(obj.user, "email", "") if obj.user_id else "")
             ws.append(row)
+        for i, h in enumerate(names + ["user_email"], 1):
+            ws.column_dimensions[get_column_letter(i)].width = min(max(len(str(h)) + 2, 14), 45)
 
-        # anchos razonables (sin volverte loco)
-        for col_idx, h in enumerate(headers, start=1):
-            ws.column_dimensions[get_column_letter(col_idx)].width = min(max(len(str(h)) + 2, 14), 45)
+    write_sheet("Personas Humanas",   humanas_qs,   PersonaHumana)
+    write_sheet("Personas Jurídicas", juridicas_qs, PersonaJuridica)
 
-    def extra_user_email(obj=None):
-        if obj is None:
-            return {"headers": ["user_email"]}
-        u = getattr(obj, "user", None)
-        return {"headers": ["user_email"], "values": [getattr(u, "email", "") if u else ""]}
-
-    write_sheet("Personas Humanas", humanas_qs, PersonaHumana, extra_cols_fn=extra_user_email)
-    write_sheet("Personas Jurídicas", juridicas_qs, PersonaJuridica, extra_cols_fn=extra_user_email)
-
-    filename = "padron_registro_completo.xlsx"
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    response["Content-Disposition"] = 'attachment; filename="padron_registro_completo.xlsx"'
     wb.save(response)
     return response
 
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import render
-from django.urls import reverse
-from django.utils.html import format_html
 
-from convocatorias.models import Postulacion
-from formacion.models import InscripcionFormacion
-
+# ============================================================
+# CONVOCATORIAS — POSTULACIONES + FORMACIÓN
+# ============================================================
 
 @staff_member_required
 def backoffice_convocatorias(request):
-    # =========================
-    # POSTULACIONES
-    # =========================
-    postulaciones = (
+    q        = (request.GET.get("q") or "").strip()
+    conv_id  = request.GET.get("conv_id") or ""
+    estado   = request.GET.get("estado") or ""
+
+    # ── POSTULACIONES ────────────────────────────────────────
+    post_qs = (
         Postulacion.objects
         .select_related("convocatoria", "user")
         .order_by("-fecha_envio")
     )
+    if q:
+        post_qs = post_qs.filter(
+            Q(nombre_proyecto__icontains=q)
+            | Q(user__email__icontains=q)
+        )
+    if conv_id:
+        post_qs = post_qs.filter(convocatoria_id=conv_id)
+    if estado:
+        post_qs = post_qs.filter(estado=estado)
 
-    rows_postulaciones = []
-    for p in postulaciones:
-        # Link a Postulación (Nombre proyecto)
-        url_post = reverse("admin:convocatorias_postulacion_change", args=[p.id])
-        link_proyecto = format_html('<a href="{}">{}</a>', url_post, p.nombre_proyecto)
+    # Pre-cargar personas para evitar N+1
+    user_ids   = list(post_qs.values_list("user_id", flat=True))
+    ph_by_user = {ph.user_id: ph for ph in PersonaHumana.objects.filter(user_id__in=user_ids)}
+    pj_by_user = {pj.user_id: pj for pj in PersonaJuridica.objects.filter(user_id__in=user_ids)}
 
-        # Presentante (admin PersonaHumana / PersonaJuridica) desde p.user
-        link_presentante = "—"
-        ph = PersonaHumana.objects.filter(user=p.user).only("id").first()
+    rows_post = []
+    for p in post_qs:
+        ph = ph_by_user.get(p.user_id)
+        pj = pj_by_user.get(p.user_id)
+
         if ph:
-            url_ph = reverse("admin:registro_audiovisual_personahumana_change", args=[ph.id])
-            label = getattr(ph, "nombre_completo", None) or str(ph)
-            link_presentante = format_html('<a href="{}">{}</a>', url_ph, label)
+            presentante = format_html(
+                '<a href="{}">{}</a>',
+                _admin_url(ph),
+                f"{ph.nombre} {ph.apellido}".strip() or str(ph),
+            )
+        elif pj:
+            presentante = format_html(
+                '<a href="{}">{}</a>',
+                _admin_url(pj),
+                pj.razon_social or str(pj),
+            )
         else:
-            pj = PersonaJuridica.objects.filter(user=p.user).only("id").first()
-            if pj:
-                url_pj = reverse("admin:registro_audiovisual_personajuridica_change", args=[pj.id])
-                label = getattr(pj, "razon_social", None) or str(pj)
-                link_presentante = format_html('<a href="{}">{}</a>', url_pj, label)
-            else:
-                link_presentante = getattr(p.user, "email", None) or str(p.user)
+            presentante = p.user.email or str(p.user)
 
-        convocatoria = p.convocatoria.titulo if p.convocatoria_id else "—"
-        linea = getattr(p.convocatoria, "linea", None) if p.convocatoria_id else None
-        linea = linea or "—"
-
-        rows_postulaciones.append({
-            "id": p.id,
-            "presentante": link_presentante,
-            "proyecto": link_proyecto,
-            "convocatoria": convocatoria,
-            "linea": linea,
+        rows_post.append({
+            "id":          p.id,
+            "presentante": presentante,
+            "proyecto":    format_html('<a href="{}">{}</a>', _admin_url(p), p.nombre_proyecto),
+            "convocatoria": p.convocatoria.titulo if p.convocatoria_id else "—",
+            "linea":       p.convocatoria.get_linea_display() if p.convocatoria_id else "—",
             "fecha_envio": p.fecha_envio,
-            "estado": p.estado,
+            "estado":      p.estado,
         })
 
+    # E: paginación postulaciones
+    pag_post   = Paginator(rows_post, POR_PAGINA)
+    page_post  = pag_post.get_page(request.GET.get("ppost"))
 
-    # =========================
-    # INSCRIPCIONES A FORMACIÓN
-    # =========================
-    inscripciones = (
+    # ── INSCRIPCIONES FORMACIÓN ──────────────────────────────
+    conv_form_id = request.GET.get("conv_form_id") or ""
+    estado_form  = request.GET.get("estado_form") or ""
+
+    insc_qs = (
         InscripcionFormacion.objects
         .select_related("convocatoria", "user", "persona_humana", "persona_juridica")
         .order_by("-fecha")
     )
+    if q:
+        insc_qs = insc_qs.filter(
+            Q(nombre__icontains=q) | Q(apellido__icontains=q) | Q(user__email__icontains=q)
+        )
+    if conv_form_id:
+        insc_qs = insc_qs.filter(convocatoria_id=conv_form_id)
+    if estado_form:
+        insc_qs = insc_qs.filter(estado=estado_form)
 
+    rows_form = []
+    for i in insc_qs:
+        # C: mostrar presentante
+        if i.persona_humana:
+            ph = i.persona_humana
+            presentante = format_html(
+                '<a href="{}">{}</a>',
+                _admin_url(ph),
+                f"{ph.nombre} {ph.apellido}".strip() or str(ph),
+            )
+        elif i.persona_juridica:
+            pj = i.persona_juridica
+            presentante = format_html(
+                '<a href="{}">{}</a>',
+                _admin_url(pj),
+                pj.razon_social or str(pj),
+            )
+        elif i.nombre or i.apellido:
+            presentante = f"{i.nombre} {i.apellido}".strip()
+        else:
+            presentante = i.user.email or str(i.user)
 
-    rows_formacion = []
-    for i in inscripciones:
-        # Link al admin de InscripcionFormacion
-        url_insc = reverse("admin:convocatorias_inscripcionformacion_change", args=[i.id])
-        link_id = format_html('<a href="{}">#{}</a>', url_insc, i.id)
-
-        rows_formacion.append({
-            "id": link_id,
+        rows_form.append({
+            "id":          format_html('<a href="{}">{}</a>', _admin_url(i), f"#{i.id}"),
+            "presentante": presentante,
+            "email":       i.user.email or i.email or "—",
             "convocatoria": i.convocatoria.titulo if i.convocatoria_id else "—",
-            "fecha": i.fecha,
-            "estado": getattr(i, "estado", "—"),
+            "fecha":       i.fecha,
+            "estado":      i.get_estado_display(),
         })
 
+    pag_form  = Paginator(rows_form, POR_PAGINA)
+    page_form = pag_form.get_page(request.GET.get("pform"))
+
+    # ── F: RESUMEN POR ESTADO ────────────────────────────────
+    resumen_post = (
+        Postulacion.objects
+        .values("estado")
+        .annotate(total=Count("id"))
+        .order_by("estado")
+    )
+    resumen_form = (
+        InscripcionFormacion.objects
+        .values("estado")
+        .annotate(total=Count("id"))
+        .order_by("estado")
+    )
+
+    # ── LISTAS PARA FILTROS ──────────────────────────────────
+    convocatorias_list      = Convocatoria.objects.order_by("-fecha_inicio").values("id", "titulo")
+    conv_formacion_list     = ConvocatoriaFormacion.objects.order_by("-fecha_inicio").values("id", "titulo")
+    estados_post_choices    = Postulacion._meta.get_field("estado").choices
+    from formacion.models import ESTADOS as ESTADOS_FORM
+    estados_form_choices    = ESTADOS_FORM
+
     return render(request, "backoffice/convocatorias.html", {
-        "rows_postulaciones": rows_postulaciones,
-        "rows_formacion": rows_formacion,
+        # filtros activos
+        "q": q, "conv_id": conv_id, "estado": estado,
+        "conv_form_id": conv_form_id, "estado_form": estado_form,
+        # datos
+        "page_post":  page_post,
+        "page_form":  page_form,
+        # resúmenes
+        "resumen_post": resumen_post,
+        "resumen_form": resumen_form,
+        # listas para selects
+        "convocatorias_list":   convocatorias_list,
+        "conv_formacion_list":  conv_formacion_list,
+        "estados_post_choices": estados_post_choices,
+        "estados_form_choices": estados_form_choices,
+    })
+
+
+# ============================================================
+# G: EXENCIONES
+# ============================================================
+
+@staff_member_required
+def backoffice_exenciones(request):
+    q      = (request.GET.get("q") or "").strip()
+    estado = (request.GET.get("estado") or "").strip()
+
+    qs = (
+        Exencion.objects
+        .select_related("user", "persona_humana", "persona_juridica")
+        .order_by("-fecha_creacion")
+    )
+    if q:
+        qs = qs.filter(
+            Q(nombre_razon_social__icontains=q)
+            | Q(cuit__icontains=q)
+            | Q(user__email__icontains=q)
+        )
+    if estado:
+        qs = qs.filter(estado=estado)
+
+    rows = []
+    for ex in qs:
+        rows.append({
+            "id":                  ex.id,
+            "nombre_razon_social": ex.nombre_razon_social or "—",
+            "cuit":                ex.cuit or "—",
+            "email":               ex.email or ex.user.email or "—",
+            "estado":              ex.get_estado_display(),
+            "fecha_creacion":      ex.fecha_creacion,
+            "fecha_vencimiento":   ex.fecha_vencimiento,
+            "url_admin":           _admin_url(ex),
+        })
+
+    paginator = Paginator(rows, POR_PAGINA)
+    page_obj  = paginator.get_page(request.GET.get("page"))
+
+    resumen = (
+        Exencion.objects
+        .values("estado")
+        .annotate(total=Count("id"))
+        .order_by("estado")
+    )
+
+    from exencion.models import ESTADOS_EXENCION
+    return render(request, "backoffice/exenciones.html", {
+        "q":       q,
+        "estado":  estado,
+        "page_obj": page_obj,
+        "total":   paginator.count,
+        "resumen": resumen,
+        "estados_choices": ESTADOS_EXENCION,
     })
