@@ -414,8 +414,9 @@ class PostulacionAdmin(admin.ModelAdmin):
     descargar_documentacion_zip.short_description = "📦 Descargar documentación (ZIP)"
 
     def _agregar_archivo_zip(self, zf, file_field, carpeta, nombre):
+        """Agrega el archivo al ZIP. Devuelve True si se pudo agregar."""
         if not file_field:
-            return
+            return False
         try:
             path = getattr(file_field, "path", None)
             if path and os.path.exists(path):
@@ -426,8 +427,9 @@ class PostulacionAdmin(admin.ModelAdmin):
                         f"{carpeta}/{nombre}{os.path.splitext(file_field.name)[1]}",
                         f.read()
                     )
+            return True
         except Exception:
-            pass
+            return False
 
     def _safe_slug(self, p):
         base = p.nombre_proyecto or f"postulacion_{p.id}"
@@ -459,12 +461,26 @@ class PostulacionAdmin(admin.ModelAdmin):
             f"Usuario: {p.user.username}\n"
             f"Convocatoria: {p.convocatoria.titulo if p.convocatoria else ''}\n"
         )
+        faltantes = []
         for doc in p.documentos.all():
-            self._agregar_archivo_zip(
+            # id incluido para que documentos del mismo tipo no se pisen en el ZIP
+            agregado = self._agregar_archivo_zip(
                 zf,
                 doc.archivo,
                 "documentacion",
-                slugify(doc.get_tipo_display())
+                slugify(f"{doc.get_tipo_display()}-{doc.id}")
+            )
+            if not agregado:
+                faltantes.append(
+                    f"- {doc.get_tipo_display()} (id {doc.id}): "
+                    f"{doc.archivo.name if doc.archivo else 'sin archivo'}"
+                )
+        if faltantes:
+            zf.writestr(
+                "FALTANTES.txt",
+                "Documentos que NO se pudieron incluir en este ZIP:\n"
+                + "\n".join(faltantes)
+                + "\n"
             )
 
     # ==================================================
