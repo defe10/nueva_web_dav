@@ -6,6 +6,8 @@ from django.core.files.base import ContentFile
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_delete, pre_save
+from django.dispatch import receiver
 
 from convocatorias.models import Convocatoria
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica, LUGARES_RESIDENCIA
@@ -98,6 +100,14 @@ class Exencion(models.Model):
         null=True
     )
 
+    # Fecha en que se depuró la documentación (documentos subidos y
+    # constancia). Los datos de la exención se conservan: es el histórico.
+    # Al estar seteada, la exención se considera archivada.
+    documentacion_depurada = models.DateTimeField(
+        null=True, blank=True,
+        verbose_name="Documentación depurada el",
+    )
+
     @property
     def localidad_fiscal_label(self):
         return dict(LUGARES_RESIDENCIA).get(self.localidad_fiscal, self.localidad_fiscal)
@@ -170,6 +180,16 @@ class Exencion(models.Model):
                 email.attach_alternative(html, "text/html")
             email.attach(filename, pdf_content, "application/pdf")
             email.send()
+
+    def regenerar_pdf(self):
+        """
+        Regenera la constancia PDF desde los datos congelados de la fila,
+        sin re-aprobar ni enviar mail. Sirve para recuperar una constancia
+        cuya copia en disco fue depurada.
+        """
+        pdf_content = generar_pdf_exencion(self)
+        filename = f"Constancia_{self.numero_constancia}.pdf"
+        self.certificado_pdf.save(filename, ContentFile(pdf_content), save=True)
 
 
 # ============================================================
@@ -304,3 +324,34 @@ class PadronPublicoExencion(models.Model):
     def __str__(self):
         estado = "activo" if self.activo else "inactivo"
         return f"Padrón público ({estado}) · {self.token}"
+
+
+# ============================================================
+# SEÑALES — limpieza de archivos al borrar
+# ============================================================
+@receiver(post_delete, sender=ExencionDocumento)
+def borrar_archivo_documento_exencion(sender, instance, **kwargs):
+    if instance.archivo:
+        instance.archivo.delete(save=False)
+
+
+@receiver(post_delete, sender=Exencion)
+def borrar_constancia_al_borrar_exencion(sender, instance, **kwargs):
+    # Al borrar la exención se elimina también la constancia del disco.
+    # Los documentos subidos se borran por su propia señal, en cascada.
+    if instance.certificado_pdf:
+        instance.certificado_pdf.delete(save=False)
+
+
+@receiver(pre_save, sender=Exencion)
+def borrar_constancia_anterior_al_regenerar(sender, instance, **kwargs):
+    # Cuando se regenera o se limpia la constancia, borra el PDF anterior
+    # para no dejar archivos huérfanos.
+    if not instance.pk:
+        return
+    try:
+        anterior = Exencion.objects.get(pk=instance.pk).certificado_pdf
+    except Exencion.DoesNotExist:
+        return
+    if anterior and anterior != instance.certificado_pdf:
+        anterior.delete(save=False)

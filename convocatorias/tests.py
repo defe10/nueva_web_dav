@@ -10,10 +10,11 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from convocatorias.models import (
     Convocatoria, Postulacion, DocumentoPostulacion,
-    IntegrantePostulacion, DocumentoIntegrante,
+    IntegrantePostulacion, DocumentoIntegrante, Rendicion,
 )
 
 MEDIA_TEST = tempfile.mkdtemp(prefix="test_depuracion_")
@@ -290,3 +291,105 @@ class BorradoIndividualEnAdminTest(TestCase):
         self.assertEqual(
             DocumentoIntegrante.objects.filter(integrante__postulacion=self.post).count(), 1
         )
+
+
+class PostulacionArchivadaFilterTest(TestCase):
+    def setUp(self):
+        self.superuser = User.objects.create_superuser("root", "root@test.com", "x")
+        self.user = User.objects.create(username="ana")
+        self.conv = crear_convocatoria()
+        self.activa = Postulacion.objects.create(user=self.user, convocatoria=self.conv, estado="enviado")
+        self.archivada = Postulacion.objects.create(
+            user=self.user, convocatoria=self.conv, estado="no_seleccionado",
+            documentacion_depurada=timezone.now(),
+        )
+        self.url = reverse("admin:convocatorias_postulacion_changelist")
+
+    def test_oculta_archivadas_por_defecto(self):
+        self.client.force_login(self.superuser)
+        ids = [p.pk for p in self.client.get(self.url).context["cl"].result_list]
+        self.assertIn(self.activa.pk, ids)
+        self.assertNotIn(self.archivada.pk, ids)
+
+    def test_filtro_archivadas_las_muestra(self):
+        self.client.force_login(self.superuser)
+        ids = [p.pk for p in self.client.get(self.url + "?archivada=archivadas").context["cl"].result_list]
+        self.assertIn(self.archivada.pk, ids)
+        self.assertNotIn(self.activa.pk, ids)
+
+
+class FiltrosPersistentesTest(TestCase):
+    def setUp(self):
+        self.superuser = User.objects.create_superuser("root", "root@test.com", "x")
+        self.client.force_login(self.superuser)
+        self.url = reverse("admin:convocatorias_postulacion_changelist")
+
+    def test_recuerda_filtros_al_reingresar(self):
+        # El admin filtra por estado
+        r = self.client.get(self.url + "?estado=enviado")
+        self.assertEqual(r.status_code, 200)
+        # Reingresa "fresco" (sin referer): lo devuelve a sus filtros
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, 302)
+        self.assertIn("estado=enviado", r["Location"])
+
+    def test_boton_limpiar_no_restaura(self):
+        self.client.get(self.url + "?estado=enviado")
+        # Clic en "✕": viene de la propia lista → no debe redirigir a los filtros
+        r = self.client.get(self.url, HTTP_REFERER="http://testserver" + self.url)
+        self.assertEqual(r.status_code, 200)
+        # Y a partir de ahí queda sin filtros guardados
+        r2 = self.client.get(self.url)
+        self.assertEqual(r2.status_code, 200)
+
+
+@override_settings(MEDIA_ROOT=MEDIA_TEST)
+class PlanillaRendicionCleanupTest(TestCase):
+    """La planilla .xlsx de la rendición no debe quedar huérfana al borrar,
+    limpiar o reemplazar."""
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(MEDIA_TEST, ignore_errors=True)
+
+    def setUp(self):
+        self.user = User.objects.create(username="ana")
+        self.conv = crear_convocatoria()
+        self.post = Postulacion.objects.create(
+            user=self.user, convocatoria=self.conv, estado="finalizado"
+        )
+
+    def _rendicion_con_planilla(self, nombre="planilla.xlsx"):
+        r = Rendicion.objects.create(
+            postulacion=self.post, user=self.user, estado="ENVIADO",
+            planilla_xlsx=SimpleUploadedFile(nombre, b"PK planilla"),
+        )
+        return r, r.planilla_xlsx.path
+
+    def test_borrar_rendicion_borra_planilla(self):
+        r, archivo = self._rendicion_con_planilla()
+        self.assertTrue(os.path.exists(archivo))
+        r.delete()
+        self.assertFalse(os.path.exists(archivo))
+
+    def test_borrar_postulacion_borra_planilla_en_cascada(self):
+        r, archivo = self._rendicion_con_planilla()
+        self.assertTrue(os.path.exists(archivo))
+        self.post.delete()
+        self.assertFalse(Rendicion.objects.filter(pk=r.pk).exists())
+        self.assertFalse(os.path.exists(archivo), "la planilla no debe quedar huérfana")
+
+    def test_reemplazar_planilla_borra_la_anterior(self):
+        r, archivo_viejo = self._rendicion_con_planilla("vieja.xlsx")
+        r.planilla_xlsx = SimpleUploadedFile("nueva.xlsx", b"PK nueva")
+        r.save()
+        archivo_nuevo = r.planilla_xlsx.path
+        self.assertFalse(os.path.exists(archivo_viejo), "la planilla vieja debe borrarse")
+        self.assertTrue(os.path.exists(archivo_nuevo))
+
+    def test_limpiar_planilla_borra_el_archivo(self):
+        r, archivo = self._rendicion_con_planilla()
+        r.planilla_xlsx = None
+        r.save()
+        self.assertFalse(os.path.exists(archivo))

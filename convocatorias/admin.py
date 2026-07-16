@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.text import slugify
 from django.utils.html import format_html, mark_safe, escape
 from django.urls import reverse
@@ -209,8 +209,64 @@ class PostulacionDocumentoInline(admin.TabularInline):
 # ============================================================
 #  POSTULACIONES
 # ============================================================
+class FiltrosPersistentesMixin:
+    """Recuerda los filtros, la búsqueda y el orden del listado entre entradas.
+
+    Django solo los conserva en el ida y vuelta de editar; acá se guardan en
+    la sesión y se restauran cuando el admin vuelve a entrar al listado. El
+    botón "✕" (limpiar) del admin sigue funcionando: si venimos de la propia
+    lista, no se restaura nada.
+    """
+
+    @property
+    def _clave_sesion(self):
+        return f"changelist_filtros_{self.model._meta.label_lower}"
+
+    def changelist_view(self, request, extra_context=None):
+        key = self._clave_sesion
+        if request.GET:
+            # El usuario está filtrando/buscando: guardamos el estado actual.
+            request.session[key] = request.GET.urlencode()
+        else:
+            guardado = request.session.get(key)
+            referer = request.META.get("HTTP_REFERER", "") or ""
+            if guardado and request.path not in referer:
+                # Entrada "fresca" al listado: restauramos los últimos filtros.
+                return HttpResponseRedirect(f"{request.path}?{guardado}")
+            # Venimos de la propia lista (p. ej. clic en "✕"): no restaurar.
+            request.session.pop(key, None)
+        return super().changelist_view(request, extra_context)
+
+
+class PostulacionArchivadaFilter(admin.SimpleListFilter):
+    """Oculta por defecto las postulaciones cuya documentación fue depurada,
+    para no ensuciar el listado con las de años anteriores."""
+    title = "archivado"
+    parameter_name = "archivada"
+
+    def lookups(self, request, model_admin):
+        return (("activas", "Activas"), ("archivadas", "Archivadas"), ("todas", "Todas"))
+
+    def queryset(self, request, queryset):
+        valor = self.value()
+        if valor == "archivadas":
+            return queryset.filter(documentacion_depurada__isnull=False)
+        if valor == "todas":
+            return queryset
+        return queryset.filter(documentacion_depurada__isnull=True)
+
+    def choices(self, changelist):
+        for lookup, title in self.lookup_choices:
+            selected = self.value() == lookup or (self.value() is None and lookup == "activas")
+            yield {
+                "selected": selected,
+                "query_string": changelist.get_query_string({self.parameter_name: lookup}),
+                "display": title,
+            }
+
+
 @admin.register(Postulacion)
-class PostulacionAdmin(admin.ModelAdmin):
+class PostulacionAdmin(FiltrosPersistentesMixin, admin.ModelAdmin):
 
     # -------------------------
     # LISTADO
@@ -227,6 +283,7 @@ class PostulacionAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
+        PostulacionArchivadaFilter,
         "estado",
         "tipo_proyecto",
         "genero",

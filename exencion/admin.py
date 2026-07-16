@@ -2,11 +2,43 @@ from django.contrib import admin, messages
 from django.utils import timezone
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 
+from . import depuracion
 from .models import Exencion, ExencionDocumento, ObservacionAdministrativaExencion
+
+
+# ============================================================
+# FILTRO: ocultar exenciones archivadas (depuradas) por defecto
+# ============================================================
+class ArchivadaFilter(admin.SimpleListFilter):
+    title = "archivado"
+    parameter_name = "archivada"
+
+    def lookups(self, request, model_admin):
+        return (("activas", "Activas"), ("archivadas", "Archivadas"), ("todas", "Todas"))
+
+    def queryset(self, request, queryset):
+        valor = self.value()
+        if valor == "archivadas":
+            return queryset.filter(documentacion_depurada__isnull=False)
+        if valor == "todas":
+            return queryset
+        # Por defecto: solo activas (no depuradas)
+        return queryset.filter(documentacion_depurada__isnull=True)
+
+    def choices(self, changelist):
+        # "Activas" es el default (queda seleccionado cuando no hay valor)
+        for lookup, title in self.lookup_choices:
+            selected = self.value() == lookup or (self.value() is None and lookup == "activas")
+            yield {
+                "selected": selected,
+                "query_string": changelist.get_query_string({self.parameter_name: lookup}),
+                "display": title,
+            }
 
 # ============================================================
 # INLINE DOCUMENTOS (readonly)
@@ -14,7 +46,9 @@ from .models import Exencion, ExencionDocumento, ObservacionAdministrativaExenci
 class ExencionDocumentoInline(admin.TabularInline):
     model = ExencionDocumento
     extra = 0
-    can_delete = False
+    # Borrado individual de archivos: solo superusuarios (la señal
+    # post_delete elimina también el archivo físico del disco).
+    can_delete = True
     show_change_link = False
 
     fields = ("tipo", "es_subsanacion", "estado", "fecha_subida", "fecha_envio", "archivo_link")
@@ -29,6 +63,9 @@ class ExencionDocumentoInline(admin.TabularInline):
 
     def has_add_permission(self, request, obj=None):
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 
 # ============================================================
@@ -47,10 +84,15 @@ class ExencionAdmin(admin.ModelAdmin):
         "convocatoria",
     )
 
-    list_filter = ("estado", "fecha_creacion")
+    list_filter = (ArchivadaFilter, "estado", "fecha_creacion")
     search_fields = ("nombre_razon_social", "cuit", "email")
 
-    actions = ["aprobar_exencion_y_emitir_pdf", "rechazar_exencion"]
+    actions = [
+        "aprobar_exencion_y_emitir_pdf",
+        "rechazar_exencion",
+        "regenerar_constancia_action",
+        "depurar_documentacion_action",
+    ]
 
     inlines = [ExencionDocumentoInline]
 
@@ -76,6 +118,7 @@ class ExencionAdmin(admin.ModelAdmin):
         "persona_juridica",
         "convocatoria",
 
+        "documentacion_depurada",
         "documentacion_resumen",
     )
 
@@ -89,6 +132,7 @@ class ExencionAdmin(admin.ModelAdmin):
                 "certificado_pdf",
                 "fecha_emision",
                 "fecha_vencimiento",
+                "documentacion_depurada",
             )
         }),
         ("Datos del solicitante", {
@@ -308,6 +352,74 @@ class ExencionAdmin(admin.ModelAdmin):
 
         if procesadas:
             self.message_user(request, f"{procesadas} exención/es rechazada/s.", level=messages.SUCCESS)
+
+    # -------------------------------------------------
+    # REGENERAR CONSTANCIA (desde datos congelados)
+    # -------------------------------------------------
+    @admin.action(description="Regenerar constancia PDF")
+    def regenerar_constancia_action(self, request, queryset):
+        hechas, saltadas = 0, 0
+        for exencion in queryset:
+            if exencion.estado != "APROBADA":
+                saltadas += 1
+                continue
+            try:
+                exencion.regenerar_pdf()
+                hechas += 1
+            except Exception as e:
+                self.message_user(
+                    request,
+                    f"Error regenerando constancia de #{exencion.id}: {type(e).__name__} - {e}",
+                    level=messages.ERROR,
+                )
+        if hechas:
+            self.message_user(request, f"{hechas} constancia(s) regenerada(s).", level=messages.SUCCESS)
+        if saltadas:
+            self.message_user(
+                request,
+                f"{saltadas} saltada(s): solo se regenera de exenciones aprobadas.",
+                level=messages.WARNING,
+            )
+
+    # -------------------------------------------------
+    # DEPURACIÓN DE DOCUMENTACIÓN (solo superusuarios)
+    # -------------------------------------------------
+    def get_actions(self, request):
+        acciones = super().get_actions(request)
+        if not request.user.is_superuser:
+            acciones.pop("depurar_documentacion_action", None)
+        return acciones
+
+    @admin.action(description="Depurar documentación (vencidas / rechazadas)")
+    def depurar_documentacion_action(self, request, queryset):
+        # De lo seleccionado, solo lo depurable (vencidas o rechazadas, sin depurar aún)
+        seleccion = queryset.values("pk")
+        depurables = depuracion.exenciones_depurables().filter(pk__in=seleccion)
+        protegidas = queryset.exclude(pk__in=depurables.values("pk"))
+
+        # Paso 2: confirmación recibida
+        if request.POST.get("confirmar_depuracion"):
+            resultado = depuracion.ejecutar(depurables, incluir_constancia=True)
+            messages.success(
+                request,
+                f"Depuración completada: {resultado['documentos']} documentos y "
+                f"{resultado['constancias']} constancia(s) borradas "
+                f"({depuracion.mb(resultado['total_bytes'])} liberados). "
+                f"{resultado['marcadas']} exenciones archivadas. "
+                "Los datos se conservan; la constancia se puede regenerar."
+            )
+            return None
+
+        # Paso 1: pantalla de confirmación (nada se borra acá)
+        resumen = depuracion.resumen(depurables, incluir_constancia=True)
+        return render(request, "admin/exencion/depurar_confirmacion.html", {
+            **self.admin_site.each_context(request),
+            "title": "Confirmar depuración de documentación",
+            "resumen": resumen,
+            "resumen_mb": depuracion.mb(resumen["total_bytes"]),
+            "depurables": depurables,
+            "protegidas": protegidas.count(),
+        })
 
 
 # ============================================================

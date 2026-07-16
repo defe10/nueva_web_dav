@@ -5,7 +5,7 @@ from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.conf import settings
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 
 from .validators import validar_documento_admitido, validar_tamano_archivo
@@ -807,3 +807,25 @@ def borrar_archivo_documento_postulacion(sender, instance, **kwargs):
 def borrar_archivo_documento_integrante(sender, instance, **kwargs):
     if instance.archivo:
         instance.archivo.delete(save=False)
+
+
+@receiver(post_delete, sender=Rendicion)
+def borrar_archivo_planilla_rendicion(sender, instance, **kwargs):
+    # Al borrar la rendición (o al borrarse en cascada con la postulación)
+    # se elimina también la planilla del disco, sin dejar archivos huérfanos.
+    if instance.planilla_xlsx:
+        instance.planilla_xlsx.delete(save=False)
+
+
+@receiver(pre_save, sender=Rendicion)
+def borrar_planilla_anterior_al_reemplazar(sender, instance, **kwargs):
+    # Cuando desde el admin se limpia o se reemplaza la planilla, borra
+    # el archivo anterior para que no quede ocupando espacio.
+    if not instance.pk:
+        return
+    try:
+        anterior = Rendicion.objects.get(pk=instance.pk).planilla_xlsx
+    except Rendicion.DoesNotExist:
+        return
+    if anterior and anterior != instance.planilla_xlsx:
+        anterior.delete(save=False)
