@@ -133,6 +133,17 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # ============================================
+# AUTHENTICATION BACKENDS
+# ============================================
+# ModelBackend: login por username (admin, usuarios con username=email).
+# EmailBackend: login por email cuando el username no coincide.
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'usuarios.backends.EmailBackend',
+]
+
+
+# ============================================
 # INTERNATIONALIZATION
 # ============================================
 
