@@ -1,0 +1,147 @@
+{% extends "sitio_publico/base.html" %}
+{% block title %}Estadísticas de Formación · DAV{% endblock %}
+
+{% block content %}
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Estadísticas</h1>
+  <p class="text-white mb-0">Convocatorias de formación</p>
+</section>
+
+<div class="container py-4">
+
+  <!-- ═══ NAVEGACIÓN ENTRE DASHBOARDS ════════════════════════ -->
+  {% include "estadisticas/_nav.html" with activo="formacion" %}
+
+  <!-- ═══ FILTROS ═════════════════════════════════════════════ -->
+  <div class="dav-card mb-4">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-md-4">
+        <label class="form-label small mb-1">Convocatoria</label>
+        <select name="conv" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for c in convocatorias %}
+            <option value="{{ c.id }}" {% if filtros.conv == c.id|stringformat:"s" %}selected{% endif %}>
+              {{ c.titulo }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label small mb-1">Año</label>
+        <select name="anio" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for a in anios %}
+            <option value="{{ a }}" {% if filtros.anio == a|stringformat:"s" %}selected{% endif %}>{{ a }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label small mb-1">Estado</label>
+        <select name="estado" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for val, label in estados %}
+            <option value="{{ val }}" {% if filtros.estado == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filtrar</button>
+        <a href="{% url 'estadisticas:dashboard_formacion' %}" class="btn btn-outline-secondary btn-sm">✕</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- ═══ TOTALES ═════════════════════════════════════════════ -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+      <div class="dav-card text-center py-3">
+        <div class="fs-1 fw-bold text-primary">{{ total }}</div>
+        <div class="text-muted">inscripciones</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="dav-card text-center py-3">
+        <div class="fs-1 fw-bold text-success">{{ admitidos }}</div>
+        <div class="text-muted">admitidos</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="dav-card text-center py-3">
+        <div class="fs-1 fw-bold text-primary">{{ total_convocatorias }}</div>
+        <div class="text-muted">convocatorias de formación</div>
+      </div>
+    </div>
+  </div>
+
+  {% if total == 0 %}
+    <div class="alert alert-info">No hay inscripciones con los filtros seleccionados.</div>
+  {% else %}
+
+  <div class="row g-4">
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Por convocatoria" filas=por_conv %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Por tipo de formación" filas=por_tipo %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Estado de inscripción" filas=por_estado %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Vínculo con el sector audiovisual" filas=por_vinculo %}
+    </div>
+
+    <div class="col-12 col-md-4">
+      {% include "estadisticas/_tabla.html" with titulo="Género" filas=por_genero %}
+    </div>
+
+    <div class="col-12 col-md-4">
+      {% include "estadisticas/_tabla.html" with titulo="Rango etario" filas=rango_etario %}
+    </div>
+
+    <div class="col-12 col-md-4">
+      {% include "estadisticas/_tabla.html" with titulo="Localidad" filas=por_localidad %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_barras.html" with titulo="Inscripciones por año" datos=evolucion_inscripciones %}
+    </div>
+
+    {% if datos_incompletos %}
+    <div class="col-12 col-md-6">
+      <div class="dav-card h-100">
+        <div class="dav-card-body">
+          <h6 class="fw-bold mb-3">Datos incompletos</h6>
+          <table class="table table-sm mb-0">
+            <tbody>
+              {% for row in datos_incompletos %}
+              <tr>
+                <td>{{ row.label }}</td>
+                <td class="text-end fw-semibold">{{ row.total }}</td>
+                <td class="text-end text-muted small" style="width:60px">{{ row.pct }}%</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- ═══ EXPORTAR ════════════════════════════════════════════ -->
+  <div class="text-end mt-4">
+    <a href="{% url 'estadisticas:exportar_formacion' %}?conv={{ filtros.conv }}&anio={{ filtros.anio }}&estado={{ filtros.estado }}"
+       class="btn btn-outline-success">
+      Descargar informe (.xlsx)
+    </a>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}

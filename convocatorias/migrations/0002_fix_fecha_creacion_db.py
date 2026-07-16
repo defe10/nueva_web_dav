@@ -11,8 +11,9 @@ def fix_fecha_creacion(apps, schema_editor):
         cursor.execute("PRAGMA table_info(convocatorias_postulacion);")
         columns = [row[1] for row in cursor.fetchall()]  # nombre de columna
 
-        # Si no existe la columna fecha_creacion, no hacemos nada
-        if "fecha_creacion" not in columns:
+        # Si no existen ambas columnas (bases nuevas no tienen la columna
+        # legada "fecha"), no hacemos nada
+        if "fecha_creacion" not in columns or "fecha" not in columns:
             return
 
         # Si existe, aseguramos que no sea NULL (según tu lógica original)

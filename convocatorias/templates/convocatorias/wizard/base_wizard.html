@@ -1,0 +1,154 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Postulación</h1>
+  <p class="text-white">{{ convocatoria.titulo }}</p>
+</section>
+
+<!-- INDICADOR DE PASOS -->
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="dav-steps">
+        {% for p in pasos %}
+          <div class="step {% if p == paso_actual %}active{% elif forloop.counter < paso_num %}done{% endif %}">
+            {{ forloop.counter }}. {{ p|capfirst }}
+          </div>
+        {% endfor %}
+      </div>
+      <p class="text-center text-muted small mt-2">Paso {{ paso_num }} de {{ total_pasos }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENIDO DEL PASO -->
+<div class="container py-3">
+  <div class="row justify-content-center">
+
+    <!-- COLUMNA PRINCIPAL -->
+    <div class="col-lg-8">
+      <div id="wizard-main">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+
+        {% block wizard_content %}{% endblock %}
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="col-lg-4 mb-4 order-lg-first">
+      <div class="dav-card">
+        <div class="dav-card-body">
+          <h6 class="fw-bold mb-3">Convocatoria</h6>
+
+          <p class="fw-semibold mb-1">{{ convocatoria.titulo }}</p>
+          {% if convocatoria.fecha_fin %}
+            <p class="small text-muted mb-3">Cierre: {{ convocatoria.fecha_fin|date:"d/m/Y" }}</p>
+          {% endif %}
+
+          {% if convocatoria.descripcion_corta %}
+            <p class="small mb-3" style="white-space: pre-line;">{{ convocatoria.descripcion_corta }}</p>
+          {% endif %}
+
+          {% if convocatoria.tematica_genero %}
+            <div class="mb-3">
+              <div class="small fw-semibold text-muted text-uppercase mb-1">Temática / Género</div>
+              <p class="small mb-0" style="white-space: pre-line;">{{ convocatoria.tematica_genero }}</p>
+            </div>
+          {% endif %}
+
+          {% if convocatoria.requisitos %}
+            <div class="mb-3">
+              <div class="small fw-semibold text-muted text-uppercase mb-1">Requisitos</div>
+              <p class="small mb-0" style="white-space: pre-line;">{{ convocatoria.requisitos }}</p>
+            </div>
+          {% endif %}
+
+          {% if convocatoria.beneficios %}
+            <div class="mb-0">
+              <div class="small fw-semibold text-muted text-uppercase mb-1">Beneficios</div>
+              <p class="small mb-0" style="white-space: pre-line;">{{ convocatoria.beneficios }}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if paso_anterior %}
+        <a href="{% url 'convocatorias:wizard_paso' postulacion.id paso_anterior %}"
+           class="btn btn-outline-secondary btn-sm mt-3 w-100">
+          ← Paso anterior
+        </a>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const main = document.getElementById("wizard-main");
+  if (!main) return;
+
+  // Sube documentos sin recargar la página (evita el salto de scroll).
+  // Requiere que los inputs de archivo usen requestSubmit(), que sí
+  // dispara este evento (submit() programático no lo hace).
+  document.addEventListener("submit", async (e) => {
+    const form = e.target;
+    if (!main.contains(form)) return;
+    if (form.enctype !== "multipart/form-data") return;
+
+    const fileInput = form.querySelector('input[type="file"]');
+    if (!fileInput || !fileInput.files.length) return;
+
+    e.preventDefault();
+
+    const boton = form.querySelector("button");
+    const textoOriginal = boton ? boton.textContent : "";
+    if (boton) {
+      boton.disabled = true;
+      boton.textContent = "Subiendo…";
+    }
+
+    try {
+      const res = await fetch(form.action || window.location.href, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { "X-Requested-With": "fetch" },
+      });
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const nuevo = doc.getElementById("wizard-main");
+
+      if (!nuevo) {
+        // Respuesta inesperada: navegamos normal
+        window.location.href = res.url;
+        return;
+      }
+
+      main.innerHTML = nuevo.innerHTML;
+
+      // Actualiza también los mensajes de Django (éxito/error)
+      const msjs = document.getElementById("mensajes-globales");
+      const nuevosMsjs = doc.getElementById("mensajes-globales");
+      if (msjs && nuevosMsjs) msjs.innerHTML = nuevosMsjs.innerHTML;
+    } catch (err) {
+      // Si falla el fetch, comportamiento clásico con recarga
+      if (boton) {
+        boton.disabled = false;
+        boton.textContent = textoOriginal;
+      }
+      form.submit();
+    }
+  });
+});
+</script>
+{% endblock %}

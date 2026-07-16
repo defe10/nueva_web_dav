@@ -1,0 +1,126 @@
+{% extends "convocatorias/wizard/base_wizard.html" %}
+
+{% block wizard_content %}
+<div class="dav-card">
+  <div class="dav-card-body">
+
+    <h3 class="mb-1">Revisión y confirmación</h3>
+    <p class="text-muted mb-4">Revisá que todo esté correcto antes de enviar tu postulación. Una vez enviada no podrás modificarla.</p>
+
+    <!-- PRODUCTOR -->
+    <h5 class="mb-2">Productor / Presentante</h5>
+    <div class="table-responsive mb-4">
+      <table class="table table-sm table-bordered">
+        <tbody>
+          <tr><td class="text-muted" style="width:40%">Nombre completo</td><td>{{ persona.nombre_completo }}</td></tr>
+          <tr><td class="text-muted">CUIT / CUIL</td><td>{{ persona.cuil_cuit }}</td></tr>
+          <tr><td class="text-muted">Teléfono</td><td>{{ persona.telefono }}</td></tr>
+          <tr><td class="text-muted">Email</td><td>{{ persona.email }}</td></tr>
+          {% if postulacion.cbu %}
+          <tr><td class="text-muted">CBU</td><td>{{ postulacion.cbu }}</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- OTROS INTEGRANTES -->
+    {% if integrantes %}
+    <h5 class="mb-2">Equipo</h5>
+    <div class="table-responsive mb-4">
+      <table class="table table-sm table-bordered">
+        <thead class="table-light">
+          <tr><th>Rol</th><th>Nombre</th><th>CUIT/CUIL</th></tr>
+        </thead>
+        <tbody>
+          {% for i in integrantes %}
+          <tr>
+            <td>{{ i.get_rol_display }}</td>
+            <td>{{ i.persona_humana.nombre_completo|default:"—" }}</td>
+            <td>{{ i.persona_humana.cuil_cuit|default:"—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    <!-- DATOS DEL PROYECTO -->
+    <h5 class="mb-2">Proyecto</h5>
+    <div class="table-responsive mb-4">
+      <table class="table table-sm table-bordered">
+        <tbody>
+          <tr><td class="text-muted" style="width:40%">Título</td><td>{{ postulacion.nombre_proyecto|default:"—" }}</td></tr>
+          <tr><td class="text-muted">Tipo</td><td>{{ postulacion.get_tipo_proyecto_display|default:"—" }}</td></tr>
+          <tr><td class="text-muted">Género</td><td>{{ postulacion.get_genero_display|default:"—" }}</td></tr>
+          {% if postulacion.sinopsis_corta %}
+          <tr><td class="text-muted">Sinopsis</td><td>{{ postulacion.sinopsis_corta|truncatechars:200 }}</td></tr>
+          {% endif %}
+          {% if postulacion.link_pitch %}
+          <tr><td class="text-muted">Link pitch</td><td><a href="{{ postulacion.link_pitch }}" target="_blank" rel="noopener">ver →</a></td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DOCUMENTACIÓN SUBIDA -->
+    {% if docs_activos %}
+    <h5 class="mb-2">Documentación del proyecto</h5>
+    <div class="table-responsive mb-4">
+      <table class="table table-sm table-bordered">
+        <tbody>
+          {% for tipo, label, obligatorio in docs_activos %}
+          <tr>
+            <td class="text-muted" style="width:50%">{{ label }}</td>
+            <td>
+              {% for doc_tipo, doc_lista in docs_subidos.items %}
+                {% if doc_tipo == tipo %}
+                  {% for doc in doc_lista %}
+                    <span class="badge bg-success me-1">✓ subido</span>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+              {% if not docs_subidos %}
+                <span class="text-muted small">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    <hr>
+
+    <!-- DECLARACIÓN JURADA + ENVÍO -->
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-check mb-4">
+        {{ form.declaracion_jurada }}
+        <label class="form-check-label ms-2" for="{{ form.declaracion_jurada.id_for_label }}">
+          {{ form.declaracion_jurada.label }}
+        </label>
+        {% if form.declaracion_jurada.errors %}
+          <div class="text-danger small mt-1">{{ form.declaracion_jurada.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center">
+        {% if paso_anterior %}
+        <a href="{% url 'convocatorias:wizard_paso' postulacion.id paso_anterior %}" class="btn btn-outline-secondary">
+          ← Volver
+        </a>
+        {% else %}
+        <div></div>
+        {% endif %}
+        <button type="submit" class="btn btn-success px-5 fw-bold">
+          Enviar postulación
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

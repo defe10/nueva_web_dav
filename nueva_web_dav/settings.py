@@ -36,9 +36,11 @@ INSTALLED_APPS = [
     'usuarios',
     'registro_audiovisual',
     'convocatorias',
+    'formacion.apps.FormacionConfig',
     'exencion',
     "backoffice",
     'chatbot',
+    'estadisticas',
 ]
 
 
@@ -128,6 +130,17 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+]
+
+
+# ============================================
+# AUTHENTICATION BACKENDS
+# ============================================
+# ModelBackend: login por username (admin, usuarios con username=email).
+# EmailBackend: login por email cuando el username no coincide.
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'usuarios.backends.EmailBackend',
 ]
 
 

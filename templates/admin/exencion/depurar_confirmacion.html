@@ -1,0 +1,61 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Depurar documentación de exenciones</h1>
+
+<p>
+  Esta acción borra <strong>definitivamente</strong> los documentos subidos y la
+  constancia PDF de las exenciones seleccionadas que estén <strong>vencidas o rechazadas</strong>.
+  Los datos de la exención <strong>se conservan</strong> (histórico, estadísticas y padrón no se ven
+  afectados) y la constancia se puede <strong>regenerar</strong> cuando haga falta.
+</p>
+
+{% if protegidas %}
+  <ul class="messagelist">
+    <li class="warning">
+      Se omiten {{ protegidas }} exención(es) seleccionada(s) que están vigentes, en trámite
+      o ya depuradas. Solo se depuran las vencidas o rechazadas.
+    </li>
+  </ul>
+{% endif %}
+
+{% if resumen.exenciones == 0 %}
+
+  <p><strong>Ninguna de las exenciones seleccionadas es depurable.</strong> No hay nada para borrar.</p>
+  <a class="button" href="{% url 'admin:exencion_exencion_changelist' %}">Volver</a>
+
+{% else %}
+
+  <h2>Qué se va a borrar</h2>
+  <table>
+    <tr><th>Exenciones a archivar</th><td>{{ resumen.exenciones }}</td></tr>
+    <tr><th>Documentos subidos</th><td>{{ resumen.documentos }}</td></tr>
+    <tr><th>Constancias PDF</th><td>{{ resumen.constancias }}</td></tr>
+    <tr><th>Espacio a liberar</th><td>{{ resumen_mb }}</td></tr>
+  </table>
+
+  <ul>
+    {% for ex in depurables %}
+      <li>#{{ ex.id }} · {{ ex.nombre_razon_social }} · {{ ex.get_estado_display }}
+        {% if ex.fecha_vencimiento %}· vencida {{ ex.fecha_vencimiento|date:"d/m/Y" }}{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <form method="post" action="">
+    {% csrf_token %}
+    {% for ex in depurables %}
+      <input type="hidden" name="_selected_action" value="{{ ex.pk }}">
+    {% endfor %}
+    <input type="hidden" name="action" value="depurar_documentacion_action">
+    <input type="hidden" name="index" value="0">
+    <input type="hidden" name="confirmar_depuracion" value="1">
+
+    <p>
+      <input type="submit" class="default" value="Sí, borrar definitivamente">
+      <a class="button cancel-link" href="{% url 'admin:exencion_exencion_changelist' %}">Cancelar</a>
+    </p>
+  </form>
+
+{% endif %}
+{% endblock %}

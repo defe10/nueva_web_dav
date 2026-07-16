@@ -3,8 +3,11 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.core.files.base import ContentFile
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_delete, pre_save
+from django.dispatch import receiver
 
 from convocatorias.models import Convocatoria
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica, LUGARES_RESIDENCIA
@@ -33,6 +36,7 @@ def validar_tamano_5mb(archivo):
 ESTADOS_EXENCION = [
     ("BORRADOR", "Borrador"),
     ("ENVIADA", "Enviada"),
+    ("OBSERVADA", "Observada — requiere subsanación"),
     ("APROBADA", "Aprobada"),
     ("RECHAZADA", "Rechazada"),
 ]
@@ -96,6 +100,14 @@ class Exencion(models.Model):
         null=True
     )
 
+    # Fecha en que se depuró la documentación (documentos subidos y
+    # constancia). Los datos de la exención se conservan: es el histórico.
+    # Al estar seteada, la exención se considera archivada.
+    documentacion_depurada = models.DateTimeField(
+        null=True, blank=True,
+        verbose_name="Documentación depurada el",
+    )
+
     @property
     def localidad_fiscal_label(self):
         return dict(LUGARES_RESIDENCIA).get(self.localidad_fiscal, self.localidad_fiscal)
@@ -117,10 +129,11 @@ class Exencion(models.Model):
         Marca la exención como aprobada y setea fechas.
         NO genera PDF ni envía mails.
         """
+        import datetime
         hoy = timezone.now().date()
         self.estado = "APROBADA"
         self.fecha_emision = hoy
-        self.fecha_vencimiento = hoy.replace(year=hoy.year + 1)
+        self.fecha_vencimiento = datetime.date(hoy.year + 1, 1, 1)
         self.save(update_fields=["estado", "fecha_emision", "fecha_vencimiento"])
 
     def aprobar_y_generar_pdf(self):
@@ -141,19 +154,42 @@ class Exencion(models.Model):
         )
 
         # 3) Enviar correo
-        if self.email:
-            email = EmailMessage(
-                subject=f"Constancia de exención {self.numero_constancia}",
-                body=(
-                    f"Hola {self.nombre_razon_social},\n\n"
-                    "Tu solicitud de exención impositiva fue aprobada.\n"
-                    "Adjuntamos la constancia en formato PDF.\n\n"
-                    "Secretaría de Cultura de Salta"
-                ),
-                to=[self.email],
+        destinatario = self.user.email or self.email
+        if destinatario:
+            asunto = f"Constancia de exención {self.numero_constancia}"
+            texto = (
+                f"Hola {self.nombre_razon_social},\n\n"
+                "Tu solicitud de exención impositiva fue aprobada.\n"
+                "Adjuntamos la constancia en formato PDF.\n\n"
+                "Dirección de Audiovisuales · Secretaría de Cultura · Provincia de Salta"
             )
+            try:
+                html = render_to_string(
+                    "exencion/aprobacion_email.html",
+                    {"exencion": self, "user": self.user},
+                )
+            except Exception:
+                html = None
+
+            email = EmailMultiAlternatives(
+                subject=asunto,
+                body=texto,
+                to=[destinatario],
+            )
+            if html:
+                email.attach_alternative(html, "text/html")
             email.attach(filename, pdf_content, "application/pdf")
             email.send()
+
+    def regenerar_pdf(self):
+        """
+        Regenera la constancia PDF desde los datos congelados de la fila,
+        sin re-aprobar ni enviar mail. Sirve para recuperar una constancia
+        cuya copia en disco fue depurada.
+        """
+        pdf_content = generar_pdf_exencion(self)
+        filename = f"Constancia_{self.numero_constancia}.pdf"
+        self.certificado_pdf.save(filename, ContentFile(pdf_content), save=True)
 
 
 # ============================================================
@@ -222,10 +258,23 @@ class ExencionDocumento(models.Model):
         ("ENVIADO", "Enviado"),
     ]
 
+    TIPOS = [
+        ("CV", "Curriculum Vitae"),
+        ("DNI", "DNI (frente y dorso)"),
+        ("CONSTANCIA_ARCA", "Constancia de inscripción en ARCA"),
+    ]
+
     exencion = models.ForeignKey(
         Exencion,
         on_delete=models.CASCADE,
         related_name="documentos"
+    )
+
+    tipo = models.CharField(
+        max_length=20,
+        choices=TIPOS,
+        blank=True,
+        null=True,
     )
 
     archivo = models.FileField(
@@ -275,3 +324,34 @@ class PadronPublicoExencion(models.Model):
     def __str__(self):
         estado = "activo" if self.activo else "inactivo"
         return f"Padrón público ({estado}) · {self.token}"
+
+
+# ============================================================
+# SEÑALES — limpieza de archivos al borrar
+# ============================================================
+@receiver(post_delete, sender=ExencionDocumento)
+def borrar_archivo_documento_exencion(sender, instance, **kwargs):
+    if instance.archivo:
+        instance.archivo.delete(save=False)
+
+
+@receiver(post_delete, sender=Exencion)
+def borrar_constancia_al_borrar_exencion(sender, instance, **kwargs):
+    # Al borrar la exención se elimina también la constancia del disco.
+    # Los documentos subidos se borran por su propia señal, en cascada.
+    if instance.certificado_pdf:
+        instance.certificado_pdf.delete(save=False)
+
+
+@receiver(pre_save, sender=Exencion)
+def borrar_constancia_anterior_al_regenerar(sender, instance, **kwargs):
+    # Cuando se regenera o se limpia la constancia, borra el PDF anterior
+    # para no dejar archivos huérfanos.
+    if not instance.pk:
+        return
+    try:
+        anterior = Exencion.objects.get(pk=instance.pk).certificado_pdf
+    except Exencion.DoesNotExist:
+        return
+    if anterior and anterior != instance.certificado_pdf:
+        anterior.delete(save=False)

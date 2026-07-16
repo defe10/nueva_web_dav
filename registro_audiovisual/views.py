@@ -13,16 +13,23 @@ from .models import PersonaHumana, PersonaJuridica
 
 @login_required(login_url="/usuarios/login/")
 def seleccionar_tipo_registro(request):
+    next_url = request.GET.get("next", "") or request.POST.get("next", "")
+    suffix = f"?next={next_url}" if next_url else ""
+
+    # Si el usuario ya tiene registro, llevarlo directo a editar
+    if PersonaHumana.objects.filter(user=request.user).exists():
+        return redirect(reverse("registro_audiovisual:editar_persona_humana") + suffix)
+    if PersonaJuridica.objects.filter(user=request.user).exists():
+        return redirect(reverse("registro_audiovisual:editar_persona_juridica") + suffix)
+
     if request.method == "POST":
         tipo = request.POST.get("tipo")
-
         if tipo == "humana":
-            return redirect("registro_audiovisual:editar_persona_humana")
-
+            return redirect(reverse("registro_audiovisual:editar_persona_humana") + suffix)
         if tipo == "juridica":
-            return redirect("registro_audiovisual:editar_persona_juridica")
+            return redirect(reverse("registro_audiovisual:editar_persona_juridica") + suffix)
 
-    return render(request, "registro/seleccionar_tipo.html")
+    return render(request, "registro/seleccionar_tipo.html", {"next_url": next_url})
 
 
 # ============================================================
@@ -32,29 +39,32 @@ def seleccionar_tipo_registro(request):
 @login_required(login_url="/usuarios/login/")
 def editar_persona_humana(request):
     user = request.user
-
     persona_existente = PersonaHumana.objects.filter(user=user).first()
+    next_url = request.GET.get("next", "") or request.POST.get("next", "")
 
     if request.method == "POST":
         form = PersonaHumanaForm(request.POST, instance=persona_existente)
 
         if form.is_valid():
-            persona = form.save()
+            persona = form.save(commit=False)
             persona.user = user
-            persona.save(update_fields=["user"])
+            persona.save()
 
+            if next_url:
+                return redirect(next_url)
             return redirect(
                 reverse("registro_audiovisual:inscripcion_exitosa")
                 + f"?tipo=humana&id={persona.id}"
             )
 
     else:
-        form = PersonaHumanaForm(instance=persona_existente)  # 👈 SIN initial
+        initial = {} if persona_existente else {"email": user.email}
+        form = PersonaHumanaForm(instance=persona_existente, initial=initial)
 
     return render(
         request,
         "registro/editar_persona_humana.html",
-        {"form": form}
+        {"form": form, "next_url": next_url}
     )
 
 
@@ -68,29 +78,32 @@ def editar_persona_humana(request):
 @login_required(login_url="/usuarios/login/")
 def editar_persona_juridica(request):
     user = request.user
-
     persona_existente = PersonaJuridica.objects.filter(user=user).first()
+    next_url = request.GET.get("next", "") or request.POST.get("next", "")
 
     if request.method == "POST":
         form = PersonaJuridicaForm(request.POST, instance=persona_existente)
 
         if form.is_valid():
-            persona = form.save()
+            persona = form.save(commit=False)
             persona.user = user
-            persona.save(update_fields=["user"])
+            persona.save()
 
+            if next_url:
+                return redirect(next_url)
             return redirect(
                 reverse("registro_audiovisual:inscripcion_exitosa")
                 + f"?tipo=juridica&id={persona.id}"
             )
 
     else:
-        form = PersonaJuridicaForm(instance=persona_existente)  # 👈 SIN initial
+        initial = {} if persona_existente else {"email": user.email}
+        form = PersonaJuridicaForm(instance=persona_existente, initial=initial)
 
     return render(
         request,
         "registro/editar_persona_juridica.html",
-        {"form": form}
+        {"form": form, "next_url": next_url}
     )
 
 
@@ -102,15 +115,12 @@ def editar_persona_juridica(request):
 @login_required(login_url="/usuarios/login/")
 def inscripcion_exitosa(request):
     tipo = request.GET.get("tipo")
-    id_persona = request.GET.get("id")
 
     persona = None
-
     if tipo == "humana":
-        persona = PersonaHumana.objects.filter(id=id_persona).first()
-
+        persona = PersonaHumana.objects.filter(user=request.user).first()
     elif tipo == "juridica":
-        persona = PersonaJuridica.objects.filter(id=id_persona).first()
+        persona = PersonaJuridica.objects.filter(user=request.user).first()
 
     return render(
         request,
@@ -120,4 +130,42 @@ def inscripcion_exitosa(request):
             "persona": persona,
         }
     )
+
+
+# ============================================================
+# 5. CONFIRMAR / ACTUALIZAR DATOS ANTES DE UN TRÁMITE
+# ============================================================
+
+@login_required(login_url="/usuarios/login/")
+def confirmar_datos(request):
+    user = request.user
+    next_url = request.GET.get("next", "")
+
+    persona_humana = PersonaHumana.objects.filter(user=user).first()
+    persona_juridica = PersonaJuridica.objects.filter(user=user).first()
+
+    if not (persona_humana or persona_juridica):
+        suffix = f"?next={next_url}" if next_url else ""
+        return redirect(reverse("registro_audiovisual:seleccionar_tipo_registro") + suffix)
+
+    persona = persona_humana or persona_juridica
+    tipo = "humana" if persona_humana else "juridica"
+
+    edit_view = (
+        "registro_audiovisual:editar_persona_humana"
+        if persona_humana
+        else "registro_audiovisual:editar_persona_juridica"
+    )
+    # Después de editar, vuelve a confirmar_datos para que el usuario pueda continuar
+    confirmar_url = reverse("registro_audiovisual:confirmar_datos")
+    if next_url:
+        confirmar_url += f"?next={next_url}"
+    edit_url = reverse(edit_view) + f"?next={confirmar_url}"
+
+    return render(request, "registro/confirmar_datos.html", {
+        "persona": persona,
+        "tipo": tipo,
+        "next_url": next_url,
+        "edit_url": edit_url,
+    })
 

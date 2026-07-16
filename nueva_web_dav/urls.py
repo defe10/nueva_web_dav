@@ -19,6 +19,9 @@ urlpatterns = [
     # Convocatorias
     path("convocatorias/", include("convocatorias.urls")),
 
+    # Formación
+    path("formacion/", include("formacion.urls")),
+
     # Exención
     path("exencion/", include("exencion.urls")),
 
@@ -27,6 +30,9 @@ urlpatterns = [
     
     # Chatbot
     path('chatbot/', include('chatbot.urls')),
+
+    # Estadísticas (solo staff)
+    path('estadisticas/', include('estadisticas.urls')),
 ]
 
 if settings.DEBUG:

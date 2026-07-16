@@ -156,6 +156,75 @@ Inicio — Dirección de Audiovisuales
 </section>
 
 <!-- ================================================== -->
+<!-- GESTIONES Y TRÁMITES -->
+<!-- ================================================== -->
+<section class="pt-0 pb-5">
+  <div class="container">
+    {% comment %} <h3 class="fw-bold mb-4">Gestiones y trámites</h3> {% endcomment %}
+
+    <div class="tramites-banner shadow-sm">
+
+        <a
+          href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}"
+          class="tramite-item"
+        >
+          <span class="titulo">Registro Audiovisual</span>
+          <span class="detalle">Iniciar registro</span>
+        </a>
+
+        <a
+          href="{% url 'exencion:iniciar' %}"
+          class="tramite-item"
+        >
+          <span class="titulo">Exención impositiva</span>
+          <span class="detalle">Iniciar solicitud</span>
+        </a>
+
+        <a
+          href="https://docs.google.com/forms/d/1dUELTaF8F3UWd1FT9o-lvkoofWsxZ4aF2kbB8rCAAGo/edit"
+          class="tramite-item"
+        >
+          <span class="titulo">Cine Móvil</span>
+          <span class="detalle">Solicitar</span>
+        </a>
+
+        <a
+          href="#"
+          class="tramite-item"
+          tabindex="0"
+          role="button"
+          data-bs-toggle="popover"
+          data-bs-trigger="manual"
+          data-bs-placement="top"
+          data-mailto="mailto:lasescuelasvanalcinesalta@gmail.com?subject=Solicitud%20de%20reserva%20%E2%80%93%20Las%20escuelas%20van%20al%20Cine&body=A%20la%20Coordinaci%C3%B3n%20Art%C3%ADstica%0D%0AMinisterio%20de%20Educaci%C3%B3n%20y%20Cultura%0D%0A%0D%0APor%20medio%20de%20la%20presente%20solicito%20la%20reserva%20de%20una%20funci%C3%B3n%20del%20programa%20%E2%80%9CLas%20escuelas%20van%20al%20Cine%E2%80%9D,%20de%20acuerdo%20con%20el%20siguiente%20detalle%3A%0D%0A%0D%0A%E2%80%A2%20Instituci%C3%B3n%3A%0D%0A%E2%80%A2%20Curso%3A%0D%0A%E2%80%A2%20Cantidad%20de%20alumnos%3A%0D%0A%E2%80%A2%20Horario%20(ma%C3%B1ana%20o%20tarde)%3A%0D%0A%0D%0AQuedo%20a%20disposici%C3%B3n%20para%20ampliar%20la%20informaci%C3%B3n%20que%20consideren%20necesaria.%0D%0A%0D%0ASaludos%20cordiales.%0D%0A%0D%0ANombre%20y%20apellido%3A%0D%0ATel%C3%A9fono%20de%20contacto%3A"
+          title="Reservar"
+          data-bs-content="Reserve función a lasescuelasvanalcinesalta@gmail.com haciendo doble clic. Indique institución, curso y cantidad de estudiantes."
+        >
+          <span class="titulo">Las escuelas van al cine</span>
+          <span class="detalle">Reservar función</span>
+        </a>
+
+        <a
+          href="#"
+          class="tramite-item"
+          tabindex="0"
+          role="button"
+          data-bs-toggle="popover"
+          data-bs-trigger="manual"
+          data-bs-placement="top"
+          data-mailto="mailto:audiovisuales@edusalta.gov.ar?subject=Solicitud%20de%20aval%20institucional&body=Sr.%20Federico%20Casoni%0D%0ADirector%20de%20Audiovisuales%0D%0ASecretar%C3%ADa%20de%20Cultura%20%E2%80%93%20Gobierno%20de%20Salta%0D%0A%0D%0APor%20medio%20de%20la%20presente%20me%20dirijo%20a%20usted%20a%20fin%20de%20solicitar%20el%20aval%20institucional%20de%20la%20Direcci%C3%B3n%20de%20Audiovisuales%20de%20Salta.%0D%0A%0D%0AMotivos:%0D%0A%5BCompletar%20por%20el%20solicitante%5D%0D%0A%0D%0AAdjunto%20nota%20modelo%20con%20la%20informaci%C3%B3n%20correspondiente.%0D%0A%0D%0ASaludos%20cordiales.%0D%0A%0D%0ANombre%20y%20apellido%3A%0D%0ADNI%3A%0D%0ATel%C3%A9fono%20de%20contacto%3A"
+          title="Solicitud de aval"
+          data-bs-content="Solicite nota a audiovisuales@edusalta.gov.ar haciendo doble clic. Adjunte una nota modelo."
+        >
+          <span class="titulo">Solicitud de avales</span>
+          <span class="detalle">Pedir aval</span>
+        </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================================================== -->
 <!-- CONVOCATORIAS -->
 <!-- ================================================== -->
 <section class="py-5 bg-light">
@@ -170,24 +239,22 @@ Inicio — Dirección de Audiovisuales
       <a href="?categoria=PROGRAMA" class="filtro {% if request.GET.categoria == 'PROGRAMA' %}active{% endif %}">Programas</a>
       <a href="?categoria=SUBSIDIO" class="filtro {% if request.GET.categoria == 'SUBSIDIO' %}active{% endif %}">Subsidios</a>
       <a href="?categoria=CURSO" class="filtro {% if request.GET.categoria == 'CURSO' %}active{% endif %}">Cursos</a>
-      <a href="?categoria=INCENTIVO" class="filtro {% if request.GET.categoria == 'INCENTIVO' %}active{% endif %}">Incentivos</a>
       <a href="?categoria=BENEFICIO" class="filtro {% if request.GET.categoria == 'BENEFICIO' %}active{% endif %}">Beneficios</a>
     </div>
-
 
     <div id="convocatorias-grid">
       {% if vigentes %}
         <div class="row g-3">
           {% for c in vigentes %}
             <div class="col-md-6 col-lg-3">
-              <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="convocatoria-card-mubi">
+              <a href="{{ c.detalle_url }}" class="convocatoria-card-mubi">
                 {% if c.imagen %}
                   <img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
                 {% else %}
                   <div class="convocatoria-placeholder"></div>
                 {% endif %}
                 <div class="overlay">
-                  <span class="categoria">{{ c.get_categoria_display }}</span>
+                  <span class="categoria">{{ c.categoria_display }}</span>
                   <h5 class="titulo">{{ c.titulo }}</h5>
                   <p class="fecha">Abierta hasta {{ c.fecha_fin|date:"d/m/Y" }}</p>
                 </div>
@@ -197,102 +264,14 @@ Inicio — Dirección de Audiovisuales
         </div>
       {% else %}
         <div class="alert alert-light border text-muted">
-          No hay convocatorias abiertas en esta categoría en este momento.
+          No hay convocatorias abiertas en este momento.
         </div>
       {% endif %}
     </div>
 
-</section>
-
-<!-- ================================================== -->
-<!-- GESTIONES Y TRÁMITES -->
-<!-- ================================================== -->
-<section class="py-5">
-  <div class="container">
-    <h3 class="fw-bold mb-4">Gestiones y trámites</h3>
-
-    <div class="row g-3 justify-content-center">
-
-      <div class="col-sm-6 col-lg-3">
-        <div class="card2 h-100 text-center shadow-sm">
-          <div class="card-body">
-            <h6 class="mb-3">Registro Audiovisual</h6>
-            <a
-              href="{% url 'registro_audiovisual:seleccionar_tipo_registro' %}"
-              class="btn btn-primary btn-sm"
-            >
-              Iniciar registro
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-sm-6 col-lg-3">
-        <div class="card2 h-100 text-center shadow-sm">
-          <div class="card-body">
-            <h6 class="mb-3">Cine Móvil</h6>
-            <a
-              href="https://docs.google.com/forms/d/1dUELTaF8F3UWd1FT9o-lvkoofWsxZ4aF2kbB8rCAAGo/edit"
-              class="btn btn-primary btn-sm"
-            >
-              Solicitar
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-sm-6 col-lg-3">
-        <div class="card2 h-100 text-center shadow-sm">
-          <div class="card-body">
-            <h6 class="mb-3">Las escuelas van al cine</h6>
-
-            <a
-              href="#"
-              class="btn btn-primary btn-sm"
-              tabindex="0"
-              role="button"
-              data-bs-toggle="popover"
-              data-bs-trigger="manual"
-              data-bs-placement="top"
-              data-mailto="mailto:lasescuelasvanalcinesalta@gmail.com?subject=Solicitud%20de%20reserva%20%E2%80%93%20Las%20escuelas%20van%20al%20Cine&body=A%20la%20Coordinaci%C3%B3n%20Art%C3%ADstica%0D%0AMinisterio%20de%20Educaci%C3%B3n%20y%20Cultura%0D%0A%0D%0APor%20medio%20de%20la%20presente%20solicito%20la%20reserva%20de%20una%20funci%C3%B3n%20del%20programa%20%E2%80%9CLas%20escuelas%20van%20al%20Cine%E2%80%9D,%20de%20acuerdo%20con%20el%20siguiente%20detalle%3A%0D%0A%0D%0A%E2%80%A2%20Instituci%C3%B3n%3A%0D%0A%E2%80%A2%20Curso%3A%0D%0A%E2%80%A2%20Cantidad%20de%20alumnos%3A%0D%0A%E2%80%A2%20Horario%20(ma%C3%B1ana%20o%20tarde)%3A%0D%0A%0D%0AQuedo%20a%20disposici%C3%B3n%20para%20ampliar%20la%20informaci%C3%B3n%20que%20consideren%20necesaria.%0D%0A%0D%0ASaludos%20cordiales.%0D%0A%0D%0ANombre%20y%20apellido%3A%0D%0ATel%C3%A9fono%20de%20contacto%3A"
-              title="Reservar"
-              data-bs-content="Reserve función a lasescuelasvanalcinesalta@gmail.com haciendo doble clic en Reservar. Indique institución, curso y cantidad de estudiantes."
-            >
-              Solicitar
-            </a>
-
-          </div>
-        </div>
-      </div>
-
-      <div class="col-sm-6 col-lg-3">
-        <div class="card2 h-100 text-center shadow-sm">
-          <div class="card-body">
-            <h6 class="mb-3">Solicitud de avales</h6>
-
-            <a
-              href="#"
-              class="btn btn-primary btn-sm"
-              tabindex="0"
-              role="button"
-              data-bs-toggle="popover"
-              data-bs-trigger="manual"
-              data-bs-placement="top"
-              data-mailto="mailto:audiovisuales@edusalta.gov.ar
-?subject=Solicitud%20de%20aval%20institucional
-&body=Sr.%20Federico%20Casoni%0D%0ADirector%20de%20Audiovisuales%0D%0ASecretar%C3%ADa%20de%20Cultura%20%E2%80%93%20Gobierno%20de%20Salta%0D%0A%0D%0APor%20medio%20de%20la%20presente%20me%20dirijo%20a%20usted%20a%20fin%20de%20solicitar%20el%20aval%20institucional%20de%20la%20Direcci%C3%B3n%20de%20Audiovisuales%20de%20Salta.%0D%0A%0D%0AMotivos:%0D%0A%5BCompletar%20por%20el%20solicitante%5D%0D%0A%0D%0AAdjunto%20nota%20modelo%20con%20la%20informaci%C3%B3n%20correspondiente.%0D%0A%0D%0ASaludos%20cordiales.%0D%0A%0D%0ANombre%20y%20apellido%3A%0D%0ADNI%3A%0D%0ATel%C3%A9fono%20de%20contacto%3A"
-              title="Solicitud de aval"
-              data-bs-content="Solicite nota a audiovisuales@edusalta.gov.ar haciendo doble clic en Solicitar. Adjunte una nota una nota modelo."
-            >
-              Solicitar
-            </a>
-
-          </div>
-        </div>
-      </div>
-
-    </div>
   </div>
 </section>
+
+
 
 {% endblock %}

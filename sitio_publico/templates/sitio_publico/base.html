@@ -195,6 +195,7 @@
         <!-- ===================== -->
         <!-- MENSAJES (Django messages) -->
         <!-- ===================== -->
+        <div id="mensajes-globales">
         {% if messages %}
           <div class="mb-3">
             {% for message in messages %}
@@ -211,6 +212,7 @@
             {% endfor %}
           </div>
         {% endif %}
+        </div>
 
         {% block content %}{% endblock %}
 
@@ -232,7 +234,12 @@
 
             <a href="{% url 'convocatorias:crear_convocatoria' %}"
               class="btn btn-info">
-              Crear nueva convocatoria
+              Crear convocatoria
+            </a>
+
+            <a href="{% url 'formacion:crear_convocatoria' %}"
+              class="btn btn-info">
+              Crear convocatoria formación
             </a>
 
             <a href="{% url 'convocatorias:convocatorias_home' %}"
@@ -240,19 +247,14 @@
               Ver convocatorias vigentes
             </a>
 
-            <a href="{% url 'backoffice:nomina_registro' %}"
-              class="btn btn-outline-secondary">
-              Registro Audiovisual
-            </a>
-
-            <a class="btn btn-outline-secondary" href="{% url 'backoffice:convocatorias' %}">
-              Convocatorias
-            </a>
-
-
             <a href="{% url 'exencion:padron_publico_exenciones' %}"
               class="btn btn-outline-secondary">
               Exenciones impositivas
+            </a>
+
+            <a href="{% url 'estadisticas:dashboard' %}"
+              class="btn btn-outline-secondary">
+              Estadísticas
             </a>
 
           </div>

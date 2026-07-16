@@ -25,6 +25,13 @@ urlpatterns = [
     # Activación de cuenta
     # ----------------------------------
     path("activar/<uidb64>/<token>/", views.activar_cuenta, name="activar"),
+    path("reenviar-activacion/", views.reenviar_activacion, name="reenviar_activacion"),
+
+    # ----------------------------------
+    # Cambio de email
+    # ----------------------------------
+    path("cambiar-email/", views.cambiar_email, name="cambiar_email"),
+    path("cambiar-email/confirmar/<str:token>/", views.confirmar_cambio_email, name="confirmar_cambio_email"),
 ]
 
 # ----------------------------------
@@ -72,9 +79,23 @@ urlpatterns += [
     ),
 
     path(
-    "jurado/postulacion/<int:postulacion_id>/documentacion/",
-    views.jurado_ver_documentacion,
+        "jurado/postulacion/<int:postulacion_id>/documentacion/",
+        views.jurado_ver_documentacion,
         name="jurado_ver_documentacion",
     ),
-
+    path(
+        "jurado/integrante/<int:persona_id>/",
+        views.perfil_integrante,
+        name="perfil_integrante",
+    ),
+    path(
+        "jurado/evaluacion/<int:convocatoria_id>/",
+        views.evaluacion_lista,
+        name="evaluacion_lista",
+    ),
+    path(
+        "jurado/evaluacion/postulacion/<int:postulacion_id>/",
+        views.evaluacion_postulacion,
+        name="evaluacion_postulacion",
+    ),
 ]

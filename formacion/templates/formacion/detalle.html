@@ -1,0 +1,150 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block title %}{{ convocatoria.titulo }} · Formación{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row ficha-convocatoria">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="col-12 col-lg-8 convocatoria-left">
+
+      <div class="convocatoria-hero mb-4"
+           {% if convocatoria.imagen %}
+           style="background-image: url('{{ convocatoria.imagen.url }}');"
+           {% endif %}>
+        <div class="convocatoria-hero-overlay">
+          <h1 class="convocatoria-hero-title">{{ convocatoria.titulo }}</h1>
+          {% if convocatoria.descripcion_corta %}
+            <p class="convocatoria-hero-subtitle mb-0">{{ convocatoria.descripcion_corta }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if convocatoria.descripcion_larga or convocatoria.descripcion_corta %}
+      <div class="descripcion-convocatoria mb-4">
+        {% if convocatoria.descripcion_larga %}
+          {{ convocatoria.descripcion_larga|linebreaks }}
+        {% else %}
+          {{ convocatoria.descripcion_corta|linebreaks }}
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="mt-4 mb-5">
+        <a href="{% url 'convocatorias:convocatorias_home' %}" class="btn btn-outline-info btn-sm">Volver</a>
+      </div>
+
+      <!-- FORMADORES / TUTORES -->
+      {% with miembros=convocatoria.miembros.all %}
+      {% if miembros and convocatoria.bloque_personas != "NINGUNO" %}
+      <div class="mb-5">
+        <h3 class="fw-bold mb-4">
+          {% if convocatoria.bloque_personas == "FORMADORES" %}
+            Formadores/as
+          {% elif convocatoria.bloque_personas == "TUTORES" %}
+            Tutores/as
+          {% endif %}
+          <hr class="my-2 border-dotted"><br>
+        </h3>
+        <div class="vstack gap-4">
+          {% for m in miembros %}
+          <div class="card border-0 shadow-sm p-3 jurado-card">
+            <div class="row g-3">
+              <div class="col-12 col-md-3 text-center">
+                {% if m.foto %}
+                  <img src="{{ m.foto.url }}" class="jurado-foto">
+                {% endif %}
+                <h6 class="fw-bold mt-2 mb-0">{{ m.nombre }}</h6>
+              </div>
+              <div class="col-12 col-md-9 d-none d-md-block">
+                <p class="jurado-bio mb-0">{{ m.bio|linebreaks }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% endwith %}
+
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="col-12 col-lg-4 convocatoria-right">
+      <div class="card1 mb-3 border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-bold text-uppercase small mb-3">Información rápida</h6>
+          <ul class="list-unstyled small mb-3">
+
+            {% if convocatoria.tematica_genero %}
+            <li>
+              <strong>Detalle:</strong>
+              <div class="text-muted">{{ convocatoria.tematica_genero|linebreaksbr }}</div>
+              <hr class="my-2 border-dotted">
+            </li>
+            {% endif %}
+
+            <li>
+              <strong>Convocatoria:</strong>
+              {% if convocatoria.vigente %}
+                <span class="badge bg-success ms-1">Abierta</span>
+                <span class="text-muted small">hasta {{ convocatoria.fecha_fin|date:"d/m/Y" }}</span>
+              {% else %}
+                <span class="badge bg-danger ms-1">Cerrada</span>
+              {% endif %}
+              <hr class="my-2 border-dotted">
+            </li>
+
+            {% if convocatoria.requisitos %}
+            <li>
+              <strong>Requisitos:</strong>
+              <div class="text-muted">{{ convocatoria.requisitos|linebreaksbr }}</div>
+              <hr class="my-2 border-dotted">
+            </li>
+            {% endif %}
+
+            {% if convocatoria.beneficios %}
+            <li>
+              <strong>Beneficios:</strong>
+              <div class="text-muted">{{ convocatoria.beneficios|linebreaksbr }}</div>
+              <hr class="my-2 border-dotted">
+            </li>
+            {% endif %}
+
+          </ul>
+
+          <div class="d-grid gap-2">
+            {% if convocatoria.vigente %}
+
+              {% if convocatoria.tipo_formacion == "ASINCRONICA" %}
+                {% if convocatoria.url_curso %}
+                  <a href="{{ convocatoria.url_curso }}" target="_blank" rel="noopener"
+                     class="btn btn-warning btn-sm">Acceder al curso</a>
+                {% endif %}
+
+              {% elif convocatoria.url_destino %}
+                <a href="{{ convocatoria.url_destino }}" target="_blank" rel="noopener"
+                   class="btn btn-primary btn-sm">Inscribirme</a>
+
+              {% else %}
+                <a href="{% url 'formacion:inscribirse' convocatoria.pk %}"
+                   class="btn btn-primary btn-sm">Inscribirme</a>
+              {% endif %}
+
+            {% endif %}
+
+            {% if convocatoria.bases_pdf %}
+              <a href="{{ convocatoria.bases_pdf.url }}" target="_blank" rel="noopener"
+                 class="btn btn-outline-primary btn-sm">Bases y condiciones</a>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

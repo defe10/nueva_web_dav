@@ -1,0 +1,198 @@
+{% extends "convocatorias/wizard/base_wizard.html" %}
+
+{% block wizard_content %}
+<div class="dav-card">
+  <div class="dav-card-body">
+
+    <h3 class="mb-1">{{ label }}</h3>
+    <p class="text-muted mb-4">
+      Buscá al/a la {{ label|lower }} por nombre. Debe estar inscripto/a en el Registro Audiovisual.
+    </p>
+
+    <!-- OPCIÓN: usar la misma persona que el productor -->
+    {% if puede_coincidir_con_productor and persona_productor and not integrante %}
+    <div class="alert alert-info mb-4">
+      <p class="mb-2">En esta convocatoria el/la {{ label|lower }} puede ser la misma persona que el/la productor/a.</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="usar_productor">
+        <button type="submit" class="btn btn-sm btn-info text-white">
+          Usar a {{ persona_productor.nombre_completo }} como {{ label|lower }}
+        </button>
+      </form>
+      <p class="text-muted small mt-2 mb-0">O buscá otra persona más abajo.</p>
+    </div>
+    {% endif %}
+
+    <!-- INTEGRANTE YA VINCULADO -->
+    {% if integrante and integrante.verificado %}
+    <div class="alert alert-success d-flex align-items-center gap-3 mb-4">
+      <span class="fs-4">✓</span>
+      <div>
+        <strong>{{ integrante.persona_humana.nombre_completo }}</strong><br>
+        <span class="small">CUIT/CUIL: {{ integrante.persona_humana.cuil_cuit }}</span>
+      </div>
+    </div>
+
+    {% if mostrar_docs %}
+    <!-- Documentación del integrante -->
+    <h5 class="mb-3" id="docs">Documentación requerida</h5>
+
+    {% if es_mismo_que_productor %}
+    <div class="alert alert-info py-2 mb-3">
+      Como es la misma persona que el/la productor/a, se usan los documentos ya subidos en ese paso.
+    </div>
+
+    <!-- DNI (solo lectura) -->
+    <div class="mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="fw-semibold">DNI anverso y reverso</span>
+        {% if docs_dni %}<span class="badge bg-success">✓ Subido</span>
+        {% else %}<span class="badge bg-warning text-dark">Pendiente (subilo en el paso Productor)</span>{% endif %}
+      </div>
+    </div>
+
+    <!-- ARCA (solo lectura) -->
+    <div class="mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="fw-semibold">Constancia tributaria</span>
+        {% if docs_arca %}<span class="badge bg-success">✓ Subido</span>
+        {% else %}<span class="badge bg-warning text-dark">Pendiente (subila en el paso Productor)</span>{% endif %}
+      </div>
+    </div>
+
+    <!-- CV (solo lectura) -->
+    <div class="mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="fw-semibold">CV / Biofilmografía</span>
+        {% if docs_cv %}<span class="badge bg-success">✓ Subido</span>
+        {% else %}<span class="badge bg-warning text-dark">Pendiente (subilo en el paso Productor)</span>{% endif %}
+      </div>
+    </div>
+
+    {% else %}
+
+    <!-- DNI -->
+    <div class="mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="fw-semibold">DNI anverso y reverso</span>
+        {% if docs_dni %}<span class="badge bg-success">✓ Subido</span>
+        {% else %}<span class="badge bg-warning text-dark">Pendiente</span>{% endif %}
+      </div>
+      <form id="form-dni-{{ rol }}" method="post" enctype="multipart/form-data"
+            action="{% url 'convocatorias:subir_doc_integrante' postulacion.id rol %}">
+        {% csrf_token %}
+        <input type="hidden" name="tipo" value="DNI">
+        <input type="file" id="archivo-dni-{{ rol }}" name="archivo"
+               accept=".pdf,.jpg,.jpeg,.png" style="display:none"
+               onchange="document.getElementById('form-dni-{{ rol }}').requestSubmit()">
+        <button type="button" class="btn btn-sm btn-outline-primary"
+                onclick="document.getElementById('archivo-dni-{{ rol }}').click()">
+          {% if docs_dni %}Reemplazar DNI{% else %}Subir DNI{% endif %}
+        </button>
+        {% if docs_dni %}<span class="text-muted small ms-2">{{ docs_dni.archivo.name|slice:"30:" }}</span>{% endif %}
+      </form>
+    </div>
+
+    <!-- ARCA -->
+    <div class="mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="fw-semibold">Constancia tributaria</span>
+        {% if docs_arca %}<span class="badge bg-success">✓ Subido</span>
+        {% else %}<span class="badge bg-warning text-dark">Pendiente</span>{% endif %}
+      </div>
+      <form id="form-arca-{{ rol }}" method="post" enctype="multipart/form-data"
+            action="{% url 'convocatorias:subir_doc_integrante' postulacion.id rol %}">
+        {% csrf_token %}
+        <input type="hidden" name="tipo" value="CONSTANCIA_ARCA">
+        <input type="file" id="archivo-arca-{{ rol }}" name="archivo"
+               accept=".pdf,.jpg,.jpeg,.png" style="display:none"
+               onchange="document.getElementById('form-arca-{{ rol }}').requestSubmit()">
+        <button type="button" class="btn btn-sm btn-outline-primary"
+                onclick="document.getElementById('archivo-arca-{{ rol }}').click()">
+          {% if docs_arca %}Reemplazar constancia ARCA{% else %}Subir constancia ARCA{% endif %}
+        </button>
+        {% if docs_arca %}<span class="text-muted small ms-2">{{ docs_arca.archivo.name|slice:"30:" }}</span>{% endif %}
+      </form>
+    </div>
+
+    <!-- CV / BIOFILMOGRAFÍA -->
+    <div class="mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="fw-semibold">CV / Biofilmografía</span>
+        {% if docs_cv %}<span class="badge bg-success">✓ Subido</span>
+        {% else %}<span class="badge bg-warning text-dark">Pendiente</span>{% endif %}
+      </div>
+      <form id="form-cv-{{ rol }}" method="post" enctype="multipart/form-data"
+            action="{% url 'convocatorias:subir_doc_integrante' postulacion.id rol %}">
+        {% csrf_token %}
+        <input type="hidden" name="tipo" value="CV_BIOFILMOGRAFIA">
+        <input type="file" id="archivo-cv-{{ rol }}" name="archivo"
+               accept=".pdf,.doc,.docx" style="display:none"
+               onchange="document.getElementById('form-cv-{{ rol }}').requestSubmit()">
+        <button type="button" class="btn btn-sm btn-outline-primary"
+                onclick="document.getElementById('archivo-cv-{{ rol }}').click()">
+          {% if docs_cv %}Reemplazar CV{% else %}Subir CV{% endif %}
+        </button>
+        {% if docs_cv %}<span class="text-muted small ms-2">{{ docs_cv.archivo.name|slice:"-40:" }}</span>{% endif %}
+      </form>
+    </div>
+
+    {% endif %}
+
+    <hr>
+    {% endif %}
+
+    <!-- Cambiar integrante -->
+    <p class="small text-muted">¿No es la persona correcta?</p>
+    {% endif %}
+
+    <!-- BÚSQUEDA -->
+    <form method="post" class="mb-3">
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="buscar">
+      <label class="form-label fw-semibold">Buscar por nombre</label>
+      <div class="input-group">
+        {{ form.nombre_busqueda }}
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+      </div>
+      {% if form.nombre_busqueda.errors %}
+        <div class="text-danger small mt-1">{{ form.nombre_busqueda.errors }}</div>
+      {% endif %}
+    </form>
+
+    <!-- RESULTADOS -->
+    {% if buscado %}
+      {% if resultados %}
+        <div class="list-group mb-4">
+          {% for persona in resultados %}
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="accion" value="seleccionar">
+              <input type="hidden" name="persona_id" value="{{ persona.id }}">
+              <button type="submit" class="list-group-item list-group-item-action text-start">
+                <strong>{{ persona.nombre_completo }}</strong>
+                <span class="text-muted small ms-2">CUIT/CUIL: {{ persona.cuil_cuit }}</span>
+              </button>
+            </form>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-warning">
+          No se encontraron personas con ese nombre en el registro. La persona debe estar inscripta en el Registro Audiovisual para poder ser vinculada.
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- SIGUIENTE -->
+    <div class="text-end mt-4">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="siguiente">
+        <button type="submit" class="btn btn-primary px-4">Siguiente →</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

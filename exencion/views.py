@@ -11,6 +11,7 @@ from django.db.models import Q
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
+from django.urls import reverse
 from convocatorias.models import Convocatoria
 from registro_audiovisual.models import PersonaHumana, PersonaJuridica
 
@@ -21,7 +22,9 @@ from .utils import datos_fiscales_completos
 # ============================================================
 # CONFIG
 # ============================================================
-MAX_ARCHIVOS_EXENCION = 5  # total por exención (inicial + subsanación)
+MAX_DOCS_SUBSANACION = 10  # límite solo para documentos de subsanación
+
+TIPOS_DOC_EXENCION = ["CV", "DNI", "CONSTANCIA_ARCA"]
 
 
 # ============================================================
@@ -33,16 +36,19 @@ def _es_pdf(archivo):
     return nombre.endswith(".pdf") or ("pdf" in content_type)
 
 
-def _cupos_restantes(exencion):
-    total_actual = ExencionDocumento.objects.filter(exencion=exencion).count()
-    return MAX_ARCHIVOS_EXENCION - total_actual
+def _cupos_restantes_subsanacion(exencion):
+    total_subs = ExencionDocumento.objects.filter(exencion=exencion, es_subsanacion=True).count()
+    return MAX_DOCS_SUBSANACION - total_subs
 
 
 # ============================================================
 # PASO 1 — INICIAR SOLICITUD
 # ============================================================
-@login_required(login_url="/usuarios/login/")
 def iniciar_solicitud(request, convocatoria_id=None):
+
+    if not request.user.is_authenticated:
+        messages.warning(request, "Para solicitar una exención impositiva necesitás ingresar con tu usuario.")
+        return redirect(f"/usuarios/login/?next={request.path}")
 
     convocatoria = None
     if convocatoria_id is not None:
@@ -54,8 +60,9 @@ def iniciar_solicitud(request, convocatoria_id=None):
     persona_juridica = PersonaJuridica.objects.filter(user=user).first()
 
     if not (persona_humana or persona_juridica):
-        next_url = request.path
-        return redirect(f"/registro/seleccionar-tipo/?next={next_url}")
+        messages.warning(request, "Para solicitar una exención impositiva primero debés completar tu Registro Audiovisual.")
+        next_url = request.path + "?confirmed=1"
+        return redirect(reverse("registro_audiovisual:seleccionar_tipo_registro") + f"?next={next_url}")
 
     persona = persona_humana or persona_juridica
 
@@ -65,76 +72,71 @@ def iniciar_solicitud(request, convocatoria_id=None):
             "Para solicitar la exención impositiva es necesario completar previamente "
             "todos los datos fiscales en el Registro Audiovisual "
             "(Situación IVA, Actividad DGR, Domicilio fiscal, Localidad fiscal y Código Postal). "
-            "Si elegiste “Ninguna/Ninguno” en IVA o DGR, se considera incompleto."
+            'Si elegiste "Ninguna/Ninguno" en IVA o DGR, se considera incompleto.'
         )
-        next_url = request.path
-        if persona_humana:
-            return redirect(f"/registro/persona-humana/?next={next_url}")
-        return redirect(f"/registro/persona-juridica/?next={next_url}")
+        edit_view = (
+            "registro_audiovisual:editar_persona_humana"
+            if persona_humana
+            else "registro_audiovisual:editar_persona_juridica"
+        )
+        next_url = request.path + "?confirmed=1"
+        tab = "fiscales" if persona_humana else "generales"
+        return redirect(reverse(edit_view) + f"?next={next_url}&tab={tab}")
 
-    exencion, _creada = Exencion.objects.get_or_create(
+    # Revisar si ya existe una exención para este usuario/convocatoria
+    from django.utils import timezone as tz
+    hoy = tz.now().date()
+
+    exencion_existente = (
+        Exencion.objects
+        .filter(user=user, convocatoria=convocatoria)
+        .order_by("-fecha_creacion")
+        .first()
+    )
+
+    if exencion_existente:
+        estado = exencion_existente.estado
+        if estado == "BORRADOR":
+            return redirect("exencion:documentacion", exencion_id=exencion_existente.id)
+        if estado in ("ENVIADA", "OBSERVADA"):
+            messages.info(request, "Tu solicitud ya fue enviada y está en revisión administrativa.")
+            return redirect("exencion:completada", exencion_id=exencion_existente.id)
+        if estado == "APROBADA":
+            vencimiento = exencion_existente.fecha_vencimiento
+            if vencimiento and vencimiento > hoy:
+                messages.success(
+                    request,
+                    "Ya tenés una constancia de exención vigente. "
+                    "Podés descargarla desde tu panel de usuario."
+                )
+                return redirect("usuarios:panel_usuario")
+            # Vencida → permitir renovación (crear nueva abajo)
+
+    # Usuario con registro completo: ofrecer revisión de datos (solo si no viene de confirmar)
+    if not request.GET.get("confirmed"):
+        next_url = request.path + "?confirmed=1"
+        return redirect(reverse("registro_audiovisual:confirmar_datos") + f"?next={next_url}")
+
+    # Crear nueva exencion (renovación o primera vez)
+    exencion = Exencion(
         user=user,
         convocatoria=convocatoria,
-        defaults={
-            "persona_humana": persona_humana,
-            "persona_juridica": persona_juridica,
-            "nombre_razon_social": (
-                getattr(persona, "nombre_completo", None)
-                or getattr(persona, "razon_social", "")
-                or ""
-            ),
-            "email": getattr(persona, "email", "") or user.email or "",
-            "cuit": getattr(persona, "cuil_cuit", "") or "",
-            "domicilio_fiscal": getattr(persona, "domicilio_fiscal", "") or "",
-            "localidad_fiscal": getattr(persona, "localidad_fiscal", "") or "",
-            "codigo_postal_fiscal": getattr(persona, "codigo_postal_fiscal", "") or "",
-            "actividad_dgr": getattr(persona, "actividad_dgr", "") or "",
-            "estado": "BORRADOR",
-        }
+        persona_humana=persona_humana,
+        persona_juridica=persona_juridica,
+        nombre_razon_social=(
+            getattr(persona, "nombre_completo", None)
+            or getattr(persona, "razon_social", "")
+            or ""
+        ),
+        email=getattr(persona, "email", "") or user.email or "",
+        cuit=getattr(persona, "cuil_cuit", "") or "",
+        domicilio_fiscal=getattr(persona, "domicilio_fiscal", "") or "",
+        localidad_fiscal=getattr(persona, "localidad_fiscal", "") or "",
+        codigo_postal_fiscal=getattr(persona, "codigo_postal_fiscal", "") or "",
+        actividad_dgr=getattr(persona, "actividad_dgr", "") or "",
+        estado="BORRADOR",
     )
-    # ✅ SIEMPRE sincronizar (creada o no)
-    exencion.persona_humana = persona_humana
-    exencion.persona_juridica = persona_juridica
-    exencion.nombre_razon_social = (
-        getattr(persona, "nombre_completo", None)
-        or getattr(persona, "razon_social", "")
-        or ""
-    )
-    exencion.email = getattr(persona, "email", "") or user.email or ""
-    exencion.cuit = getattr(persona, "cuil_cuit", "") or ""
-    exencion.domicilio_fiscal = getattr(persona, "domicilio_fiscal", "") or ""
-    exencion.localidad_fiscal = getattr(persona, "localidad_fiscal", "") or ""
-    exencion.codigo_postal_fiscal = getattr(persona, "codigo_postal_fiscal", "") or ""
-    exencion.actividad_dgr = getattr(persona, "actividad_dgr", "") or ""
-
-    exencion.save(update_fields=[
-        "persona_humana", "persona_juridica",
-        "nombre_razon_social", "email", "cuit",
-        "domicilio_fiscal", "localidad_fiscal", "codigo_postal_fiscal",
-        "actividad_dgr",
-    ])
-
-    # ✅ SIEMPRE sincronizar (creada o no)
-    exencion.persona_humana = persona_humana
-    exencion.persona_juridica = persona_juridica
-    exencion.nombre_razon_social = (
-        getattr(persona, "nombre_completo", None)
-        or getattr(persona, "razon_social", "")
-        or ""
-    )
-    exencion.email = getattr(persona, "email", "") or user.email or ""
-    exencion.cuit = getattr(persona, "cuil_cuit", "") or ""
-    exencion.domicilio_fiscal = getattr(persona, "domicilio_fiscal", "") or ""
-    exencion.localidad_fiscal = getattr(persona, "localidad_fiscal", "") or ""
-    exencion.codigo_postal_fiscal = getattr(persona, "codigo_postal_fiscal", "") or ""
-    exencion.actividad_dgr = getattr(persona, "actividad_dgr", "") or ""
-
-    exencion.save(update_fields=[
-        "persona_humana", "persona_juridica",
-        "nombre_razon_social", "email", "cuit",
-        "domicilio_fiscal", "localidad_fiscal", "codigo_postal_fiscal",
-        "actividad_dgr",
-    ])
+    exencion.save()
 
     return redirect("exencion:documentacion", exencion_id=exencion.id)
 
@@ -156,12 +158,12 @@ def subir_documentacion(request, exencion_id):
             request,
             "Para continuar con la solicitud de exención debés completar previamente "
             "todos los datos fiscales en tu Registro Audiovisual. "
-            "Si elegiste “Ninguna/Ninguno” en IVA o DGR, se considera incompleto."
+            'Si elegiste "Ninguna/Ninguno" en IVA o DGR, se considera incompleto.'
         )
         next_url = request.path
         if exencion.persona_humana:
-            return redirect(f"/registro/persona-humana/?next={next_url}")
-        return redirect(f"/registro/persona-juridica/?next={next_url}")
+            return redirect(reverse("registro_audiovisual:editar_persona_humana") + f"?next={next_url}&tab=fiscales")
+        return redirect(reverse("registro_audiovisual:editar_persona_juridica") + f"?next={next_url}&tab=generales")
 
     documentos_pendientes = ExencionDocumento.objects.filter(
         exencion=exencion,
@@ -175,7 +177,18 @@ def subir_documentacion(request, exencion_id):
         estado="ENVIADO",
     ).order_by("-fecha_subida")
 
-    restantes = _cupos_restantes(exencion)
+    restantes = _cupos_restantes_subsanacion(exencion)
+
+    docs_iniciales = ExencionDocumento.objects.filter(
+        exencion=exencion,
+        es_subsanacion=False,
+    )
+    doc_cv   = docs_iniciales.filter(tipo="CV").first()
+    doc_dni  = docs_iniciales.filter(tipo="DNI").first()
+    doc_arca = docs_iniciales.filter(tipo="CONSTANCIA_ARCA").first()
+
+    todos_subidos = all([doc_cv, doc_dni, doc_arca])
+    alguno_enviado = docs_iniciales.filter(estado="ENVIADO").exists()
 
     return render(
         request,
@@ -185,7 +198,12 @@ def subir_documentacion(request, exencion_id):
             "convocatoria": exencion.convocatoria,
             "documentos_pendientes": documentos_pendientes,
             "documentos_enviados": documentos_enviados,
-            "max_archivos": MAX_ARCHIVOS_EXENCION,
+            "doc_cv": doc_cv,
+            "doc_dni": doc_dni,
+            "doc_arca": doc_arca,
+            "todos_subidos": todos_subidos,
+            "alguno_enviado": alguno_enviado,
+            "max_archivos": MAX_DOCS_SUBSANACION,
             "restantes": restantes,
         }
     )
@@ -204,33 +222,43 @@ def agregar_documentacion(request, exencion_id):
     if request.method != "POST":
         return redirect("exencion:documentacion", exencion_id=exencion.id)
 
-    archivos = request.FILES.getlist("archivos")
-    if not archivos:
-        messages.error(request, "Seleccioná al menos un archivo para subir.")
+    tipo = request.POST.get("tipo")
+    archivo = request.FILES.get("archivo")
+
+    if not tipo or tipo not in TIPOS_DOC_EXENCION:
+        messages.error(request, "Tipo de documento inválido.")
         return redirect("exencion:documentacion", exencion_id=exencion.id)
 
-    restantes = _cupos_restantes(exencion)
-
-    if restantes <= 0:
-        messages.error(request, f"Ya alcanzaste el máximo de {MAX_ARCHIVOS_EXENCION} archivos para esta exención.")
+    if not archivo:
+        messages.error(request, "Seleccioná un archivo para subir.")
         return redirect("exencion:documentacion", exencion_id=exencion.id)
 
-    if len(archivos) > restantes:
-        messages.error(
-            request,
-            f"Podés subir como máximo {restantes} archivo(s) más. Límite total: {MAX_ARCHIVOS_EXENCION}."
-        )
+    if not _es_pdf(archivo):
+        messages.error(request, f"El archivo '{archivo.name}' no es PDF.")
         return redirect("exencion:documentacion", exencion_id=exencion.id)
 
-    guardados = 0
+    # Si ya existe uno pendiente del mismo tipo, reemplazarlo; si está enviado, no permitir
+    existente = ExencionDocumento.objects.filter(
+        exencion=exencion,
+        tipo=tipo,
+        es_subsanacion=False,
+    ).first()
 
-    for archivo in archivos:
-        if not _es_pdf(archivo):
-            messages.error(request, f"El archivo '{archivo.name}' no es PDF.")
-            continue
+    if existente and existente.estado == "ENVIADO":
+        messages.error(request, "No podés reemplazar un documento ya enviado.")
+        return redirect("exencion:documentacion", exencion_id=exencion.id)
 
+    if existente:
+        existente.archivo = archivo
+        try:
+            existente.full_clean()
+            existente.save()
+        except Exception as e:
+            messages.error(request, str(e))
+    else:
         doc = ExencionDocumento(
             exencion=exencion,
+            tipo=tipo,
             archivo=archivo,
             es_subsanacion=False,
             estado="PENDIENTE",
@@ -238,14 +266,8 @@ def agregar_documentacion(request, exencion_id):
         try:
             doc.full_clean()
             doc.save()
-            guardados += 1
         except Exception as e:
             messages.error(request, str(e))
-
-    if guardados > 0:
-        messages.success(request, f"Se agregaron {guardados} archivo(s).")
-    else:
-        messages.error(request, "No se pudo subir ningún archivo. Revisá los errores.")
 
     return redirect("exencion:documentacion", exencion_id=exencion.id)
 
@@ -263,12 +285,12 @@ def confirmar_documentacion(request, exencion_id):
     if request.method != "POST":
         return redirect("exencion:documentacion", exencion_id=exencion.id)
 
-    # ✅ NUEVO: exigir que exista al menos 1 documento cargado (pendiente o enviado)
-    if not ExencionDocumento.objects.filter(
-        exencion=exencion,
-        es_subsanacion=False,
-    ).exists():
-        messages.error(request, "Debés subir al menos un archivo PDF antes de enviar la documentación.")
+    # Exigir los 3 tipos de documento
+    docs_iniciales = ExencionDocumento.objects.filter(exencion=exencion, es_subsanacion=False)
+    tipos_subidos = set(docs_iniciales.values_list("tipo", flat=True))
+    faltantes = [t for t in TIPOS_DOC_EXENCION if t not in tipos_subidos]
+    if faltantes:
+        messages.error(request, "Debés subir los tres documentos requeridos antes de enviar.")
         return redirect("exencion:documentacion", exencion_id=exencion.id)
 
     qs_pendientes = ExencionDocumento.objects.filter(
@@ -277,7 +299,7 @@ def confirmar_documentacion(request, exencion_id):
         estado="PENDIENTE",
     )
 
-    # Si no hay pendientes pero ya hay enviados, no vuelvas a “enviar”: redirigí a completada
+    # Si no hay pendientes pero ya hay enviados, no vuelvas a "enviar": redirigí a completada
     if not qs_pendientes.exists():
         messages.info(request, "Tu documentación ya fue enviada.")
         return redirect("exencion:completada", exencion_id=exencion.id)
@@ -363,7 +385,7 @@ def subir_documento_subsanado_exencion(request, exencion_id):
         estado="ENVIADO",
     ).order_by("-fecha_subida")
 
-    restantes = _cupos_restantes(exencion)
+    restantes = _cupos_restantes_subsanacion(exencion)
 
     return render(
         request,
@@ -373,7 +395,7 @@ def subir_documento_subsanado_exencion(request, exencion_id):
             "observaciones_pendientes": observaciones_pendientes,
             "documentos_pendientes": documentos_pendientes,
             "documentos_enviados": documentos_enviados,
-            "max_archivos": MAX_ARCHIVOS_EXENCION,
+            "max_archivos": MAX_DOCS_SUBSANACION,
             "restantes": restantes,
         }
     )
@@ -397,16 +419,16 @@ def agregar_documento_subsanado_exencion(request, exencion_id):
         messages.error(request, "Seleccioná al menos un archivo para subir.")
         return redirect("exencion:subir_documento_subsanado_exencion", exencion_id=exencion.id)
 
-    restantes = _cupos_restantes(exencion)
+    restantes = _cupos_restantes_subsanacion(exencion)
 
     if restantes <= 0:
-        messages.error(request, f"Ya alcanzaste el máximo de {MAX_ARCHIVOS_EXENCION} archivos para esta exención.")
+        messages.error(request, f"Ya alcanzaste el máximo de {MAX_DOCS_SUBSANACION} archivos de subsanación para esta exención.")
         return redirect("exencion:subir_documento_subsanado_exencion", exencion_id=exencion.id)
 
     if len(archivos) > restantes:
         messages.error(
             request,
-            f"Podés subir como máximo {restantes} archivo(s) más. Límite total: {MAX_ARCHIVOS_EXENCION}."
+            f"Podés subir como máximo {restantes} archivo(s) más de subsanación. Límite: {MAX_DOCS_SUBSANACION}."
         )
         return redirect("exencion:subir_documento_subsanado_exencion", exencion_id=exencion.id)
 
@@ -588,5 +610,4 @@ def padron_exenciones_excel(request):
 
 @staff_member_required
 def ir_a_padron_publico_exenciones(request):
-    padron = get_object_or_404(PadronPublicoExencion, activo=True)
-    return redirect("exencion:padron_publico_exenciones", token=padron.token)
+    return redirect("exencion:padron_publico_exenciones")

@@ -1,0 +1,121 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 720px;">
+
+  <div class="mb-4">
+    <a href="{% url 'usuarios:evaluacion_lista' postulacion.convocatoria.id %}" class="text-decoration-none text-secondary small">
+      ← Volver a la lista
+    </a>
+  </div>
+
+  <h1 class="fw-bold mb-1">{{ postulacion.nombre_proyecto }}</h1>
+  <p class="text-muted mb-4">{{ postulacion.convocatoria.titulo }}</p>
+
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+        {{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" id="form-evaluacion">
+    {% csrf_token %}
+
+    {% if not items_criterios %}
+      <div class="alert alert-warning">
+        Esta convocatoria no tiene criterios de evaluación cargados. Contactá al administrador.
+      </div>
+    {% else %}
+
+      <!-- Opción no puntuar -->
+      <div class="card mb-4 border-0 bg-light">
+        <div class="card-body">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="no_puntuar" id="no_puntuar"
+                   {% if evaluacion.no_puntuar %}checked{% endif %}>
+            <label class="form-check-label fw-semibold" for="no_puntuar">
+              No puntuar este proyecto
+            </label>
+            <div class="form-text">Marcá esta opción si el comité decide excluir este proyecto de la evaluación.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criterios -->
+      <div id="bloque-criterios" {% if evaluacion.no_puntuar %}style="display:none"{% endif %}>
+        <h5 class="fw-semibold mb-3">Criterios de evaluación</h5>
+
+        {% for item in items_criterios %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold mb-1">
+            {{ item.criterio.nombre }}
+            <span class="text-muted fw-normal small">/ {{ item.criterio.puntaje_maximo }}</span>
+          </label>
+          <input type="number"
+                 class="form-control"
+                 name="puntaje_{{ item.criterio.id }}"
+                 min="0"
+                 max="{{ item.criterio.puntaje_maximo }}"
+                 value="{{ item.puntaje|default:'' }}"
+                 placeholder="0 – {{ item.criterio.puntaje_maximo }}">
+        </div>
+        {% endfor %}
+
+        <div class="mt-2 mb-4 text-end text-muted small" id="total-display">
+          Total: <strong id="total-valor">—</strong>
+          / {{ puntaje_maximo_total }}
+        </div>
+      </div>
+
+    {% endif %}
+
+    <!-- Fundamentación -->
+    <div class="mb-4">
+      <label class="form-label fw-semibold" for="fundamentacion">Fundamentación</label>
+      <textarea class="form-control" name="fundamentacion" id="fundamentacion"
+                rows="5" placeholder="Observaciones del comité sobre este proyecto...">{{ evaluacion.fundamentacion }}</textarea>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary px-4">Guardar evaluación</button>
+      <a href="{% url 'usuarios:evaluacion_lista' postulacion.convocatoria.id %}" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+(function () {
+  const chk = document.getElementById('no_puntuar');
+  const bloque = document.getElementById('bloque-criterios');
+  const inputs = document.querySelectorAll('input[name^="puntaje_"]');
+  const totalEl = document.getElementById('total-valor');
+
+  function actualizarTotal() {
+    let suma = 0;
+    inputs.forEach(function(inp) {
+      const v = parseInt(inp.value, 10);
+      if (!isNaN(v)) suma += v;
+    });
+    if (totalEl) totalEl.textContent = suma;
+  }
+
+  if (chk && bloque) {
+    chk.addEventListener('change', function () {
+      bloque.style.display = this.checked ? 'none' : '';
+    });
+  }
+
+  inputs.forEach(function(inp) {
+    inp.addEventListener('input', actualizarTotal);
+  });
+
+  actualizarTotal();
+})();
+</script>
+{% endblock %}

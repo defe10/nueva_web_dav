@@ -46,15 +46,27 @@
             {% endif %}
         {% endfor %}
 
-        {% if nodo.opciones.all %}
+        {% with opciones=nodo.opciones.all %}
+        {% if opciones %}
             <div class="chatbot-options">
-                {% for opcion in nodo.opciones.all %}
+                {% for opcion in opciones %}
                     <a href="{% url 'ver_nodo' opcion.id %}" class="btn btn-outline-primary chatbot-chip chatbot-option-link">
                         {{ opcion.texto }}
                     </a>
                 {% endfor %}
             </div>
+        {% else %}
+            <!-- C: nodo sin opciones → navegación automática -->
+            <div class="chatbot-options">
+                <a href="{% url 'chatbot_volver' %}" class="btn btn-outline-secondary chatbot-chip chatbot-nav-btn" data-chat-action="volver">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <a href="{% url 'chatbot_inicio' %}" class="btn btn-outline-secondary chatbot-chip chatbot-nav-btn" data-chat-action="inicio">
+                    <i class="bi bi-house"></i> Inicio
+                </a>
+            </div>
         {% endif %}
+        {% endwith %}
 
     </div>
 

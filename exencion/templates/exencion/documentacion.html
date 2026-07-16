@@ -29,26 +29,20 @@
           Subí la documentación requerida para obtener el certificado de registro.
         </p>
 
-        <h5 class="fw-bold mt-4 mb-3">Documentación</h5>
+        <h5 class="fw-bold mt-4 mb-3">Documentación requerida</h5>
         <p class="small">
-          <strong>Personas humanas:</strong><br>
           1. Curriculum Vitae que acredite trayectoria Audiovisual.<br>
           2. DNI (frente y dorso).<br>
           3. Constancia de inscripción en ARCA con actividad audiovisual declarada.
-          <br><br>
-          <strong>Personas jurídicas:</strong><br>
-          1. Acta constitutiva.<br>
-          2. Última acta de designación de autoridades.<br>
-          3. Constancia de inscripción en ARCA con actividad audiovisual declarada.
         </p>
 
-        {% comment %} <h5 class="fw-bold mt-4 mb-3">Cómo funciona</h5>
+        <h5 class="fw-bold mt-4 mb-3">Cómo funciona</h5>
         <p class="small mb-0">
-          • Subí los archivos requeridos.<br>
-          • Podés agregar o eliminar documentos antes de enviarlos.<br>
-          • Cuando esté todo listo, hacé clic en <strong>Enviar documentación</strong>.<br>
-          • La solicitud quedará en revisión administrativa.
-        </p> {% endcomment %}
+          • Subí cada documento haciendo clic en <strong>Subir</strong>.<br>
+          • Podés reemplazar un documento antes de enviarlo.<br>
+          • Cuando tengas los tres, hacé clic en <strong>Enviar documentación</strong>.<br>
+          • Una vez enviados, la solicitud quedará en revisión administrativa.
+        </p>
 
       </div>
     </div>
@@ -57,81 +51,124 @@
     <div class="col-lg-8">
       <div class="dav-card" id="documentacion">
 
+        {% if messages %}
+          {% for msg in messages %}
+            <div class="alert alert-{{ msg.tags|default:'info' }} mb-3">{{ msg }}</div>
+          {% endfor %}
+        {% endif %}
 
-        <!-- AGREGAR ARCHIVOS -->
-        <form method="post"
-              action="{% url 'exencion:agregar_documentacion' exencion.id %}"
-              enctype="multipart/form-data"
-              class="row g-3">
-          {% csrf_token %}
+        <h5 class="fw-bold mb-4">Documentación requerida</h5>
 
-          <div class="col-12">
-            <label class="form-label fw-bold">
-              Seleccionar archivos
-            </label>
-            <input type="file"
-                   name="archivos"
-                   multiple
-                   class="form-control">
-            <div class="form-text">
-              <br>
-              1. Primero debes <strong>Elegir archivos</strong> requeridos.<br>
-              2. Luego debes <strong>Agregar archivos.</strong><br>
-              3. Cuando tengas agregados todos los archivos, debes <strong>Enviar documentación.</strong><br>
-              Antes de enviarlos puedes eliminarlos y volver a agregar otros. <br>
-              4. Una vez enviados, podrás ver la lista de archivos <strong>Ya enviados</strong><br><br>
-              
-              Podés subir uno o varios archivos en formato PDF.
-            </div>
+        <!-- CV -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="fw-semibold">Curriculum Vitae que acredite trayectoria Audiovisual</span>
+            {% if doc_cv %}
+              <span class="badge bg-success">✓ Subido</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">Pendiente</span>
+            {% endif %}
           </div>
-
-          <div class="col-12 text-end">
-            <button type="submit" class="btn btn-outline-primary">
-              Agregar archivos
+          {% if not alguno_enviado %}
+          <form id="form-cv" method="post" enctype="multipart/form-data"
+                action="{% url 'exencion:agregar_documentacion' exencion.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="tipo" value="CV">
+            <input type="file" id="archivo-cv" name="archivo"
+                   accept=".pdf" style="display:none"
+                   onchange="document.getElementById('form-cv').submit()">
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    onclick="document.getElementById('archivo-cv').click()">
+              {% if doc_cv %}Reemplazar CV{% else %}Subir CV{% endif %}
             </button>
+            {% if doc_cv %}
+              <span class="text-muted small ms-2">{{ doc_cv.archivo.name|nombre_original }}</span>
+            {% endif %}
+          </form>
+          {% elif doc_cv %}
+            <span class="text-muted small">{{ doc_cv.archivo.name|nombre_original }}</span>
+          {% endif %}
+        </div>
+
+        <hr class="my-3">
+
+        <!-- DNI -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="fw-semibold">DNI (frente y dorso)</span>
+            {% if doc_dni %}
+              <span class="badge bg-success">✓ Subido</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">Pendiente</span>
+            {% endif %}
           </div>
-        </form>
+          {% if not alguno_enviado %}
+          <form id="form-dni" method="post" enctype="multipart/form-data"
+                action="{% url 'exencion:agregar_documentacion' exencion.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="tipo" value="DNI">
+            <input type="file" id="archivo-dni" name="archivo"
+                   accept=".pdf" style="display:none"
+                   onchange="document.getElementById('form-dni').submit()">
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    onclick="document.getElementById('archivo-dni').click()">
+              {% if doc_dni %}Reemplazar DNI{% else %}Subir DNI{% endif %}
+            </button>
+            {% if doc_dni %}
+              <span class="text-muted small ms-2">{{ doc_dni.archivo.name|nombre_original }}</span>
+            {% endif %}
+          </form>
+          {% elif doc_dni %}
+            <span class="text-muted small">{{ doc_dni.archivo.name|nombre_original }}</span>
+          {% endif %}
+        </div>
+
+        <hr class="my-3">
+
+        <!-- ARCA -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="fw-semibold">Constancia de inscripción en ARCA con actividad audiovisual declarada</span>
+            {% if doc_arca %}
+              <span class="badge bg-success">✓ Subido</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">Pendiente</span>
+            {% endif %}
+          </div>
+          {% if not alguno_enviado %}
+          <form id="form-arca" method="post" enctype="multipart/form-data"
+                action="{% url 'exencion:agregar_documentacion' exencion.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="tipo" value="CONSTANCIA_ARCA">
+            <input type="file" id="archivo-arca" name="archivo"
+                   accept=".pdf" style="display:none"
+                   onchange="document.getElementById('form-arca').submit()">
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    onclick="document.getElementById('archivo-arca').click()">
+              {% if doc_arca %}Reemplazar constancia ARCA{% else %}Subir constancia ARCA{% endif %}
+            </button>
+            {% if doc_arca %}
+              <span class="text-muted small ms-2">{{ doc_arca.archivo.name|nombre_original }}</span>
+            {% endif %}
+          </form>
+          {% elif doc_arca %}
+            <span class="text-muted small">{{ doc_arca.archivo.name|nombre_original }}</span>
+          {% endif %}
+        </div>
 
         <hr class="my-4">
 
-        <!-- PENDIENTES -->
-        <h6 class="fw-bold mb-3">Pendientes de envío</h6>
-
-        {% if documentos_pendientes %}
-          <div class="table-responsive mb-3">
-            <table class="table align-middle">
-              <thead>
-                <tr>
-                  <th>Archivo</th>
-                  <th class="text-end" style="width: 120px;">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for doc in documentos_pendientes %}
-                  <tr>
-                    <td>
-                      <div class="fw-semibold">
-                        {{ doc.archivo.name|nombre_original }}
-                      </div>
-                      <div class="small text-muted">
-                        Subido: {{ doc.fecha_subida|date:"d/m/Y H:i" }}
-                      </div>
-                    </td>
-                    <td class="text-end">
-                      <form method="post" action="{% url 'exencion:eliminar_documento' doc.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                          Eliminar
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+        <!-- ACCIÓN: ENVIAR o estado -->
+        {% if alguno_enviado %}
+          <div class="alert alert-success d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Tu documentación ya fue enviada.</strong><br>
+              Está en revisión administrativa.
+            </div>
+            <span class="badge bg-success">Enviado</span>
           </div>
 
-          <!-- CONFIRMAR ENVÍO -->
+        {% elif todos_subidos %}
           <form method="post"
                 action="{% url 'exencion:confirmar_documentacion' exencion.id %}"
                 class="text-end">
@@ -141,57 +178,9 @@
             </button>
           </form>
 
-        {% elif documentos_enviados %}
-          <div class="alert alert-success d-flex justify-content-between align-items-center">
-            <div>
-              <strong>Tu documentación ya fue enviada.</strong><br>
-              Podés verla en la sección <strong>Ya enviados</strong>.
-            </div>
-            <span class="badge bg-success">Enviado</span>
-          </div>
-
         {% else %}
-          <div class="alert alert-light border">
-            Todavía no agregaste archivos. Usá el botón <strong>Agregar archivos</strong>.
-          </div>
-        {% endif %}
-
-        <!-- ENVIADOS -->
-        {% if documentos_enviados %}
-          <hr class="my-4">
-          <h6 class="fw-bold mb-3">Ya enviados</h6>
-
-          <div class="table-responsive">
-            <table class="table align-middle">
-              <thead>
-                <tr>
-                  <th>Archivo</th>
-                  <th style="width: 180px;">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for doc in documentos_enviados %}
-                  <tr>
-                    <td>
-                      <div class="fw-semibold">
-                        {{ doc.archivo.name|nombre_original }}
-                      </div>
-                      <div class="small text-muted">
-                        Subido: {{ doc.fecha_subida|date:"d/m/Y H:i" }}
-                      </div>
-                    </td>
-                    <td>
-                      <span class="badge bg-success">Enviado</span>
-                      {% if doc.fecha_envio %}
-                        <div class="small text-muted">
-                          {{ doc.fecha_envio|date:"d/m/Y H:i" }}
-                        </div>
-                      {% endif %}
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+          <div class="alert alert-light border text-muted small">
+            Subí los tres documentos requeridos para poder enviar la solicitud.
           </div>
         {% endif %}
 

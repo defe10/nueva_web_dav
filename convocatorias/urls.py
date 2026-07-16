@@ -42,50 +42,22 @@ urlpatterns = [
     ),
 
     # --------------------------------
-    # FORMULARIO DE POSTULACIÓN (IDEA)
+    # WIZARD DE POSTULACIÓN (nuevo flujo)
     # --------------------------------
     path(
         "postular/<int:convocatoria_id>/",
-        views.postular_convocatoria,
-        name="postular_convocatoria"
-    ),
-
-    # --------------------------------
-    # DOCUMENTACIÓN PERSONAL
-    # --------------------------------
-    path(
-        "documentacion/personal/<int:postulacion_id>/",
-        views.subir_documentacion_personal,
-        name="subir_documentacion_personal"
+        views.wizard_inicio,
+        name="postular_convocatoria",   # alias para no romper links existentes
     ),
     path(
-        "documentacion/personal/<int:postulacion_id>/agregar/",
-        views.agregar_documentacion_personal,
-        name="agregar_documentacion_personal"
+        "postular/<int:postulacion_id>/<str:paso>/",
+        views.wizard_paso,
+        name="wizard_paso",
     ),
     path(
-        "documentacion/personal/<int:postulacion_id>/confirmar/",
-        views.confirmar_documentacion_personal,
-        name="confirmar_documentacion_personal"
-    ),
-
-    # --------------------------------
-    # DOCUMENTACIÓN DEL PROYECTO
-    # --------------------------------
-    path(
-        "documentacion/proyecto/<int:postulacion_id>/",
-        views.subir_documentacion_proyecto,
-        name="subir_documentacion_proyecto"
-    ),
-    path(
-        "documentacion/proyecto/<int:postulacion_id>/agregar/",
-        views.agregar_documentacion_proyecto,
-        name="agregar_documentacion_proyecto"
-    ),
-    path(
-        "documentacion/proyecto/<int:postulacion_id>/confirmar/",
-        views.confirmar_documentacion_proyecto,
-        name="confirmar_documentacion_proyecto"
+        "postular/<int:postulacion_id>/doc-integrante/<str:rol>/",
+        views.subir_doc_integrante,
+        name="subir_doc_integrante",
     ),
 
     # --------------------------------
@@ -116,21 +88,21 @@ urlpatterns = [
     ),
 
     # --------------------------------
-    # VER DOCUMENTACIÓN (USUARIO)
-    # --------------------------------
-    path(
-        "ver-documentacion/<int:postulacion_id>/",
-        views.ver_documentacion_proyecto,
-        name="ver_documentacion_proyecto"
-    ),
-
-    # --------------------------------
     # ✅ RENDICIÓN (DETALLE)
     # --------------------------------
     path(
         "rendicion/<int:rendicion_id>/",
         views.rendicion_detalle,
         name="rendicion_detalle"
+    ),
+
+    # --------------------------------
+    # DESCARGA DE PLANILLA OFICIAL PRE-COMPLETADA
+    # --------------------------------
+    path(
+        "postulacion/<int:postulacion_id>/planilla/",
+        views.descargar_planilla_oficial,
+        name="descargar_planilla_oficial",
     ),
 
     # --------------------------------

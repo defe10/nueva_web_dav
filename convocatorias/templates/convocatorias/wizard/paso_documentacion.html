@@ -1,0 +1,72 @@
+{% extends "convocatorias/wizard/base_wizard.html" %}
+
+{% block wizard_content %}
+<div class="dav-card">
+  <div class="dav-card-body">
+
+    <h3 class="mb-1" id="docs">Documentación del proyecto</h3>
+    <p class="text-muted mb-4">Subí todos los documentos requeridos para poder continuar.</p>
+
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags|default:'danger' }} py-2">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% if not docs_activos %}
+      <div class="alert alert-info">Esta convocatoria no requiere documentación adicional del proyecto.</div>
+    {% else %}
+
+      {% for tipo, label, obligatorio in docs_activos %}
+      {% with archivos=docs_subidos|dictsort:tipo %}
+      <div class="mb-4 pb-3 border-bottom">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="fw-semibold">{{ label }}{% if not obligatorio %} <span class="text-muted fw-normal small">(opcional)</span>{% endif %}</span>
+          {% for k, v in docs_subidos.items %}{% if k == tipo %}
+            {% if v %}<span class="badge bg-success">✓ Subido</span>
+            {% elif obligatorio %}<span class="badge bg-danger text-white">Falta subir</span>
+            {% else %}<span class="badge bg-secondary">No subido</span>{% endif %}
+          {% endif %}{% endfor %}
+        </div>
+
+        {% for k, lista in docs_subidos.items %}{% if k == tipo %}
+          {% for doc in lista %}
+            <p class="small text-muted mb-1">
+              ✓ {{ doc.archivo.name|slice:"-40:" }}
+              <a href="{% url 'convocatorias:eliminar_documento_postulacion' doc.id %}"
+                 class="text-danger ms-2 small"
+                 onclick="return confirm('¿Eliminar este archivo?')">eliminar</a>
+            </p>
+          {% endfor %}
+        {% endif %}{% endfor %}
+
+<form method="post" enctype="multipart/form-data" id="form-doc-{{ tipo }}">
+          {% csrf_token %}
+          <input type="hidden" name="accion" value="subir">
+          <input type="hidden" name="tipo" value="{{ tipo }}">
+          <input type="file" id="archivo-{{ tipo }}" name="archivo"
+                 accept=".pdf,.jpg,.jpeg,.png,.xls,.xlsx" style="display:none"
+                 onchange="document.getElementById('form-doc-{{ tipo }}').requestSubmit()">
+          <button type="button" class="btn btn-sm btn-outline-primary mt-1"
+                  onclick="document.getElementById('archivo-{{ tipo }}').click()">
+            Subir archivo
+          </button>
+        </form>
+      </div>
+      {% endwith %}
+      {% endfor %}
+
+    {% endif %}
+
+    <!-- SIGUIENTE -->
+    <div class="text-end mt-4">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="siguiente">
+        <button type="submit" class="btn btn-primary px-4">Siguiente →</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

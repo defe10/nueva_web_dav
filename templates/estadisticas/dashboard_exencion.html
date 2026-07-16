@@ -1,0 +1,110 @@
+{% extends "sitio_publico/base.html" %}
+{% block title %}Estadísticas de Exenciones · DAV{% endblock %}
+
+{% block content %}
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Estadísticas</h1>
+  <p class="text-white mb-0">Exenciones impositivas</p>
+</section>
+
+<div class="container py-4">
+
+  <!-- ═══ NAVEGACIÓN ENTRE DASHBOARDS ════════════════════════ -->
+  {% include "estadisticas/_nav.html" with activo="exencion" %}
+
+  <!-- ═══ FILTROS ═════════════════════════════════════════════ -->
+  <div class="dav-card mb-4">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-6 col-md-2">
+        <label class="form-label small mb-1">Año</label>
+        <select name="anio" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for a in anios %}
+            <option value="{{ a }}" {% if filtros.anio == a|stringformat:"s" %}selected{% endif %}>{{ a }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label small mb-1">Estado</label>
+        <select name="estado" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for val, label in estados %}
+            {% if val != "BORRADOR" %}
+              <option value="{{ val }}" {% if filtros.estado == val %}selected{% endif %}>{{ label }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label small mb-1">Localidad fiscal</label>
+        <select name="loc" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for val, label in lugares %}
+            <option value="{{ val }}" {% if filtros.loc == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filtrar</button>
+        <a href="{% url 'estadisticas:dashboard_exencion' %}" class="btn btn-outline-secondary btn-sm">✕</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- ═══ TOTALES ═════════════════════════════════════════════ -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+      <div class="dav-card text-center py-3">
+        <div class="fs-1 fw-bold text-primary">{{ total }}</div>
+        <div class="text-muted">solicitudes (sin borradores)</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="dav-card text-center py-3">
+        <div class="fs-1 fw-bold text-success">{{ aprobadas }}</div>
+        <div class="text-muted">aprobadas</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="dav-card text-center py-3">
+        <div class="fs-1 fw-bold text-success">{{ vigentes }}</div>
+        <div class="text-muted">vigentes hoy</div>
+      </div>
+    </div>
+  </div>
+
+  {% if total == 0 %}
+    <div class="alert alert-info">No hay solicitudes de exención con los filtros seleccionados.</div>
+  {% else %}
+
+  <div class="row g-4">
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Por estado" filas=por_estado %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Tipo de solicitante" filas=tipo_solicitante %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_barras.html" with titulo="Solicitudes por año" datos=evolucion_solicitudes %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Localidad fiscal" filas=por_localidad %}
+    </div>
+
+  </div>
+
+  <!-- ═══ EXPORTAR ════════════════════════════════════════════ -->
+  <div class="text-end mt-4">
+    <a href="{% url 'estadisticas:exportar_exenciones' %}?anio={{ filtros.anio }}&estado={{ filtros.estado }}&loc={{ filtros.loc }}"
+       class="btn btn-outline-success">
+      Descargar informe (.xlsx)
+    </a>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}

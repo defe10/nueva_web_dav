@@ -13,4 +13,7 @@ urlpatterns = [
 
     # Inscripción finalizada
     path("inscripcion-exitosa/", views.inscripcion_exitosa, name="inscripcion_exitosa"),
+
+    # Confirmar datos antes de un trámite
+    path("confirmar-datos/", views.confirmar_datos, name="confirmar_datos"),
 ]

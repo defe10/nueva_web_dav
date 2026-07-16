@@ -22,4 +22,4 @@ def crear_perfil_usuario(sender, instance, created, **kwargs):
     Crea automáticamente un PerfilUsuario asociado cuando se crea un User.
     """
     if created:
-        PerfilUsuario.objects.create(user=instance)
+        PerfilUsuario.objects.get_or_create(user=instance)

@@ -4,67 +4,100 @@
 {% block content %}
 <div class="container py-5">
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h1 class="fw-bold mb-1">Documentación del proyecto</h1>
-      <div class="text-muted small">
-        <strong>{{ postulacion.nombre_proyecto }}</strong> · {{ postulacion.convocatoria.titulo }}
-      </div>
+      <h1 class="fw-bold mb-1">{{ postulacion.nombre_proyecto|default:"Sin título" }}</h1>
+      <div class="text-muted small">{{ postulacion.convocatoria.titulo }}</div>
     </div>
-
     <a href="{% url 'usuarios:panel_jurado' %}" class="btn btn-outline-secondary">
-      Volver al panel
+      ← Volver al panel
     </a>
   </div>
 
-  <div class="card shadow-sm" style="border-radius: 16px;">
+  <!-- ESTADO -->
+  <div class="mb-4">
+    <span class="badge fs-6
+      {% if postulacion.estado == 'admitido' %}bg-info text-dark
+      {% elif postulacion.estado == 'evaluacion_jurado' %}bg-warning text-dark
+      {% elif postulacion.estado == 'seleccionado' %}bg-success
+      {% elif postulacion.estado == 'no_seleccionado' %}bg-secondary
+      {% endif %}">
+      {{ postulacion.get_estado_display }}
+    </span>
+  </div>
+
+  <!-- DATOS DEL PROYECTO -->
+  <div class="card shadow-sm mb-4" style="border-radius:16px;">
     <div class="card-body">
+      <h5 class="fw-bold mb-3">Datos del proyecto</h5>
+      <table class="table table-sm table-bordered mb-0">
+        <tbody>
+          <tr><td class="text-muted" style="width:30%">Tipo</td><td>{{ postulacion.get_tipo_proyecto_display|default:"—" }}</td></tr>
+          <tr><td class="text-muted">Género</td><td>{{ postulacion.get_genero_display|default:"—" }}</td></tr>
+          {% if postulacion.sinopsis_corta %}
+          <tr><td class="text-muted">Sinopsis / Logline</td><td style="white-space:pre-wrap">{{ postulacion.sinopsis_corta }}</td></tr>
+          {% endif %}
+          {% if postulacion.link_pitch %}
+          <tr><td class="text-muted">Link pitch</td><td><a href="{{ postulacion.link_pitch }}" target="_blank" rel="noopener">ver →</a></td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-      <div class="row g-3 mb-3">
-        <div class="col-md-6">
-          <div class="text-muted small">Postulante</div>
-          <div class="fw-semibold">{{ postulacion.user.username }}</div>
-        </div>
-        <div class="col-md-6">
-          <div class="text-muted small">Estado</div>
-          <div class="fw-semibold">{{ postulacion.estado }}</div>
-        </div>
-      </div>
+  <!-- EQUIPO (oculto en doble ciego) -->
+  {% if not doble_ciego and integrantes %}
+  <div class="card shadow-sm mb-4" style="border-radius:16px;">
+    <div class="card-body">
+      <h5 class="fw-bold mb-3">Equipo</h5>
+      <table class="table table-sm table-bordered mb-0">
+        <thead class="table-light">
+          <tr><th>Rol</th><th>Nombre</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for i, cv_url in integrantes %}
+          <tr>
+            <td>{{ i.get_rol_display }}</td>
+            <td>{{ i.persona_humana.nombre_completo|default:i.nombre_busqueda|default:"—" }}</td>
+            <td>
+              {% if cv_url %}
+              <a href="{{ cv_url }}" target="_blank" rel="noopener"
+                 class="btn btn-sm btn-outline-secondary">CV / Biofilmografía</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
 
-      <hr>
+  <!-- DOCUMENTACIÓN DEL PROYECTO -->
+  <div class="card shadow-sm mb-4" style="border-radius:16px;">
+    <div class="card-body">
+      <h5 class="fw-bold mb-3">Documentación del proyecto</h5>
 
-      <h5 class="fw-bold mb-3">Archivos enviados</h5>
-
-      {% if documentos %}
-        <div class="list-group">
-          {% for d in documentos %}
-            <div class="list-group-item d-flex justify-content-between align-items-center">
+      {% if documentos_postulacion %}
+        <div class="list-group list-group-flush">
+          {% for d in documentos_postulacion %}
+            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
               <div class="me-3">
                 <div class="fw-semibold">{{ d.get_tipo_display }}</div>
-                <div class="text-muted small">
-                  {{ d.archivo.name }}
-                </div>
-                <div class="text-muted small">
-                  Subido: {{ d.fecha_subida|date:"d/m/Y H:i" }}
-                </div>
+                <div class="text-muted small">Subido: {{ d.fecha_subida|date:"d/m/Y H:i" }}</div>
               </div>
-
-              <a class="btn btn-sm btn-outline-primary"
-                 href="{{ d.archivo.url }}"
-                 target="_blank" rel="noopener">
-                Abrir PDF
-              </a>
+              <a href="{{ d.archivo.url }}" target="_blank" rel="noopener"
+                 class="btn btn-sm btn-outline-primary">Abrir</a>
             </div>
           {% endfor %}
         </div>
       {% else %}
-        <div class="alert alert-warning mb-0">
-          No hay documentación enviada para esta postulación.
-        </div>
+        <p class="text-muted mb-0">No hay documentación de proyecto enviada.</p>
       {% endif %}
 
     </div>
   </div>
+
 
 </div>
 {% endblock %}

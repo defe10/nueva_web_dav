@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
+from django.contrib.auth.password_validation import validate_password
 
 
 # =====================================================
@@ -82,6 +83,10 @@ class RegistroUsuarioForm(forms.ModelForm):
         p2 = self.cleaned_data.get("password2")
         if p1 != p2:
             raise forms.ValidationError("Las contraseñas no coinciden.")
+        try:
+            validate_password(p2)
+        except forms.ValidationError as e:
+            raise forms.ValidationError(e.messages)
         return p2
 
     def clean_honeypot(self):

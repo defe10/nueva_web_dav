@@ -1,17 +1,12 @@
 {% extends "sitio_publico/base.html" %}
 
-{% block title %}
-Nómina · Registro Audiovisual
-{% endblock %}
+{% block title %}Nómina · Registro Audiovisual{% endblock %}
 
 {% block content %}
 
-<!-- HERO -->
 <section class="fomento-hero text-center">
   <h1 class="fw-bold mb-2">Nómina del Registro Audiovisual</h1>
-  <p class="text-white mb-0">
-    Vista interna de administración
-  </p>
+  <p class="text-white mb-0">Vista interna de administración</p>
 </section>
 
 <div class="container py-4">
@@ -19,44 +14,29 @@ Nómina · Registro Audiovisual
   <!-- BUSCADOR + EXCEL -->
   <div class="dav-card mb-3">
     <form method="get" class="row g-2 align-items-center">
-
       <div class="col-12 col-lg-6">
-        <input
-          type="text"
-          name="q"
-          value="{{ q }}"
-          class="form-control"
-          placeholder="Buscar por nombre / razón social o email"
-        >
+        <input type="text" name="q" value="{{ q }}" class="form-control"
+               placeholder="Buscar por nombre / razón social o email">
       </div>
-
       <div class="col-12 col-lg-auto">
-        <button type="submit" class="btn btn-dark w-100">
-          Buscar
-        </button>
+        <button type="submit" class="btn btn-dark w-100">Buscar</button>
       </div>
-
       <div class="col-12 col-lg-auto">
-        <a href="{% url 'backoffice:nomina_registro' %}"
-           class="btn btn-outline-secondary w-100">
-          Limpiar
-        </a>
+        <a href="{% url 'backoffice:nomina_registro' %}" class="btn btn-outline-secondary w-100">Limpiar</a>
       </div>
-
       <div class="col-12 col-lg-auto ms-lg-auto">
         <a href="{% url 'backoffice:nomina_registro_excel' %}{% if q %}?q={{ q|urlencode }}{% endif %}"
-           class="btn btn-success w-100">
-          Descargar Excel
-        </a>
+           class="btn btn-success w-100">Descargar Excel</a>
       </div>
-
     </form>
   </div>
 
-  <!-- TABLA -->
-  <div class="dav-card">
-    <div class="table-responsive">
+  <!-- TOTAL -->
+  <p class="text-muted small mb-2">{{ total }} registro{{ total|pluralize }} encontrado{{ total|pluralize }}</p>
 
+  <!-- TABLA -->
+  <div class="dav-card mb-3">
+    <div class="table-responsive">
       <table class="table align-middle mb-0">
         <thead>
           <tr>
@@ -64,63 +44,60 @@ Nómina · Registro Audiovisual
             <th>Nombre / Razón social</th>
             <th style="width:170px;">Tipo de persona</th>
             <th>Correo electrónico</th>
-            <th style="width:190px;">Fecha registro / renovación</th>
+            <th style="width:190px;">Fecha registro</th>
           </tr>
         </thead>
-
         <tbody>
-          {% for r in rows %}
+          {% for r in page_obj %}
             <tr>
-
-              <td class="text-muted">
-                #{{ r.id }}
-              </td>
-
+              <td class="text-muted">#{{ r.id }}</td>
               <td class="fw-semibold">
-                <a href="{{ r.url_admin }}"
-                   class="text-decoration-none"
-                   target="_blank">
+                <a href="{{ r.url_admin }}" class="text-decoration-none" target="_blank">
                   {{ r.display }}
                 </a>
               </td>
-
-              <td>
-                {{ r.tipo }}
-              </td>
-
+              <td>{{ r.tipo }}</td>
               <td>
                 {% if r.email %}
-                  <a href="mailto:{{ r.email }}"
-                     class="text-decoration-none">
-                    {{ r.email }}
-                  </a>
+                  <a href="mailto:{{ r.email }}" class="text-decoration-none">{{ r.email }}</a>
                 {% else %}
                   <span class="text-muted">—</span>
                 {% endif %}
               </td>
-
               <td>
-                {% if r.fecha %}
-                  {{ r.fecha|date:"d/m/Y H:i" }}
-                {% else %}
-                  <span class="text-muted">—</span>
-                {% endif %}
+                {% if r.fecha %}{{ r.fecha|date:"d/m/Y H:i" }}{% else %}<span class="text-muted">—</span>{% endif %}
               </td>
-
             </tr>
           {% empty %}
             <tr>
-              <td colspan="5" class="text-center text-muted py-4">
-                No hay registros para mostrar.
-              </td>
+              <td colspan="5" class="text-center text-muted py-4">No hay registros para mostrar.</td>
             </tr>
           {% endfor %}
         </tbody>
-
       </table>
-
     </div>
   </div>
+
+  <!-- PAGINACIÓN -->
+  {% if page_obj.paginator.num_pages > 1 %}
+  <nav>
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?{% if q %}q={{ q|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">‹ Anterior</a>
+        </li>
+      {% endif %}
+      <li class="page-item disabled">
+        <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+      </li>
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?{% if q %}q={{ q|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente ›</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
 
 </div>
 

@@ -1,0 +1,319 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block title %}Crear convocatoria de formación{% endblock %}
+
+{% block content %}
+
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Crear convocatoria de formación</h1>
+  <p class="text-white mb-0">Administración del sistema</p>
+</section>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+
+      <div class="dav-card mb-5">
+
+        <h3 class="mb-1">Nueva convocatoria de formación</h3>
+        <p class="text-muted mb-4">
+          La línea se asigna automáticamente como <strong>Formación</strong>.
+        </p>
+
+        <form method="post" enctype="multipart/form-data" class="row g-3">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="col-12">
+              <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            </div>
+          {% endif %}
+
+          <div class="col-md-3">
+            <label class="form-label">Orden en el carrusel</label>
+            {{ form.orden }}
+          </div>
+
+          <div class="col-md-9">
+            <label class="form-label fw-semibold">Tipo de formación</label>
+            {{ form.tipo_formacion }}
+            <small class="text-muted d-block mt-1">
+              <strong>Asincrónica:</strong> link público, sin inscripción. &nbsp;·&nbsp;
+              <strong>Inscripción libre:</strong> sin registro audiovisual. &nbsp;·&nbsp;
+              <strong>Inscripción con registro:</strong> requiere Registro Audiovisual.
+            </small>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Título</label>
+            {{ form.titulo }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Descripción corta</label>
+            {{ form.descripcion_corta }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Descripción completa</label>
+            {{ form.descripcion_larga }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Temática / Género</label>
+            {{ form.tematica_genero }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Requisitos</label>
+            {{ form.requisitos }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Beneficios</label>
+            {{ form.beneficios }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Bases y condiciones (PDF)</label>
+            {{ form.bases_pdf }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Imagen (JPG/PNG)</label>
+            {{ form.imagen }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">URL del curso asincrónico</label>
+            {{ form.url_curso }}
+            <small class="text-muted d-block">Solo para cursos de tipo <em>Asincrónica</em>.</small>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">URL externa (reemplaza el formulario)</label>
+            {{ form.url_destino }}
+            <small class="text-muted d-block">Opcional. Si se completa, el botón de inscripción redirige a esta URL.</small>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Fecha de inicio</label>
+            {{ form.fecha_inicio }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Fecha de cierre</label>
+            {{ form.fecha_fin }}
+          </div>
+
+          <!-- BLOQUE PERSONAS -->
+          <div class="col-12 mt-4">
+            <h4 class="fw-bold">Formación / Tutorías</h4>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Título del bloque</label>
+            {{ form.bloque_personas }}
+            <small class="text-muted d-block">
+              Elegí cómo se mostrará este bloque.
+            </small>
+          </div>
+
+          <!-- FORMSET FORMADORES -->
+          <div class="col-12">
+            {{ formset.management_form }}
+            <div id="jurado-container">
+              {% for jform in formset %}
+              <div class="jurado-row border rounded p-3 mb-3 position-relative">
+                {% if jform.instance.pk %}{{ jform.id }}{% endif %}
+                <div class="row g-2 align-items-start">
+                  <div class="col-md-5">
+                    <label class="form-label small fw-semibold">Nombre</label>
+                    {{ jform.nombre }}
+                  </div>
+                  <div class="col-md-1">
+                    <label class="form-label small fw-semibold">Orden</label>
+                    {{ jform.orden }}
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Foto (opcional)</label>
+                    {{ jform.foto }}
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small fw-semibold">Bio (opcional)</label>
+                    {{ jform.bio }}
+                  </div>
+                  {% if jform.non_field_errors %}
+                  <div class="col-12">
+                    <div class="alert alert-danger py-1">{{ jform.non_field_errors }}</div>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="mt-2">
+                  {% if jform.DELETE %}
+                  <div class="form-check">
+                    {{ jform.DELETE }}
+                    <label class="form-check-label text-danger small" for="{{ jform.DELETE.id_for_label }}">Eliminar este miembro</label>
+                  </div>
+                  {% else %}
+                  <button type="button" class="btn btn-sm btn-outline-danger remove-jurado">Quitar</button>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <button type="button" id="add-jurado" class="btn btn-outline-secondary btn-sm mt-1">
+              + Agregar miembro
+            </button>
+          </div>
+
+          <!-- ================================================= -->
+          <!-- CONFIGURACIÓN DE INSCRIPCIÓN                       -->
+          <!-- ================================================= -->
+          <div class="col-12 mt-3" id="seccion-config-inscripcion">
+            <hr>
+            <h5 class="fw-bold mb-1">Configuración de la inscripción</h5>
+            <p class="text-muted small mb-3">
+              Seleccioná los campos que deberán completar los participantes al inscribirse.
+            </p>
+
+            {% if config_form.non_field_errors %}
+              <div class="alert alert-danger">{{ config_form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="row g-2">
+              {% for field in config_form %}
+              <div class="col-md-6 col-lg-4">
+                <div class="form-check">
+                  {{ field }}
+                  <label class="form-check-label" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                  </label>
+                  {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="col-12 mt-4">
+            <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end gap-3">
+              <button type="submit" class="btn btn-primary">Crear convocatoria</button>
+              <a href="{% url 'convocatorias:convocatorias_home' %}" class="btn btn-outline-secondary">Volver</a>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const tipoSelect = document.getElementById("id_tipo_formacion");
+  const seccion    = document.getElementById("seccion-config-inscripcion");
+
+  function actualizar() {
+    if (!tipoSelect || !seccion) return;
+    const val = tipoSelect.value;
+    seccion.style.display = (val === "ASINCRONICA" || val === "") ? "none" : "block";
+  }
+
+  tipoSelect && tipoSelect.addEventListener("change", actualizar);
+  actualizar();
+})();
+
+// Formset dinámico de formadores/tutores
+(function () {
+  const container   = document.getElementById("jurado-container");
+  const addBtn      = document.getElementById("add-jurado");
+  const totalInput  = document.getElementById("id_miembros-TOTAL_FORMS");
+
+  if (!container || !addBtn || !totalInput) return;
+
+  function getTotal() { return parseInt(totalInput.value, 10); }
+
+  function buildRow(idx) {
+    const tpl = container.querySelector(".jurado-row");
+    if (!tpl) {
+      // no hay filas previas: construir desde cero
+      const div = document.createElement("div");
+      div.className = "jurado-row border rounded p-3 mb-3 position-relative";
+      div.innerHTML = `
+        <div class="row g-2 align-items-start">
+          <div class="col-md-5">
+            <label class="form-label small fw-semibold">Nombre</label>
+            <input type="text" name="miembros-${idx}-nombre" class="form-control" placeholder="Nombre completo">
+          </div>
+          <div class="col-md-1">
+            <label class="form-label small fw-semibold">Orden</label>
+            <input type="number" name="miembros-${idx}-orden" class="form-control" style="width:80px" value="${idx + 1}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Foto (opcional)</label>
+            <input type="file" name="miembros-${idx}-foto" class="form-control">
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-semibold">Bio (opcional)</label>
+            <textarea name="miembros-${idx}-bio" class="form-control" rows="2" placeholder="Breve descripción (opcional)"></textarea>
+          </div>
+        </div>
+        <div class="mt-2">
+          <button type="button" class="btn btn-sm btn-outline-danger remove-jurado">Quitar</button>
+        </div>
+        <input type="hidden" name="miembros-${idx}-id" value="">
+        <input type="hidden" name="miembros-${idx}-convocatoria" value="">
+      `;
+      return div;
+    }
+
+    const clone = tpl.cloneNode(true);
+    clone.querySelectorAll("[name]").forEach(el => {
+      el.name = el.name.replace(/-\d+-/, `-${idx}-`);
+      if (el.id) el.id = el.id.replace(/-\d+-/, `-${idx}-`);
+      if (el.tagName !== "INPUT" || el.type !== "hidden") {
+        if (el.tagName === "INPUT" && el.type !== "file") el.value = "";
+        if (el.tagName === "TEXTAREA") el.value = "";
+      }
+    });
+    // Quitar el checkbox DELETE clonado si aparece
+    const delCheck = clone.querySelector("[name*=DELETE]");
+    if (delCheck) {
+      delCheck.closest(".form-check")?.remove();
+      const quitBtn = document.createElement("div");
+      quitBtn.className = "mt-2";
+      quitBtn.innerHTML = `<button type="button" class="btn btn-sm btn-outline-danger remove-jurado">Quitar</button>`;
+      clone.appendChild(quitBtn);
+    }
+    return clone;
+  }
+
+  addBtn.addEventListener("click", function () {
+    const idx = getTotal();
+    container.appendChild(buildRow(idx));
+    totalInput.value = idx + 1;
+  });
+
+  container.addEventListener("click", function (e) {
+    if (e.target.classList.contains("remove-jurado")) {
+      e.target.closest(".jurado-row").remove();
+      // reindexar
+      container.querySelectorAll(".jurado-row").forEach((row, i) => {
+        row.querySelectorAll("[name]").forEach(el => {
+          el.name = el.name.replace(/-\d+-/, `-${i}-`);
+          if (el.id) el.id = el.id.replace(/-\d+-/, `-${i}-`);
+        });
+      });
+      totalInput.value = container.querySelectorAll(".jurado-row").length;
+    }
+  });
+})();
+</script>
+{% endblock %}

@@ -1,4 +1,3 @@
-from datetime import date
 from django import forms
 from .models import PersonaHumana, PersonaJuridica
 
@@ -16,10 +15,12 @@ def agregar_opcion_seleccionar(form, campos):
 
 
 class PersonaHumanaForm(forms.ModelForm):
+
     class Meta:
         model = PersonaHumana
         fields = [
-            "nombre_completo",
+            "nombre",
+            "apellido",
             "cuil_cuit",
             "fecha_nacimiento",
             "genero",
@@ -46,7 +47,8 @@ class PersonaHumanaForm(forms.ModelForm):
         ]
 
         widgets = {
-            "nombre_completo": forms.TextInput(attrs={"class": "form-control"}),
+            "nombre": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: María Lucía"}),
+            "apellido": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: González"}),
             "cuil_cuit": forms.TextInput(attrs={"class": "form-control"}),
             "fecha_nacimiento": forms.DateInput(
                 format="%Y-%m-%d",
@@ -77,7 +79,6 @@ class PersonaHumanaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         agregar_opcion_seleccionar(
             self,
             [
@@ -95,16 +96,11 @@ class PersonaHumanaForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-
         if (
             cleaned_data.get("lugar_residencia") == "otro"
             and not cleaned_data.get("otro_lugar_residencia")
         ):
-            self.add_error(
-                "otro_lugar_residencia",
-                "Debe especificar el lugar de residencia."
-            )
-
+            self.add_error("otro_lugar_residencia", "Debe especificar el lugar de residencia.")
         return cleaned_data
 
     def clean_lugar_residencia(self):
@@ -137,22 +133,6 @@ class PersonaHumanaForm(forms.ModelForm):
             raise forms.ValidationError("Debe seleccionar un área cultural complementaria.")
         return valor
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-
-        if instance.fecha_nacimiento:
-            hoy = date.today()
-            instance.edad = (
-                hoy.year
-                - instance.fecha_nacimiento.year
-                - ((hoy.month, hoy.day) < (instance.fecha_nacimiento.month, instance.fecha_nacimiento.day))
-            )
-
-        if commit:
-            instance.save()
-
-        return instance
-
 
 class PersonaJuridicaForm(forms.ModelForm):
     class Meta:
@@ -170,6 +150,10 @@ class PersonaJuridicaForm(forms.ModelForm):
             "email",
             "situacion_iva",
             "actividad_dgr",
+            "representante_nombre",
+            "representante_apellido",
+            "representante_dni",
+            "representante_cuil",
             "area_desempeno_JJPP_1",
             "area_desempeno_JJPP_2",
             "portfolio_web",
@@ -195,6 +179,10 @@ class PersonaJuridicaForm(forms.ModelForm):
             "email": forms.EmailInput(attrs={"class": "form-control"}),
             "situacion_iva": forms.Select(attrs={"class": "form-select"}),
             "actividad_dgr": forms.Select(attrs={"class": "form-select"}),
+            "representante_nombre":   forms.TextInput(attrs={"class": "form-control"}),
+            "representante_apellido": forms.TextInput(attrs={"class": "form-control"}),
+            "representante_dni":      forms.TextInput(attrs={"class": "form-control"}),
+            "representante_cuil":     forms.TextInput(attrs={"class": "form-control"}),
             "area_desempeno_JJPP_1": forms.Select(attrs={"class": "form-select"}),
             "area_desempeno_JJPP_2": forms.Select(attrs={"class": "form-select"}),
             "portfolio_web": forms.URLInput(attrs={"class": "form-control"}),
@@ -218,6 +206,7 @@ class PersonaJuridicaForm(forms.ModelForm):
                 "area_desempeno_JJPP_2",
             ]
         )
+        self.fields["area_desempeno_JJPP_2"].required = False
 
     def clean_tipo_persona_juridica(self):
         valor = self.cleaned_data.get("tipo_persona_juridica")
@@ -249,24 +238,3 @@ class PersonaJuridicaForm(forms.ModelForm):
             raise forms.ValidationError("Debe seleccionar un área de desempeño principal.")
         return valor
 
-    def clean_area_desempeno_JJPP_2(self):
-        valor = self.cleaned_data.get("area_desempeno_JJPP_2")
-        if not valor:
-            raise forms.ValidationError("Debe seleccionar un área de desempeño secundaria.")
-        return valor
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-
-        if instance.fecha_constitucion:
-            hoy = date.today()
-            instance.antiguedad = (
-                hoy.year
-                - instance.fecha_constitucion.year
-                - ((hoy.month, hoy.day) < (instance.fecha_constitucion.month, instance.fecha_constitucion.day))
-            )
-
-        if commit:
-            instance.save()
-
-        return instance

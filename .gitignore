@@ -13,3 +13,6 @@ db_dev.sqlite3
 
 config/secrets.py
 .DS_Store
+
+# Claude Code (configuración local de la herramienta)
+.claude/

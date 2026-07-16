@@ -1,0 +1,28 @@
+<div class="mb-4">
+  <div class="d-flex align-items-center justify-content-between mb-2">
+    <span class="fw-semibold">
+      {{ label }}
+      {% if opcional %}<span class="text-muted fw-normal small">(opcional)</span>{% endif %}
+    </span>
+    {% if doc %}
+      <span class="badge bg-success">✓ Subido</span>
+    {% else %}
+      <span class="badge bg-warning text-dark">Pendiente</span>
+    {% endif %}
+  </div>
+  <form id="{{ form_id }}" method="post" enctype="multipart/form-data"
+        action="{% url 'convocatorias:subir_doc_integrante' postulacion.id 'PRODUCTOR' %}">
+    {% csrf_token %}
+    <input type="hidden" name="tipo" value="{{ tipo }}">
+    <input type="file" id="archivo-{{ form_id }}" name="archivo"
+           accept="{{ accept|default:'.pdf,.jpg,.jpeg,.png' }}" style="display:none"
+           onchange="document.getElementById('{{ form_id }}').requestSubmit()">
+    <button type="button" class="btn btn-sm btn-outline-primary"
+            onclick="document.getElementById('archivo-{{ form_id }}').click()">
+      {% if doc %}Reemplazar{% else %}Subir{% endif %} {{ label }}
+    </button>
+    {% if doc %}
+      <span class="text-muted small ms-2">{{ doc.archivo.name|slice:"-40:" }}</span>
+    {% endif %}
+  </form>
+</div>

@@ -1,0 +1,77 @@
+{% extends "sitio_publico/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Registro Audiovisual</h1>
+  <p class="text-white mb-0">Revisá tus datos antes de continuar</p>
+</section>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+
+      <div class="dav-card">
+
+        <h4 class="mb-1">Tus datos registrados</h4>
+        <p class="text-muted mb-4">
+          Verificá que la información esté actualizada. Si necesitás modificar algo, hacé clic en <strong>Actualizar datos</strong>.
+        </p>
+
+        <dl class="row mb-0">
+
+          {% if tipo == "humana" %}
+            <dt class="col-sm-4">Nombre completo</dt>
+            <dd class="col-sm-8">{{ persona.nombre_completo }}</dd>
+
+            <dt class="col-sm-4">CUIL / CUIT</dt>
+            <dd class="col-sm-8">{{ persona.cuil_cuit }}</dd>
+
+            <dt class="col-sm-4">Correo electrónico</dt>
+            <dd class="col-sm-8">{{ persona.email }}</dd>
+
+            <dt class="col-sm-4">Domicilio real</dt>
+            <dd class="col-sm-8">{{ persona.domicilio_real }}</dd>
+
+            {% if persona.domicilio_fiscal %}
+              <dt class="col-sm-4">Domicilio fiscal</dt>
+              <dd class="col-sm-8">{{ persona.domicilio_fiscal }}</dd>
+            {% endif %}
+
+          {% else %}
+            <dt class="col-sm-4">Razón social</dt>
+            <dd class="col-sm-8">{{ persona.razon_social }}</dd>
+
+            <dt class="col-sm-4">CUIL / CUIT</dt>
+            <dd class="col-sm-8">{{ persona.cuil_cuit }}</dd>
+
+            <dt class="col-sm-4">Correo electrónico</dt>
+            <dd class="col-sm-8">{{ persona.email }}</dd>
+
+            {% if persona.domicilio_fiscal %}
+              <dt class="col-sm-4">Domicilio fiscal</dt>
+              <dd class="col-sm-8">{{ persona.domicilio_fiscal }}</dd>
+            {% endif %}
+          {% endif %}
+
+        </dl>
+
+        <hr class="my-4">
+
+        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
+          <a href="{{ edit_url }}" class="btn btn-outline-secondary">
+            Actualizar datos
+          </a>
+          <a href="{{ next_url }}" class="btn btn-primary">
+            Continuar con el trámite
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

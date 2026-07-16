@@ -66,12 +66,13 @@ exportar_excel.short_description = "📤 Exportar selección a Excel (.xlsx)"
 class PersonaHumanaAdmin(admin.ModelAdmin):
 
     actions = [exportar_excel]
+    list_select_related = ("user",)
 
     list_display = (
         "id",
         "user",
         "fecha_creacion",
-        "nombre_completo",
+        "nombre", "apellido",
         "cuil_cuit",
         "fecha_nacimiento",
         "edad",
@@ -94,7 +95,7 @@ class PersonaHumanaAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "nombre_completo",
+        "nombre", "apellido",
         "cuil_cuit",
         "email",
         "telefono",
@@ -111,13 +112,13 @@ class PersonaHumanaAdmin(admin.ModelAdmin):
 
     ordering = ("-fecha_creacion",)
 
-    readonly_fields = ("fecha_creacion",)
+    readonly_fields = ("fecha_creacion", "fecha_actualizacion", "edad")
 
     fieldsets = (
         ("🔹 Datos Personales", {
             "fields": (
                 "user",
-                "nombre_completo",
+                ("nombre", "apellido"),
                 ("cuil_cuit", "fecha_nacimiento", "edad"),
                 "genero",
                 ("lugar_residencia", "otro_lugar_residencia"),
@@ -152,7 +153,7 @@ class PersonaHumanaAdmin(admin.ModelAdmin):
         }),
 
         ("🔹 Metadatos", {
-            "fields": ("fecha_creacion",)
+            "fields": ("fecha_creacion", "fecha_actualizacion")
         }),
     )
 
@@ -165,6 +166,7 @@ class PersonaHumanaAdmin(admin.ModelAdmin):
 class PersonaJuridicaAdmin(admin.ModelAdmin):
 
     actions = [exportar_excel]
+    list_select_related = ("user",)
 
     list_display = (
         "id",
@@ -205,7 +207,7 @@ class PersonaJuridicaAdmin(admin.ModelAdmin):
 
     ordering = ("-fecha_creacion",)
 
-    readonly_fields = ("fecha_creacion",)
+    readonly_fields = ("fecha_creacion", "fecha_actualizacion", "antiguedad")
 
     fieldsets = (
         ("🔹 Datos Jurídicos", {
@@ -247,6 +249,6 @@ class PersonaJuridicaAdmin(admin.ModelAdmin):
         }),
 
         ("🔹 Metadatos", {
-            "fields": ("fecha_creacion",)
+            "fields": ("fecha_creacion", "fecha_actualizacion")
         }),
     )

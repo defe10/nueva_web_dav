@@ -1,0 +1,101 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Depurar documentación presentada</h1>
+
+<p>
+  Esta acción borra <strong>definitivamente</strong> los archivos presentados
+  (documentos de postulación y de integrantes) de las convocatorias seleccionadas.
+  Los datos de las postulaciones (estados, montos, rendiciones) <strong>se conservan</strong>:
+  las estadísticas históricas no se ven afectadas.
+</p>
+
+{% if convocatorias_abiertas %}
+  <ul class="messagelist">
+    <li class="warning">
+      Se omiten {{ convocatorias_abiertas.count }} convocatoria(s) que todavía están abiertas:
+      {% for c in convocatorias_abiertas %}{{ c.titulo }}{% if not forloop.last %}, {% endif %}{% endfor %}.
+      Solo se puede depurar documentación de convocatorias cerradas.
+    </li>
+  </ul>
+{% endif %}
+
+{% if not convocatorias_cerradas %}
+
+  <p><strong>Ninguna de las convocatorias seleccionadas está cerrada.</strong> No hay nada para depurar.</p>
+  <a class="button" href="{% url 'admin:convocatorias_convocatoria_changelist' %}">Volver</a>
+
+{% else %}
+
+  <h2>Qué se va a borrar</h2>
+  <table>
+    <tr>
+      <th>Postulaciones alcanzadas (no ganadoras)</th>
+      <td>{{ resumen.postulaciones }}</td>
+    </tr>
+    <tr>
+      <th>Documentos a borrar</th>
+      <td>{{ resumen.total_docs }}</td>
+    </tr>
+    <tr>
+      <th>Espacio a liberar</th>
+      <td>{{ resumen_mb }}</td>
+    </tr>
+  </table>
+
+  {% if resumen.por_conv %}
+    <h3>Por convocatoria</h3>
+    <ul>
+      {% for titulo, cant in resumen.por_conv %}
+        <li>{{ titulo }}: {{ cant }} documentos</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if protegidas %}
+    <h3>Ganadoras protegidas</h3>
+    <p>
+      {{ protegidas }} postulación(es) seleccionadas o finalizadas quedan protegidas por defecto
+      ({{ resumen_ganadoras.total_docs }} documentos, {{ resumen_ganadoras_mb }}).
+      Solo se incluyen si marcás la casilla de abajo.
+    </p>
+  {% endif %}
+
+  {% if resumen.total_docs == 0 and resumen_ganadoras.total_docs == 0 %}
+
+    <p><strong>No hay documentos para borrar</strong> en las convocatorias seleccionadas.</p>
+    <a class="button" href="{% url 'admin:convocatorias_convocatoria_changelist' %}">Volver</a>
+
+  {% else %}
+
+    <form method="post" action="">
+      {% csrf_token %}
+      {% for c in convocatorias_cerradas %}
+        <input type="hidden" name="_selected_action" value="{{ c.pk }}">
+      {% endfor %}
+      {% for c in convocatorias_abiertas %}
+        <input type="hidden" name="_selected_action" value="{{ c.pk }}">
+      {% endfor %}
+      <input type="hidden" name="action" value="depurar_documentacion_action">
+      <input type="hidden" name="index" value="0">
+      <input type="hidden" name="confirmar_depuracion" value="1">
+
+      {% if protegidas %}
+        <p>
+          <label>
+            <input type="checkbox" name="incluir_ganadores" value="1">
+            Incluir también la documentación de las ganadoras (seleccionadas y finalizadas)
+          </label>
+        </p>
+      {% endif %}
+
+      <p>
+        <input type="submit" class="default" value="Sí, borrar definitivamente">
+        <a class="button cancel-link" href="{% url 'admin:convocatorias_convocatoria_changelist' %}">Cancelar</a>
+      </p>
+    </form>
+
+  {% endif %}
+
+{% endif %}
+{% endblock %}

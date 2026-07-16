@@ -12,13 +12,11 @@
 <div class="container mt-2">
   <div class="row justify-content-center">
     <div class="col-lg-8">
-
       <div class="dav-steps">
         <div class="step">1. Tipo de persona</div>
         <div class="step active">2. Completar datos</div>
         <div class="step">3. Completado</div>
       </div>
-
     </div>
   </div>
 </div>
@@ -36,8 +34,7 @@
           y agilizar cualquier trámite administrativo.
         </p>
         <p class="mb-0">
-          Al finalizar, hacé clic en <strong>“Enviar”</strong> para completar el registro.
-          Podrás actualizar tus datos cuando quieras desde <em>Mi cuenta</em>.
+          Navegá por las solapas y completá cada sección. Solo podrás enviar el formulario al llegar a la última.
         </p>
       </div>
     </div>
@@ -47,178 +44,282 @@
       <div class="dav-card">
 
         <h3 class="mb-2">Formulario de inscripción</h3>
-        <p class="text-muted mb-4">
+        <p class="text-muted mb-3">
           Datos requeridos para la inscripción de Personas Jurídicas.
         </p>
 
-        <form method="post" class="row g-3">
+        <!-- SOLAPAS NAV -->
+        <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-juridicos-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-juridicos" type="button" role="tab">
+              Datos generales
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-fiscales-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-fiscales" type="button" role="tab">
+              Datos fiscales
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-socio-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-socio" type="button" role="tab">
+              Socio / Autoridad
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-profesionales-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-profesionales" type="button" role="tab">
+              Datos profesionales
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-presencia-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-presencia" type="button" role="tab">
+              Presencia y trabajos
+            </button>
+          </li>
+        </ul>
+
+        <form method="post" id="formRegistro">
           {% csrf_token %}
+          {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
 
-          <!-- DATOS JURÍDICOS -->
-          <div class="col-12">
-            <h5>Datos de la persona jurídica</h5>
-          </div>
+          <div class="tab-content">
 
-          <div class="col-md-8">
-            <label class="form-label">Tipo de persona jurídica</label>
-            {{ form.tipo_persona_juridica }}
-            {{ form.tipo_persona_juridica.errors }}
-          </div>
+            <!-- TAB 1: DATOS GENERALES -->
+            <div class="tab-pane fade show active" id="tab-juridicos" role="tabpanel">
+              <div class="row g-3">
 
-          <div class="col-md-4">
-            <label class="form-label">CUIT</label>
-            {{ form.cuil_cuit }}
-            <small class="text-muted">Sin espacios ni guiones.</small>
-            {{ form.cuil_cuit.errors }}
-          </div>
+                <div class="col-md-8">
+                  <label class="form-label">Tipo de persona jurídica</label>
+                  {{ form.tipo_persona_juridica }}
+                  {{ form.tipo_persona_juridica.errors }}
+                </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Razón social</label>
-            {{ form.razon_social }}
-            {{ form.razon_social.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">CUIT</label>
+                  {{ form.cuil_cuit }}
+                  <small class="text-muted">Sin espacios ni guiones.</small>
+                  {{ form.cuil_cuit.errors }}
+                </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Nombre comercial</label>
-            {{ form.nombre_comercial }}
-            {{ form.nombre_comercial.errors }}
-          </div>
+                <div class="col-md-6">
+                  <label class="form-label">Razón social</label>
+                  {{ form.razon_social }}
+                  {{ form.razon_social.errors }}
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Domicilio fiscal</label>
-            {{ form.domicilio_fiscal }}
-            {{ form.domicilio_fiscal.errors }}
-          </div>
+                <div class="col-md-6">
+                  <label class="form-label">Nombre comercial</label>
+                  {{ form.nombre_comercial }}
+                  {{ form.nombre_comercial.errors }}
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Código postal</label>
-            {{ form.codigo_postal_fiscal }}
-            {{ form.codigo_postal_fiscal.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Domicilio fiscal</label>
+                  {{ form.domicilio_fiscal }}
+                  {{ form.domicilio_fiscal.errors }}
+                </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Ciudad</label>
-            {{ form.localidad_fiscal }}
-            {{ form.localidad_fiscal.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Código postal</label>
+                  {{ form.codigo_postal_fiscal }}
+                  {{ form.codigo_postal_fiscal.errors }}
+                </div>
 
-          <div class="col-md-8" id="otro-lugar-wrapper" style="display:none;">
-            <label class="form-label">Especificar otro lugar</label>
-            {{ form.otro_lugar_residencia }}
-            {{ form.otro_lugar_residencia.errors }}
-          </div>
+                <div class="col-md-4">
+                  <label class="form-label">Ciudad</label>
+                  {{ form.localidad_fiscal }}
+                  {{ form.localidad_fiscal.errors }}
+                </div>
 
-          <div class="col-md-5">
-            <label class="form-label">Fecha de constitución</label>
-            {{ form.fecha_constitucion }}
-            {{ form.fecha_constitucion.errors }}
-          </div>
+                <div class="col-md-5">
+                  <label class="form-label">Fecha de constitución</label>
+                  {{ form.fecha_constitucion }}
+                  {{ form.fecha_constitucion.errors }}
+                </div>
 
-          <div class="col-md-7 mb-3">
-            <label class="form-label">Antigüedad (años)</label>
-              <input
-                type="text"
-                id="antiguedad_calculada"
-                class="form-control"
-                readonly
-              >
-          </div>
+                <div class="col-md-7">
+                  <label class="form-label">Antigüedad (años)</label>
+                  <input type="text" id="antiguedad_calculada" class="form-control" readonly
+                         value="{{ form.instance.antiguedad|default:'' }}">
+                </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Teléfono</label>
-            {{ form.telefono }}
-            {{ form.telefono.errors }}
-          </div>
+                <div class="col-md-6">
+                  <label class="form-label">Teléfono</label>
+                  {{ form.telefono }}
+                  {{ form.telefono.errors }}
+                </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Correo electrónico</label>
-            {{ form.email }}
-            <small class="text-muted">
-              Correo para notificaciones administrativas.
-            </small>
-            {{ form.email.errors }}
-          </div>
+                <div class="col-md-6">
+                  <label class="form-label">Correo electrónico</label>
+                  {{ form.email }}
+                  <small class="text-muted">Correo para notificaciones administrativas.</small>
+                  {{ form.email.errors }}
+                </div>
 
-          <!-- DATOS FISCALES -->
-          <div class="col-12 mt-4">
-            <h5>Datos fiscales</h5>
-          </div>
+                <div class="col-12 d-flex justify-content-end mt-2">
+                  <button type="button" class="btn btn-secondary tab-next"
+                          data-target="tab-fiscales-btn">Siguiente</button>
+                </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Situación ante el IVA</label>
-            {{ form.situacion_iva }}
-            {{ form.situacion_iva.errors }}
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Actividad declarada en DGR</label>
-            {{ form.actividad_dgr }}
-            {{ form.actividad_dgr.errors }}
-          </div>
-
-          <!-- DATOS PROFESIONALES -->
-          <div class="col-12 mt-4">
-            <h5>Datos profesionales</h5>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Área de desempeño principal</label>
-            {{ form.area_desempeno_JJPP_1 }}
-            {{ form.area_desempeno_JJPP_1.errors }}
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Área de desempeño secundaria</label>
-            {{ form.area_desempeno_JJPP_2 }}
-            {{ form.area_desempeno_JJPP_2.errors }}
-          </div>
-
-          <div class="col-12 mt-4">
-          <h5 class="mb-3">Presencia y trabajos</h5>
-          <p class="text-muted small">
-          Podés compartir links a tu portfolio, canales, redes profesionales o trabajos destacados.
-          </p>
-        </div>
-
-          <div class="col-12">
-            {{ form.portfolio_web.label_tag }}
-            {{ form.portfolio_web }}
-            {{ form.portfolio_web.errors }}
-          </div>
-
-          <div class="col-12">
-            {{ form.canal_video.label_tag }}
-            {{ form.canal_video }}
-            {{ form.canal_video.errors }}
-          </div>
-
-          <div class="col-12">
-            {{ form.instagram.label_tag }}
-            {{ form.instagram }}
-            {{ form.instagram.errors }}
-          </div>
-
-          <div class="col-12">
-            {{ form.linkedin.label_tag }}
-            {{ form.linkedin }}
-            {{ form.linkedin.errors }}
-          </div>
-
-          <div class="col-12">
-            {{ form.link_trabajo_destacado.label_tag }}
-            {{ form.link_trabajo_destacado }}
-            {{ form.link_trabajo_destacado.errors }}
-          </div>
-
-          <!-- BOTÓN -->
-          <div class="col-12 mt-4">
-            <div class="d-flex justify-content-center justify-content-md-end">
-              <button type="submit" class="btn btn-primary">
-                Enviar
-              </button>
+              </div>
             </div>
-          </div>
 
+            <!-- TAB 2: DATOS FISCALES -->
+            <div class="tab-pane fade" id="tab-fiscales" role="tabpanel">
+              <div class="row g-3">
+
+                <div class="col-12">
+                  <div class="alert alert-info py-2 mb-0">
+                    <strong>Sección opcional.</strong> Estos datos no son obligatorios para completar el registro.
+                    Solo son necesarios si vas a solicitar exenciones impositivas.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Situación ante el IVA</label>
+                  {{ form.situacion_iva }}
+                  {{ form.situacion_iva.errors }}
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Actividad declarada en DGR</label>
+                  {{ form.actividad_dgr }}
+                  {{ form.actividad_dgr.errors }}
+                </div>
+
+                <div class="col-12 d-flex justify-content-between mt-2">
+                  <button type="button" class="btn btn-outline-secondary tab-prev"
+                          data-target="tab-juridicos-btn">Anterior</button>
+                  <button type="button" class="btn btn-secondary tab-next"
+                          data-target="tab-socio-btn">Siguiente</button>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- TAB 3: SOCIO / GERENTE / AUTORIDAD -->
+            <div class="tab-pane fade" id="tab-socio" role="tabpanel">
+              <div class="row g-3">
+
+                <div class="col-12">
+                  <p class="text-muted small mb-1">Nombre y apellido completo tal como figura en el DNI.</p>
+                </div>
+
+                <div class="col-md-5">
+                  <label class="form-label">Nombre</label>
+                  {{ form.representante_nombre }}
+                  {{ form.representante_nombre.errors }}
+                </div>
+
+                <div class="col-md-7">
+                  <label class="form-label">Apellido</label>
+                  {{ form.representante_apellido }}
+                  {{ form.representante_apellido.errors }}
+                </div>
+
+                <div class="col-md-5">
+                  <label class="form-label">DNI</label>
+                  {{ form.representante_dni }}
+                  {{ form.representante_dni.errors }}
+                </div>
+
+                <div class="col-md-7">
+                  <label class="form-label">CUIL / CUIT</label>
+                  {{ form.representante_cuil }}
+                  {{ form.representante_cuil.errors }}
+                </div>
+
+                <div class="col-12 d-flex justify-content-between mt-2">
+                  <button type="button" class="btn btn-outline-secondary tab-prev"
+                          data-target="tab-fiscales-btn">Anterior</button>
+                  <button type="button" class="btn btn-secondary tab-next"
+                          data-target="tab-profesionales-btn">Siguiente</button>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- TAB 4: DATOS PROFESIONALES -->
+            <div class="tab-pane fade" id="tab-profesionales" role="tabpanel">
+              <div class="row g-3">
+
+                <div class="col-md-6">
+                  <label class="form-label">Área de desempeño principal</label>
+                  {{ form.area_desempeno_JJPP_1 }}
+                  {{ form.area_desempeno_JJPP_1.errors }}
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Área de desempeño secundaria</label>
+                  {{ form.area_desempeno_JJPP_2 }}
+                  {{ form.area_desempeno_JJPP_2.errors }}
+                </div>
+
+                <div class="col-12 d-flex justify-content-between mt-2">
+                  <button type="button" class="btn btn-outline-secondary tab-prev"
+                          data-target="tab-socio-btn">Anterior</button>
+                  <button type="button" class="btn btn-secondary tab-next"
+                          data-target="tab-presencia-btn">Siguiente</button>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- TAB 5: PRESENCIA Y TRABAJOS (submit aquí) -->
+            <div class="tab-pane fade" id="tab-presencia" role="tabpanel">
+              <div class="row g-3">
+
+                <div class="col-12">
+                  <p class="text-muted small mb-1">
+                    Podés compartir links a tu portfolio, canales, redes profesionales y un trabajo destacado.
+                  </p>
+                </div>
+
+                <div class="col-12">
+                  {{ form.portfolio_web.label_tag }}
+                  {{ form.portfolio_web }}
+                  {{ form.portfolio_web.errors }}
+                </div>
+
+                <div class="col-12">
+                  {{ form.canal_video.label_tag }}
+                  {{ form.canal_video }}
+                  {{ form.canal_video.errors }}
+                </div>
+
+                <div class="col-12">
+                  {{ form.instagram.label_tag }}
+                  {{ form.instagram }}
+                  {{ form.instagram.errors }}
+                </div>
+
+                <div class="col-12">
+                  {{ form.linkedin.label_tag }}
+                  {{ form.linkedin }}
+                  {{ form.linkedin.errors }}
+                </div>
+
+                <div class="col-12">
+                  {{ form.link_trabajo_destacado.label_tag }}
+                  {{ form.link_trabajo_destacado }}
+                  <small class="text-muted">Un solo trabajo destacado.</small>
+                  {{ form.link_trabajo_destacado.errors }}
+                </div>
+
+                <div class="col-12 d-flex justify-content-between mt-2">
+                  <button type="button" class="btn btn-outline-secondary tab-prev"
+                          data-target="tab-profesionales-btn">Anterior</button>
+                  <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+
+              </div>
+            </div>
+
+          </div>{# /tab-content #}
         </form>
 
       </div>
@@ -229,57 +330,64 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  const fechaInput = document.querySelector("#id_fecha_constitucion");
-  const antiguedadInput = document.querySelector("#antiguedad_calculada");
 
-  if (!fechaInput || !antiguedadInput) return;
+  // Navegación entre solapas con botones Anterior / Siguiente
+  document.querySelectorAll(".tab-next, .tab-prev").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var targetBtn = document.getElementById(btn.getAttribute("data-target"));
+      if (targetBtn) bootstrap.Tab.getOrCreateInstance(targetBtn).show();
+    });
+  });
 
-  function calcularAntiguedad() {
-    if (!fechaInput.value) {
-      antiguedadInput.value = "";
-      return;
+  // Si ?tab=... en la URL, activar la solapa correspondiente
+  (function () {
+    var tab = new URLSearchParams(window.location.search).get("tab");
+    var map = {
+      "fiscales":   "tab-fiscales-btn",
+      "generales":  "tab-juridicos-btn",
+      "socio":      "tab-socio-btn",
+      "profesional":"tab-profesionales-btn",
+      "presencia":  "tab-presencia-btn",
+    };
+    var btnId = map[tab];
+    if (btnId) {
+      var btn = document.getElementById(btnId);
+      if (btn) bootstrap.Tab.getOrCreateInstance(btn).show();
     }
+  })();
 
-    const fecha = new Date(fechaInput.value);
-    const hoy = new Date();
-
-    let antiguedad = hoy.getFullYear() - fecha.getFullYear();
-    const m = hoy.getMonth() - fecha.getMonth();
-
-    if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
-      antiguedad--;
+  // Si hay errores de validación, activar la primera solapa que los contenga
+  var tabPanes = document.querySelectorAll(".tab-pane");
+  var tabButtons = document.querySelectorAll("#formTabs .nav-link");
+  var firstErrorFound = false;
+  tabPanes.forEach(function (pane, i) {
+    if (!firstErrorFound && pane.querySelector(".errorlist, .is-invalid")) {
+      tabButtons.forEach(function (b) { b.classList.remove("active"); });
+      tabPanes.forEach(function (p) { p.classList.remove("show", "active"); });
+      tabButtons[i].classList.add("active");
+      pane.classList.add("show", "active");
+      firstErrorFound = true;
     }
+  });
 
-    antiguedadInput.value = antiguedad;
+  // Calcular antigüedad
+  var fechaInput = document.querySelector("#id_fecha_constitucion");
+  var antiguedadInput = document.querySelector("#id_antiguedad");
+  if (antiguedadInput) antiguedadInput.setAttribute("readonly", true);
+  if (fechaInput && antiguedadInput) {
+    function calcularAntiguedad() {
+      if (!fechaInput.value) { antiguedadInput.value = ""; return; }
+      var f = new Date(fechaInput.value), h = new Date();
+      var ant = h.getFullYear() - f.getFullYear();
+      var m = h.getMonth() - f.getMonth();
+      if (m < 0 || (m === 0 && h.getDate() < f.getDate())) ant--;
+      antiguedadInput.value = ant;
+    }
+    calcularAntiguedad();
+    fechaInput.addEventListener("change", calcularAntiguedad);
   }
 
-  fechaInput.addEventListener("change", calcularAntiguedad);
 });
 </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const selectLocalidad = document.querySelector("#id_localidad_fiscal");
-  const wrapperOtro = document.querySelector("#otro-lugar-wrapper");
-
-  if (!selectLocalidad || !wrapperOtro) return;
-
-  function toggleOtroLugar() {
-    if (selectLocalidad.value === "otro") {
-      wrapperOtro.style.display = "block";
-    } else {
-      wrapperOtro.style.display = "none";
-    }
-  }
-
-  // 👉 ejecutar al cargar (modo editar)
-  toggleOtroLugar();
-
-  // 👉 ejecutar al cambiar
-  selectLocalidad.addEventListener("change", toggleOtroLugar);
-});
-</script>
-
-
 
 {% endblock %}
