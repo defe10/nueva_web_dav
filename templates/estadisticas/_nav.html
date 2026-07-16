@@ -1,0 +1,18 @@
+<ul class="nav nav-pills mb-4">
+  <li class="nav-item">
+    <a class="nav-link {% if activo == 'fomento' %}active{% endif %}"
+       href="{% url 'estadisticas:dashboard' %}">Plan de Fomento</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if activo == 'registro' %}active{% endif %}"
+       href="{% url 'estadisticas:dashboard_registro' %}">Registro Audiovisual</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if activo == 'exencion' %}active{% endif %}"
+       href="{% url 'estadisticas:dashboard_exencion' %}">Exenciones</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if activo == 'formacion' %}active{% endif %}"
+       href="{% url 'estadisticas:dashboard_formacion' %}">Formación</a>
+  </li>
+</ul>

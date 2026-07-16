@@ -1,0 +1,138 @@
+{% extends "sitio_publico/base.html" %}
+{% block title %}Estadísticas del Registro · DAV{% endblock %}
+
+{% block content %}
+<section class="fomento-hero text-center">
+  <h1 class="fw-bold mb-2">Estadísticas</h1>
+  <p class="text-white mb-0">Registro Audiovisual de Salta</p>
+</section>
+
+<div class="container py-4">
+
+  <!-- ═══ NAVEGACIÓN ENTRE DASHBOARDS ════════════════════════ -->
+  {% include "estadisticas/_nav.html" with activo="registro" %}
+
+  <!-- ═══ FILTROS ═════════════════════════════════════════════ -->
+  <div class="dav-card mb-4">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-6 col-md-3">
+        <label class="form-label small mb-1">Localidad</label>
+        <select name="loc" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for val, label in lugares %}
+            <option value="{{ val }}" {% if filtros.loc == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label small mb-1">Área de desempeño</label>
+        <select name="area" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for val, label in areas %}
+            <option value="{{ val }}" {% if filtros.area == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filtrar</button>
+        <a href="{% url 'estadisticas:dashboard_registro' %}" class="btn btn-outline-secondary btn-sm">✕</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- ═══ TOTALES ═════════════════════════════════════════════ -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+      <div class="dav-card text-center py-3">
+        <div class="fs-1 fw-bold text-primary">{{ total_ph }}</div>
+        <div class="text-muted">personas humanas registradas</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="dav-card text-center py-3">
+        <div class="fs-1 fw-bold text-primary">{{ total_pj }}</div>
+        <div class="text-muted">personas jurídicas registradas</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="dav-card text-center py-3">
+        <div class="fs-1 fw-bold text-primary">{{ localidades }}</div>
+        <div class="text-muted">localidades alcanzadas</div>
+      </div>
+    </div>
+  </div>
+
+  {% if total_ph == 0 and total_pj == 0 %}
+    <div class="alert alert-info">No hay inscriptos en el Registro Audiovisual con los filtros seleccionados.</div>
+  {% else %}
+
+  <!-- ═══ EVOLUCIÓN ANUAL ═════════════════════════════════════ -->
+  <div class="row g-4 mb-4">
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_barras.html" with titulo="Altas en el registro por año (humanas + jurídicas)" datos=evolucion_altas %}
+    </div>
+  </div>
+
+  <!-- ═══ PERSONAS HUMANAS ════════════════════════════════════ -->
+  <h4 class="fw-bold mb-1">Personas humanas</h4>
+  <p class="text-muted small mb-3">Perfil de las y los trabajadores audiovisuales inscriptos.</p>
+
+  <div class="row g-4 mb-5">
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Roles predominantes (área principal)" filas=roles total=total_ph %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Técnicos disponibles por área (principal o secundaria)" filas=tecnicos total=total_ph %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Ubicación territorial" filas=residencia_ph total=total_ph %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Género" filas=genero_ph total=total_ph %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Nivel educativo alcanzado" filas=nivel_educativo total=total_ph %}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {% include "estadisticas/_tabla.html" with titulo="Situación fiscal (IVA)" filas=situacion_iva_ph total=total_ph %}
+    </div>
+
+  </div>
+
+  <!-- ═══ PERSONAS JURÍDICAS ══════════════════════════════════ -->
+  <h4 class="fw-bold mb-1">Personas jurídicas</h4>
+  <p class="text-muted small mb-3">Empresas y organizaciones audiovisuales registradas.</p>
+
+  <div class="row g-4">
+
+    <div class="col-12 col-md-4">
+      {% include "estadisticas/_tabla.html" with titulo="Tipo de persona jurídica" filas=tipo_pj total=total_pj %}
+    </div>
+
+    <div class="col-12 col-md-4">
+      {% include "estadisticas/_tabla.html" with titulo="Área de desempeño" filas=area_pj total=total_pj %}
+    </div>
+
+    <div class="col-12 col-md-4">
+      {% include "estadisticas/_tabla.html" with titulo="Localidad fiscal" filas=localidad_pj total=total_pj %}
+    </div>
+
+  </div>
+
+  <!-- ═══ EXPORTAR ════════════════════════════════════════════ -->
+  <div class="text-end mt-4">
+    <a href="{% url 'estadisticas:exportar_registro' %}?loc={{ filtros.loc }}&area={{ filtros.area }}"
+       class="btn btn-outline-success">
+      Descargar informe (.xlsx)
+    </a>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}

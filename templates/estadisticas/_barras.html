@@ -1,0 +1,18 @@
+<div class="dav-card h-100">
+  <div class="dav-card-body">
+    <h6 class="fw-bold mb-3">{{ titulo }}</h6>
+    {% if datos.filas %}
+      {% for row in datos.filas %}
+      <div class="d-flex align-items-center mb-2">
+        <div class="small text-muted" style="width:60px">{{ row.label }}</div>
+        <div class="flex-grow-1 rounded" style="height:16px;background:#e9ecef">
+          <div class="bg-primary rounded" style="height:16px;width:{% widthratio row.total datos.max_total 100 %}%"></div>
+        </div>
+        <div class="small fw-semibold text-end" style="width:110px">{{ row.display }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted small">Sin datos.</p>
+    {% endif %}
+  </div>
+</div>
