@@ -60,12 +60,12 @@ class ObservacionFormacionInline(admin.TabularInline):
 
 @admin.register(InscripcionFormacion)
 class InscripcionFormacionAdmin(admin.ModelAdmin):
-    list_display   = ("usuario", "convocatoria", "estado", "contacto_email", "contacto_telefono", "vinculo_sector", "fecha")
+    list_display   = ("usuario", "convocatoria", "estado", "contacto_email", "contacto_telefono", "vinculo_sector", "documentacion_link", "fecha")
     list_filter    = ("estado", "vinculo_sector", "convocatoria")
     search_fields  = ("user__username", "user__email", "nombre", "apellido", "dni", "email", "telefono")
     ordering       = ("-fecha",)
-    readonly_fields = ("user", "convocatoria", "fecha")
-    actions        = ["marcar_admitido", "marcar_no_admitido", "marcar_lista_espera", "exportar_excel"]
+    readonly_fields = ("user", "convocatoria", "fecha", "documentacion_descarga")
+    actions        = ["marcar_admitido", "marcar_no_admitido", "marcar_lista_espera", "exportar_excel", "descargar_documentacion"]
     inlines        = [ObservacionFormacionInline]
     list_select_related = ("user", "convocatoria", "persona_humana", "persona_juridica")
     fieldsets = (
@@ -73,11 +73,30 @@ class InscripcionFormacionAdmin(admin.ModelAdmin):
         ("Registro Audiovisual", {"fields": ("persona_humana", "persona_juridica")}),
         ("Contacto",             {"fields": ("nombre", "apellido", "dni", "email", "telefono", "localidad", "otra_localidad")}),
         ("Perfil",               {"fields": ("vinculo_sector", "declaracion_jurada")}),
+        ("Documentación",        {"fields": ("documentacion", "documentacion_descarga")}),
     )
 
     def usuario(self, obj):
         return obj.user.username
     usuario.short_description = "Usuario"
+
+    def documentacion_link(self, obj):
+        from django.utils.html import format_html
+        if obj.documentacion:
+            return format_html('<a href="{}" download>⬇ Descargar</a>', obj.documentacion.url)
+        return "—"
+    documentacion_link.short_description = "Documentación"
+
+    def documentacion_descarga(self, obj):
+        from django.utils.html import format_html
+        if obj.documentacion:
+            nombre = obj.documentacion.name.rsplit("/", 1)[-1]
+            return format_html(
+                '<a href="{0}" target="_blank">Ver</a> · <a href="{0}" download>Descargar</a> ({1})',
+                obj.documentacion.url, nombre,
+            )
+        return "No se subió documentación."
+    documentacion_descarga.short_description = "Ver / descargar"
 
     def contacto_email(self, obj):
         return obj.user.email or obj.email or "—"
@@ -195,6 +214,65 @@ class InscripcionFormacionAdmin(admin.ModelAdmin):
         wb.save(response)
         return response
     exportar_excel.short_description = "📤 Exportar seleccionadas a Excel (.xlsx)"
+
+    @admin.action(description="📦 Descargar documentación seleccionada (ZIP)")
+    def descargar_documentacion(self, request, queryset):
+        import zipfile
+        from io import BytesIO
+        from django.utils.text import slugify as _slugify
+
+        qs = queryset.select_related("user", "convocatoria").exclude(documentacion="")
+        sin_doc = queryset.count() - qs.count()
+
+        if not qs.exists():
+            self.message_user(
+                request,
+                "Ninguna de las inscripciones seleccionadas tiene documentación subida.",
+                messages.WARNING,
+            )
+            return
+
+        buffer = BytesIO()
+        incluidos = 0
+        faltantes = 0
+        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+            for ins in qs:
+                nombre_archivo = ins.documentacion.name.rsplit("/", 1)[-1]
+                prefijo = _slugify(f"{ins.apellido or ''} {ins.nombre or ''}".strip()) or ins.user.username
+                arcname = f"{prefijo}-{ins.pk}_{nombre_archivo}"
+                try:
+                    with ins.documentacion.open("rb") as f:
+                        zf.writestr(arcname, f.read())
+                    incluidos += 1
+                except FileNotFoundError:
+                    faltantes += 1
+
+        if not incluidos:
+            self.message_user(
+                request,
+                "No se pudo leer ningún archivo (no se encuentran en el servidor).",
+                messages.ERROR,
+            )
+            return
+
+        avisos = []
+        if sin_doc:
+            avisos.append(f"{sin_doc} inscripción/es sin documentación")
+        if faltantes:
+            avisos.append(f"{faltantes} archivo/s no encontrados en el servidor")
+        if avisos:
+            self.message_user(
+                request,
+                f"Se omitieron: {', '.join(avisos)}.",
+                messages.WARNING,
+            )
+
+        convocatorias = qs.values_list("convocatoria__slug", flat=True).distinct()
+        sufijo = convocatorias[0] if len(convocatorias) == 1 else "formacion"
+
+        response = HttpResponse(buffer.getvalue(), content_type="application/zip")
+        response["Content-Disposition"] = f'attachment; filename="documentacion_{sufijo}.zip"'
+        return response
 
 
 # ==========================================

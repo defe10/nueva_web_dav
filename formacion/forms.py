@@ -167,6 +167,13 @@ class InscripcionFormacionForm(forms.ModelForm):
                 self.fields[field_name].required = False
                 self.fields[field_name].widget = forms.HiddenInput()
 
+        # si la convocatoria pide documentación, es obligatoria para inscribirse
+        if config and config.mostrar_documentacion:
+            self.fields["documentacion"].required = True
+            self.fields["documentacion"].error_messages["required"] = (
+                "Debés subir la documentación requerida para inscribirte."
+            )
+
     def clean(self):
         cleaned = super().clean()
 
