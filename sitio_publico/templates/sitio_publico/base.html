@@ -195,6 +195,7 @@
         <!-- ===================== -->
         <!-- MENSAJES (Django messages) -->
         <!-- ===================== -->
+        <div id="mensajes-globales">
         {% if messages %}
           <div class="mb-3">
             {% for message in messages %}
@@ -211,6 +212,7 @@
             {% endfor %}
           </div>
         {% endif %}
+        </div>
 
         {% block content %}{% endblock %}
 
