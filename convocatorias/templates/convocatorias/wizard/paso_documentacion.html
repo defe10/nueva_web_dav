@@ -46,7 +46,7 @@
           <input type="hidden" name="tipo" value="{{ tipo }}">
           <input type="file" id="archivo-{{ tipo }}" name="archivo"
                  accept=".pdf,.jpg,.jpeg,.png,.xls,.xlsx" style="display:none"
-                 onchange="document.getElementById('form-doc-{{ tipo }}').submit()">
+                 onchange="document.getElementById('form-doc-{{ tipo }}').requestSubmit()">
           <button type="button" class="btn btn-sm btn-outline-primary mt-1"
                   onclick="document.getElementById('archivo-{{ tipo }}').click()">
             Subir archivo

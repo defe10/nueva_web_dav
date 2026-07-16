@@ -30,13 +30,15 @@
 
     <!-- COLUMNA PRINCIPAL -->
     <div class="col-lg-8">
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
+      <div id="wizard-main">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
 
-      {% block wizard_content %}{% endblock %}
+        {% block wizard_content %}{% endblock %}
+      </div>
     </div>
 
     <!-- SIDEBAR -->
@@ -88,4 +90,65 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const main = document.getElementById("wizard-main");
+  if (!main) return;
+
+  // Sube documentos sin recargar la página (evita el salto de scroll).
+  // Requiere que los inputs de archivo usen requestSubmit(), que sí
+  // dispara este evento (submit() programático no lo hace).
+  document.addEventListener("submit", async (e) => {
+    const form = e.target;
+    if (!main.contains(form)) return;
+    if (form.enctype !== "multipart/form-data") return;
+
+    const fileInput = form.querySelector('input[type="file"]');
+    if (!fileInput || !fileInput.files.length) return;
+
+    e.preventDefault();
+
+    const boton = form.querySelector("button");
+    const textoOriginal = boton ? boton.textContent : "";
+    if (boton) {
+      boton.disabled = true;
+      boton.textContent = "Subiendo…";
+    }
+
+    try {
+      const res = await fetch(form.action || window.location.href, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { "X-Requested-With": "fetch" },
+      });
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const nuevo = doc.getElementById("wizard-main");
+
+      if (!nuevo) {
+        // Respuesta inesperada: navegamos normal
+        window.location.href = res.url;
+        return;
+      }
+
+      main.innerHTML = nuevo.innerHTML;
+
+      // Actualiza también los mensajes de Django (éxito/error)
+      const msjs = document.getElementById("mensajes-globales");
+      const nuevosMsjs = doc.getElementById("mensajes-globales");
+      if (msjs && nuevosMsjs) msjs.innerHTML = nuevosMsjs.innerHTML;
+    } catch (err) {
+      // Si falla el fetch, comportamiento clásico con recarga
+      if (boton) {
+        boton.disabled = false;
+        boton.textContent = textoOriginal;
+      }
+      form.submit();
+    }
+  });
+});
+</script>
 {% endblock %}

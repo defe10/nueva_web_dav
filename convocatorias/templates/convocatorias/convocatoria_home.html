@@ -43,11 +43,11 @@
           {% for c in vigentes %}
             {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
               <div class="col-md-6 col-lg-4">
-                <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="convocatoria-card-mubi">
+                <a href="{{ c.detalle_url }}" class="convocatoria-card-mubi">
                   {% if c.imagen %}<img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
                   {% else %}<div class="convocatoria-placeholder"></div>{% endif %}
                   <div class="overlay">
-                    <span class="categoria">{{ c.get_categoria_display }}</span>
+                    <span class="categoria">{{ c.categoria_display }}</span>
                     <h5 class="titulo">{{ c.titulo }}</h5>
                     <p class="fecha">Abierta hasta {{ c.fecha_fin|date:"d/m/Y" }}</p>
                   </div>
@@ -71,11 +71,11 @@
             {% for c in cerradas %}
               {% if not request.GET.categoria or request.GET.categoria == c.categoria %}
                 <div class="col-md-6 col-lg-4">
-                  <a href="{% url 'convocatorias:convocatoria_detalle' c.slug %}" class="convocatoria-card-mubi">
+                  <a href="{{ c.detalle_url }}" class="convocatoria-card-mubi">
                     {% if c.imagen %}<img src="{{ c.imagen.url }}" alt="{{ c.titulo }}">
                     {% else %}<div class="convocatoria-placeholder"></div>{% endif %}
                     <div class="overlay">
-                      <span class="categoria">{{ c.get_categoria_display }}</span>
+                      <span class="categoria">{{ c.categoria_display }}</span>
                       <span class="badge bg-secondary ms-2" style="vertical-align:middle;">Cerrada</span>
                       <h5 class="titulo">{{ c.titulo }}</h5>
                       <p class="fecha">Cerró el {{ c.fecha_fin|date:"d/m/Y" }}</p>

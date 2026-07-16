@@ -10,8 +10,11 @@ from openpyxl.utils import get_column_letter
 from django.conf import settings
 from django.contrib import messages
 from django.core.mail import EmailMultiAlternatives
+from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.utils import timezone
+
+from . import depuracion
 
 import io
 import os
@@ -76,6 +79,8 @@ class ConvocatoriaAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("titulo",)}
     ordering = ("orden", "-fecha_inicio")
 
+    actions = ["depurar_documentacion_action"]
+
     def url_destino_admin(self, obj):
         if not obj.url_destino:
             return "—"
@@ -85,6 +90,56 @@ class ConvocatoriaAdmin(admin.ModelAdmin):
         )
     url_destino_admin.short_description = "URL destino"
 
+    # ==================================================
+    # DEPURACIÓN DE DOCUMENTACIÓN (solo superusuarios)
+    # ==================================================
+    def get_actions(self, request):
+        acciones = super().get_actions(request)
+        if not request.user.is_superuser:
+            acciones.pop("depurar_documentacion_action", None)
+        return acciones
+
+    @admin.action(description="Depurar documentación presentada (borrar archivos)")
+    def depurar_documentacion_action(self, request, queryset):
+        hoy = timezone.localdate()
+        cerradas = queryset.filter(fecha_fin__lt=hoy)
+        abiertas = queryset.exclude(fecha_fin__lt=hoy)
+
+        # Paso 2: el superusuario ya confirmó en la pantalla intermedia
+        if request.POST.get("confirmar_depuracion"):
+            incluir = request.POST.get("incluir_ganadores") == "1"
+            qs = depuracion.postulaciones_depurables(
+                convocatorias=cerradas, incluir_ganadores=incluir,
+            )
+            resultado = depuracion.ejecutar(qs)
+            alcance = "incluyendo ganadoras" if incluir else "ganadoras protegidas"
+            messages.success(
+                request,
+                f"Depuración completada ({alcance}): {resultado['total_docs']} documentos "
+                f"borrados, {depuracion.mb(resultado['total_bytes'])} liberados. "
+                f"{resultado['marcadas']} postulaciones marcadas como depuradas. "
+                "Los datos de las postulaciones se conservan."
+            )
+            return None
+
+        # Paso 1: pantalla de confirmación con el resumen (nada se borra acá)
+        sin_ganadoras = depuracion.postulaciones_depurables(convocatorias=cerradas)
+        protegidas = depuracion.ganadoras_protegidas(convocatorias=cerradas)
+        resumen = depuracion.resumen(sin_ganadoras)
+        resumen_ganadoras = depuracion.resumen(protegidas)
+
+        return render(request, "admin/convocatorias/depurar_confirmacion.html", {
+            **self.admin_site.each_context(request),
+            "title": "Confirmar depuración de documentación",
+            "convocatorias_cerradas": cerradas,
+            "convocatorias_abiertas": abiertas,
+            "resumen": resumen,
+            "resumen_mb": depuracion.mb(resumen["total_bytes"]),
+            "resumen_ganadoras": resumen_ganadoras,
+            "resumen_ganadoras_mb": depuracion.mb(resumen_ganadoras["total_bytes"]),
+            "protegidas": protegidas.count(),
+        })
+
 
 # ============================================================
 # INTEGRANTES DEL EQUIPO (inline en Postulación)
@@ -92,9 +147,14 @@ class ConvocatoriaAdmin(admin.ModelAdmin):
 class DocumentoIntegranteInline(admin.TabularInline):
     model = DocumentoIntegrante
     extra = 0
-    can_delete = False
+    # Borrado individual de archivos: solo superusuarios (la señal
+    # post_delete elimina también el archivo físico).
+    can_delete = True
     fields = ("tipo", "estado", "archivo", "fecha_subida")
     readonly_fields = ("archivo", "fecha_subida")
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 
 class IntegrantePostulacionInline(admin.StackedInline):
@@ -132,12 +192,17 @@ class IntegrantePostulacionInline(admin.StackedInline):
 class PostulacionDocumentoInline(admin.TabularInline):
     model = DocumentoPostulacion
     extra = 0
-    can_delete = False
+    # Borrado individual de archivos: solo superusuarios (la señal
+    # post_delete elimina también el archivo físico).
+    can_delete = True
     verbose_name = "Documento del proyecto"
     verbose_name_plural = "Documentación del proyecto"
     fields = ("tipo", "estado", "archivo", "fecha_subida")
     readonly_fields = ("archivo", "fecha_subida")
     ordering = ("tipo",)
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 
 
@@ -200,6 +265,7 @@ class PostulacionAdmin(admin.ModelAdmin):
         "edad",
         "genero_persona",
         "lugar_residencia",
+        "documentacion_depurada",
     )
 
     inlines = [IntegrantePostulacionInline, PostulacionDocumentoInline]
@@ -217,6 +283,7 @@ class PostulacionAdmin(admin.ModelAdmin):
                     "genero_persona",
                     "lugar_residencia",
                     "convocatoria",
+                    "documentacion_depurada",
                 )
             }),
         )
@@ -230,6 +297,7 @@ class PostulacionAdmin(admin.ModelAdmin):
                         "tipo_proyecto",
                         "genero",
                         "estado",
+                        "monto_otorgado",
                     )
                 }),
             )
@@ -238,7 +306,7 @@ class PostulacionAdmin(admin.ModelAdmin):
         if obj.convocatoria and obj.convocatoria.linea == "libre":
             return base + (
                 ("Estado", {
-                    "fields": ("estado",),
+                    "fields": ("estado", "monto_otorgado"),
                     "description": "Línea libre: no requiere datos del proyecto. Se gestiona por documentación."
                 }),
             )
@@ -251,6 +319,7 @@ class PostulacionAdmin(admin.ModelAdmin):
                     "tipo_proyecto",
                     "genero",
                     "estado",
+                    "monto_otorgado",
                 )
             }),
         )
@@ -574,8 +643,9 @@ class PostulacionAdmin(admin.ModelAdmin):
     descargar_documentacion_zip.short_description = "📦 Descargar documentación (ZIP)"
 
     def _agregar_archivo_zip(self, zf, file_field, carpeta, nombre):
+        """Agrega el archivo al ZIP. Devuelve True si se pudo agregar."""
         if not file_field:
-            return
+            return False
         try:
             path = getattr(file_field, "path", None)
             if path and os.path.exists(path):
@@ -586,8 +656,9 @@ class PostulacionAdmin(admin.ModelAdmin):
                         f"{carpeta}/{nombre}{os.path.splitext(file_field.name)[1]}",
                         f.read()
                     )
+            return True
         except Exception:
-            pass
+            return False
 
     def _safe_slug(self, p):
         base = p.nombre_proyecto or f"postulacion_{p.id}"
@@ -619,22 +690,41 @@ class PostulacionAdmin(admin.ModelAdmin):
             f"Usuario: {p.user.username}\n"
             f"Convocatoria: {p.convocatoria.titulo if p.convocatoria else ''}\n"
         )
+        faltantes = []
         for doc in p.documentos.all():
-            self._agregar_archivo_zip(
+            # id incluido para que documentos del mismo tipo no se pisen en el ZIP
+            agregado = self._agregar_archivo_zip(
                 zf,
                 doc.archivo,
                 "documentacion",
-                slugify(doc.get_tipo_display())
+                slugify(f"{doc.get_tipo_display()}-{doc.id}")
             )
+            if not agregado:
+                faltantes.append(
+                    f"- {doc.get_tipo_display()} (id {doc.id}): "
+                    f"{doc.archivo.name if doc.archivo else 'sin archivo'}"
+                )
         for integrante in p.integrantes.all():
             carpeta = f"equipo/{integrante.rol.lower()}_{slugify(integrante.nombre_busqueda or str(integrante.id))}"
             for doc in integrante.documentos.all():
-                self._agregar_archivo_zip(
+                agregado = self._agregar_archivo_zip(
                     zf,
                     doc.archivo,
                     carpeta,
-                    slugify(doc.get_tipo_display()),
+                    slugify(f"{doc.get_tipo_display()}-{doc.id}"),
                 )
+                if not agregado:
+                    faltantes.append(
+                        f"- {carpeta} · {doc.get_tipo_display()} (id {doc.id}): "
+                        f"{doc.archivo.name if doc.archivo else 'sin archivo'}"
+                    )
+        if faltantes:
+            zf.writestr(
+                "FALTANTES.txt",
+                "Documentos que NO se pudieron incluir en este ZIP:\n"
+                + "\n".join(faltantes)
+                + "\n"
+            )
 
     # ==================================================
     # EXPORTAR EXCEL
@@ -983,24 +1073,30 @@ class RendicionAdmin(admin.ModelAdmin):
             "fields": ("planilla_xlsx", "link_documentacion", "observaciones_usuario"),
         }),
         ("Impacto económico", {
-            "description": "Montos totales por categoría extraídos de la planilla de rendición.",
+            "description": "Montos totales y cantidades por categoría extraídos de la planilla de rendición.",
             "fields": (
-                "honorarios_tecnicos",
-                "honorarios_elenco",
-                "otros_honorarios",
-                "insumos",
-                "servicios_audiovisuales",
-                "servicios_logistica",
+                ("honorarios_tecnicos",     "honorarios_tecnicos_cantidad"),
+                ("honorarios_elenco",       "honorarios_elenco_cantidad"),
+                ("otros_honorarios",        "otros_honorarios_cantidad"),
+                ("insumos",                 "insumos_cantidad"),
+                ("servicios_audiovisuales", "servicios_audiovisuales_cantidad"),
+                ("servicios_logistica",     "servicios_logistica_cantidad"),
             ),
         }),
         ("Revisión administrativa", {
-            "fields": ("observaciones_admin", "fecha_ultima_revision"),
+            "fields": ("observaciones_admin", "fecha_ultima_revision", "fecha_aprobacion"),
         }),
         ("Estado físico", {
             "classes": ("collapse",),
             "fields": ("fisico_estado", "fisico_fecha_recepcion", "fisico_observaciones"),
         }),
     )
+
+    def save_model(self, request, obj, form, change):
+        if obj.estado == "APROBADO" and not obj.fecha_aprobacion:
+            obj.fecha_aprobacion = timezone.now().date()
+            obj.add_event("admin", "APROBADO", f"Aprobada por {request.user.username}")
+        super().save_model(request, obj, form, change)
 
 
 

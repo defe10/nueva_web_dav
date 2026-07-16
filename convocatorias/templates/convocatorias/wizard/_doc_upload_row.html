@@ -16,7 +16,7 @@
     <input type="hidden" name="tipo" value="{{ tipo }}">
     <input type="file" id="archivo-{{ form_id }}" name="archivo"
            accept="{{ accept|default:'.pdf,.jpg,.jpeg,.png' }}" style="display:none"
-           onchange="document.getElementById('{{ form_id }}').submit()">
+           onchange="document.getElementById('{{ form_id }}').requestSubmit()">
     <button type="button" class="btn btn-sm btn-outline-primary"
             onclick="document.getElementById('archivo-{{ form_id }}').click()">
       {% if doc %}Reemplazar{% else %}Subir{% endif %} {{ label }}

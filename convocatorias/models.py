@@ -217,6 +217,22 @@ class Postulacion(models.Model):
     )
 
     declaracion_jurada = models.BooleanField(default=False)
+
+    # Monto asignado al proyecto al ser seleccionado. Lo carga el staff;
+    # permite comparar otorgado vs. rendido vs. aprobado en estadísticas.
+    monto_otorgado = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True,
+        verbose_name="Monto otorgado ($)",
+        help_text="Cargar cuando el proyecto resulta seleccionado.",
+    )
+
+    # Fecha en que se eliminó la documentación presentada (comando
+    # depurar_documentacion). Los datos de la postulación se conservan.
+    documentacion_depurada = models.DateTimeField(
+        null=True, blank=True,
+        verbose_name="Documentación depurada el",
+    )
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)  # NUEVO
 
     # ✅ ESTA es la fecha real de “clic final”
@@ -647,6 +663,14 @@ class Rendicion(models.Model):
     servicios_audiovisuales  = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Servicios audiovisuales")
     servicios_logistica      = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Servicios / logística")
 
+    # Impacto económico — cantidades por categoría (personas / servicios / ítems)
+    honorarios_tecnicos_cantidad     = models.PositiveIntegerField(default=0, verbose_name="Cantidad — honorarios técnicos")
+    honorarios_elenco_cantidad       = models.PositiveIntegerField(default=0, verbose_name="Cantidad — honorarios elenco")
+    otros_honorarios_cantidad        = models.PositiveIntegerField(default=0, verbose_name="Cantidad — otros honorarios")
+    insumos_cantidad                 = models.PositiveIntegerField(default=0, verbose_name="Cantidad — insumos")
+    servicios_audiovisuales_cantidad = models.PositiveIntegerField(default=0, verbose_name="Cantidad — servicios audiovisuales")
+    servicios_logistica_cantidad     = models.PositiveIntegerField(default=0, verbose_name="Cantidad — servicios / logística")
+
     estado = models.CharField(max_length=20, choices=ESTADOS, default="BORRADOR")
 
     # Físico (paralelo)
@@ -659,6 +683,9 @@ class Rendicion(models.Model):
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     fecha_envio = models.DateTimeField(null=True, blank=True)
     fecha_ultima_revision = models.DateTimeField(null=True, blank=True)
+    # Fecha en que la rendición pasó a APROBADO: es la referencia temporal
+    # del impacto económico (no el año de envío de la postulación)
+    fecha_aprobacion = models.DateField(null=True, blank=True)
 
     # Bitácora liviana
     historial = models.JSONField(default=list, blank=True)

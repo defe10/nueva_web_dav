@@ -85,7 +85,7 @@
         <input type="hidden" name="tipo" value="DNI">
         <input type="file" id="archivo-dni-{{ rol }}" name="archivo"
                accept=".pdf,.jpg,.jpeg,.png" style="display:none"
-               onchange="document.getElementById('form-dni-{{ rol }}').submit()">
+               onchange="document.getElementById('form-dni-{{ rol }}').requestSubmit()">
         <button type="button" class="btn btn-sm btn-outline-primary"
                 onclick="document.getElementById('archivo-dni-{{ rol }}').click()">
           {% if docs_dni %}Reemplazar DNI{% else %}Subir DNI{% endif %}
@@ -107,7 +107,7 @@
         <input type="hidden" name="tipo" value="CONSTANCIA_ARCA">
         <input type="file" id="archivo-arca-{{ rol }}" name="archivo"
                accept=".pdf,.jpg,.jpeg,.png" style="display:none"
-               onchange="document.getElementById('form-arca-{{ rol }}').submit()">
+               onchange="document.getElementById('form-arca-{{ rol }}').requestSubmit()">
         <button type="button" class="btn btn-sm btn-outline-primary"
                 onclick="document.getElementById('archivo-arca-{{ rol }}').click()">
           {% if docs_arca %}Reemplazar constancia ARCA{% else %}Subir constancia ARCA{% endif %}
@@ -129,7 +129,7 @@
         <input type="hidden" name="tipo" value="CV_BIOFILMOGRAFIA">
         <input type="file" id="archivo-cv-{{ rol }}" name="archivo"
                accept=".pdf,.doc,.docx" style="display:none"
-               onchange="document.getElementById('form-cv-{{ rol }}').submit()">
+               onchange="document.getElementById('form-cv-{{ rol }}').requestSubmit()">
         <button type="button" class="btn btn-sm btn-outline-primary"
                 onclick="document.getElementById('archivo-cv-{{ rol }}').click()">
           {% if docs_cv %}Reemplazar CV{% else %}Subir CV{% endif %}

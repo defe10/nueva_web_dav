@@ -23,6 +23,22 @@
 
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
+          <input type="hidden" name="stash_token" value="{{ stash_token }}">
+
+          {% if form.errors or config_form.errors or jurado_formset.total_error_count or criterio_formset.total_error_count %}
+          <div class="alert alert-danger">
+            <strong>No se pudo crear la convocatoria.</strong> Revisá los campos marcados en rojo.
+            {{ form.non_field_errors }}
+            {{ config_form.non_field_errors }}
+            {% if archivos_conservados %}
+            <hr class="my-2">
+            <span class="d-block small">
+              ✔ Los archivos ya adjuntados se conservaron y no hace falta volver a subirlos:
+              <strong>{{ archivos_conservados|join:", " }}</strong>
+            </span>
+            {% endif %}
+          </div>
+          {% endif %}
 
           <!-- STEPPER DE PROGRESO -->
           <div class="d-flex align-items-center mb-4 gap-0" id="tab-stepper">
@@ -72,20 +88,20 @@
 
                 <div class="col-md-3">
                   <label class="form-label">Orden en el carrusel</label>
-                  {{ form.orden }}
+                  {{ form.orden }}{{ form.orden.errors }}
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Categoría</label>
-                  {{ form.categoria }}
+                  {{ form.categoria }}{{ form.categoria.errors }}
                 </div>
                 <div class="col-md-5">
                   <label class="form-label">Línea</label>
-                  {{ form.linea }}
+                  {{ form.linea }}{{ form.linea.errors }}
                 </div>
 
                 <div class="col-12">
                   <label class="form-label">Título</label>
-                  {{ form.titulo }}
+                  {{ form.titulo }}{{ form.titulo.errors }}
                 </div>
 
                 <div class="col-12">
@@ -113,16 +129,16 @@
 
                 <div class="col-md-6">
                   <label class="form-label">Bases y condiciones (PDF)</label>
-                  {{ form.bases_pdf }}
+                  {{ form.bases_pdf }}{{ form.bases_pdf.errors }}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Planilla oficial (.xlsx)</label>
-                  {{ config_form.planilla_archivo }}
+                  {{ config_form.planilla_archivo }}{{ config_form.planilla_archivo.errors }}
                   <small class="text-muted d-block mt-1">El presentante la descarga desde el detalle de la convocatoria.</small>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Imagen (JPG/PNG)</label>
-                  {{ form.imagen }}
+                  {{ form.imagen }}{{ form.imagen.errors }}
                   <div id="imagen-preview-wrap" class="mt-2 d-none">
                     <img id="imagen-preview" src="#" alt="Vista previa"
                          class="img-thumbnail" style="max-height:160px; object-fit:cover;">
@@ -141,11 +157,11 @@
 
                 <div class="col-md-6">
                   <label class="form-label">Fecha de inicio</label>
-                  {{ form.fecha_inicio }}
+                  {{ form.fecha_inicio }}{{ form.fecha_inicio.errors }}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Fecha de cierre</label>
-                  {{ form.fecha_fin }}
+                  {{ form.fecha_fin }}{{ form.fecha_fin.errors }}
                 </div>
 
               </div>
@@ -160,7 +176,7 @@
                   <h6 class="fw-semibold mb-2">Tipo de postulante</h6>
                   <div style="max-width:380px">
                     <label class="form-label small text-muted">{{ config_form.tipo_postulante.label }}</label>
-                    {{ config_form.tipo_postulante }}
+                    {{ config_form.tipo_postulante }}{{ config_form.tipo_postulante.errors }}
                   </div>
                 </div>
 
@@ -255,15 +271,15 @@
                   <div class="row g-2 align-items-start">
                     <div class="col-md-5">
                       <label class="form-label small fw-semibold">Nombre</label>
-                      {{ jform.nombre }}
+                      {{ jform.nombre }}{{ jform.nombre.errors }}
                     </div>
                     <div class="col-md-1">
                       <label class="form-label small fw-semibold">Orden</label>
-                      {{ jform.orden }}
+                      {{ jform.orden }}{{ jform.orden.errors }}
                     </div>
                     <div class="col-md-6">
                       <label class="form-label small fw-semibold">Foto (opcional)</label>
-                      {{ jform.foto }}
+                      {{ jform.foto }}{{ jform.foto.errors }}
                     </div>
                     <div class="col-12">
                       <label class="form-label small fw-semibold">Bio (opcional)</label>
@@ -307,15 +323,15 @@
                   <div class="row g-2 align-items-end">
                     <div class="col-md-7">
                       <label class="form-label small fw-semibold">Nombre del criterio</label>
-                      {{ cform.nombre }}
+                      {{ cform.nombre }}{{ cform.nombre.errors }}
                     </div>
                     <div class="col-md-2">
                       <label class="form-label small fw-semibold">Puntaje máx.</label>
-                      {{ cform.puntaje_maximo }}
+                      {{ cform.puntaje_maximo }}{{ cform.puntaje_maximo.errors }}
                     </div>
                     <div class="col-md-1">
                       <label class="form-label small fw-semibold">Orden</label>
-                      {{ cform.orden }}
+                      {{ cform.orden }}{{ cform.orden.errors }}
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
                       {% if cform.DELETE %}
@@ -389,6 +405,11 @@
   display: none;
 }
 .stepper-step.has-error .stepper-num .err-badge { display: block; }
+/* errores de validación de Django */
+.errorlist {
+  list-style: none; padding-left: 0; margin: 4px 0 0;
+  color: #dc3545; font-size: .85rem;
+}
 </style>
 
 <script>
@@ -446,6 +467,18 @@
     }
   });
   if (firstErrorTab) activateTab(firstErrorTab);
+
+  // ── Validación nativa en tabs ocultos ──
+  // Si el navegador bloquea el envío por un campo requerido que está en un
+  // tab no visible, el aviso nativo no puede mostrarse y el submit queda
+  // "muerto". Capturamos el evento invalid y activamos el tab del campo.
+  document.querySelector('form[enctype]').addEventListener('invalid', function (e) {
+    const pane = e.target.closest('.tab-pane');
+    if (pane && !pane.classList.contains('active')) {
+      activateTab(pane.id.replace('pane-', 'tab-'));
+      setTimeout(() => e.target.reportValidity(), 150);
+    }
+  }, true);
 
   // ── Preview de imagen ──
   const imagenInput   = document.getElementById('{{ form.imagen.id_for_label }}');

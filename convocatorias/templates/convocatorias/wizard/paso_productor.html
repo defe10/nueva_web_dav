@@ -78,7 +78,7 @@
                onchange="
                  var cbuInput = document.querySelector('#form-cbu [name=cbu]');
                  if (cbuInput) document.getElementById('cbu-doc-hidden').value = cbuInput.value;
-                 document.getElementById('form-cbu-doc').submit();
+                 document.getElementById('form-cbu-doc').requestSubmit();
                ">
         <button type="button" class="btn btn-sm btn-outline-primary"
                 onclick="document.getElementById('archivo-cbu-doc').click()">

@@ -69,20 +69,27 @@
           <!-- ── 2. Impacto económico ─────────────────────── -->
           <h5 class="fw-bold mb-3">2. Impacto económico</h5>
           <p class="text-muted small mb-3">
-            Completá los montos totales por categoría a partir de tu planilla.
+            Completá los montos totales y las cantidades (personas, servicios o ítems) por categoría a partir de tu planilla.
           </p>
 
           <div class="row g-3 mb-4">
             {% for campo, label in campos_impacto %}
             <div class="col-12 col-md-6">
               <label class="form-label fw-semibold small">{{ label }}</label>
+              {% with campo_cantidad=campo|add:"_cantidad" %}
               <div class="input-group">
                 <span class="input-group-text">$</span>
                 <input type="number" name="{{ campo }}" min="0" step="0.01"
                        class="form-control"
                        value="{{ rendicion|get_attr:campo|default:0 }}"
                        placeholder="0">
+                <span class="input-group-text">Cant.</span>
+                <input type="number" name="{{ campo_cantidad }}" min="0" step="1"
+                       class="form-control" style="max-width:90px"
+                       value="{{ rendicion|get_attr:campo_cantidad|default:0 }}"
+                       placeholder="0">
               </div>
+              {% endwith %}
             </div>
             {% endfor %}
           </div>

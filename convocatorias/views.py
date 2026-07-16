@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -19,6 +21,7 @@ from convocatorias.models import (
     IntegrantePostulacion,
     Rendicion,
 )
+from formacion.models import ConvocatoriaFormacion
 
 from .forms import (
     PostulacionForm,
@@ -114,18 +117,37 @@ def convocatorias_home(request):
 
     qs = Convocatoria.objects.all().order_by("orden", "-fecha_inicio")
 
-    def separar_por_linea(linea):
-        base = qs.filter(linea=linea)
+    def anotar(convocatorias):
+        lista = list(convocatorias)
+        for c in lista:
+            c.detalle_url = reverse("convocatorias:convocatoria_detalle", args=[c.slug])
+            c.categoria_display = c.get_categoria_display()
+        return lista
 
-        vigentes = base.filter(fecha_inicio__lte=hoy, fecha_fin__gte=hoy)
+    def anotar_formacion(convocatorias):
+        # las convocatorias de formación viven en otro modelo:
+        # se listan como "Curso / Capacitación"
+        lista = list(convocatorias)
+        for f in lista:
+            f.detalle_url = reverse("formacion:detalle", args=[f.slug])
+            f.categoria = "CURSO"
+            f.categoria_display = "Curso / Capacitación"
+        return lista
 
-        # solo las que ya terminaron
-        cerradas = base.filter(fecha_fin__lt=hoy)
+    def ordenar(lista):
+        lista.sort(key=lambda c: (c.orden, -c.fecha_inicio.toordinal()))
+        return lista
 
-        return vigentes, cerradas
+    qs_formacion = ConvocatoriaFormacion.objects.all()
 
-    vigentes = qs.filter(fecha_inicio__lte=hoy, fecha_fin__gte=hoy)
-    cerradas = qs.filter(fecha_fin__lt=hoy)
+    vigentes = ordenar(
+        anotar(qs.filter(fecha_inicio__lte=hoy, fecha_fin__gte=hoy))
+        + anotar_formacion(qs_formacion.filter(fecha_inicio__lte=hoy, fecha_fin__gte=hoy))
+    )
+    cerradas = ordenar(
+        anotar(qs.filter(fecha_fin__lt=hoy))
+        + anotar_formacion(qs_formacion.filter(fecha_fin__lt=hoy))
+    )
 
     return render(
         request,
@@ -256,9 +278,105 @@ def postulacion_confirmada(request, postulacion_id):
 # ============================================================
 # CREAR CONVOCATORIA (ADMIN)
 # ============================================================
+
+# Cuando la validación falla, el navegador vacía los <input type="file">.
+# Para que el admin no pierda los archivos ya adjuntados (bases, planilla,
+# imagen, fotos de jurado), los guardamos en un directorio temporal y los
+# reinyectamos en el siguiente intento si no vuelve a subirlos.
+# El stash se ata a un token oculto del formulario: así un GET paralelo
+# (otra pestaña, prefetch, botón atrás) no interfiere con un reintento.
+_CONV_STASH_KEY = "crear_convocatoria_files"
+_CONV_STASH_MAX_EDAD = 3 * 60 * 60  # segundos; intentos más viejos se descartan
+
+
+def _conv_stash_storage():
+    from django.conf import settings
+    from django.core.files.storage import FileSystemStorage
+    return FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "tmp_uploads"))
+
+
+def _conv_stash_purgar_vencidos(request):
+    """Elimina intentos viejos para que no queden archivos huérfanos."""
+    import time
+    storage = _conv_stash_storage()
+    stashes = request.session.get(_CONV_STASH_KEY, {})
+    vigentes = {}
+    for token, entrada in stashes.items():
+        if time.time() - entrada.get("ts", 0) < _CONV_STASH_MAX_EDAD:
+            vigentes[token] = entrada
+        else:
+            for info in entrada.get("files", {}).values():
+                if storage.exists(info["path"]):
+                    storage.delete(info["path"])
+    if vigentes != stashes:
+        request.session[_CONV_STASH_KEY] = vigentes
+
+
+def _conv_stash_guardar(request, token, campos_con_error):
+    """Guarda los archivos subidos (salvo los rechazados) para el próximo intento."""
+    import time
+    storage = _conv_stash_storage()
+    stashes = request.session.get(_CONV_STASH_KEY, {})
+    entrada = stashes.get(token, {"files": {}})
+    entrada["ts"] = time.time()
+    for campo, archivo in request.FILES.items():
+        if campo in campos_con_error:
+            continue
+        viejo = entrada["files"].get(campo)
+        if viejo and storage.exists(viejo["path"]):
+            storage.delete(viejo["path"])
+        archivo.seek(0)
+        path = storage.save(archivo.name, archivo)
+        entrada["files"][campo] = {
+            "path": path,
+            "name": archivo.name,
+            "content_type": archivo.content_type,
+            "size": archivo.size,
+        }
+    stashes[token] = entrada
+    request.session[_CONV_STASH_KEY] = stashes
+    return [info["name"] for info in entrada["files"].values()]
+
+
+def _conv_stash_restaurar(request, token):
+    """Reinyecta en request.FILES los archivos guardados que no se volvieron a subir."""
+    from django.core.files.uploadedfile import UploadedFile
+    storage = _conv_stash_storage()
+    entrada = request.session.get(_CONV_STASH_KEY, {}).get(token)
+    if not entrada:
+        return []
+    restaurados = []
+    for campo, info in entrada["files"].items():
+        if campo not in request.FILES and storage.exists(info["path"]):
+            request.FILES[campo] = UploadedFile(
+                file=storage.open(info["path"], "rb"),
+                name=info["name"],
+                content_type=info.get("content_type"),
+                size=info.get("size"),
+            )
+            restaurados.append(info["name"])
+    return restaurados
+
+
+def _conv_stash_limpiar(request, token):
+    storage = _conv_stash_storage()
+    stashes = request.session.get(_CONV_STASH_KEY, {})
+    entrada = stashes.pop(token, None)
+    if entrada:
+        for info in entrada["files"].values():
+            if storage.exists(info["path"]):
+                storage.delete(info["path"])
+        request.session[_CONV_STASH_KEY] = stashes
+
+
 @staff_member_required
 def crear_convocatoria(request):
+    import uuid
+    _conv_stash_purgar_vencidos(request)
+    archivos_conservados = []
     if request.method == "POST":
+        stash_token = request.POST.get("stash_token") or uuid.uuid4().hex
+        _conv_stash_restaurar(request, stash_token)
         form = ConvocatoriaForm(request.POST, request.FILES)
         config_form = ConfiguracionPostulacionForm(request.POST, request.FILES)
         jurado_formset = MiembroJuradoFormSet(request.POST, request.FILES)
@@ -272,8 +390,17 @@ def crear_convocatoria(request):
             jurado_formset.save()
             criterio_formset.instance = convocatoria
             criterio_formset.save()
+            _conv_stash_limpiar(request, stash_token)
             return redirect("convocatorias:convocatorias_home")
+
+        # Validación fallida: conservar los archivos que sí fueron aceptados
+        campos_con_error = set(form.errors) | set(config_form.errors)
+        for i, jform in enumerate(jurado_formset.forms):
+            for campo in jform.errors:
+                campos_con_error.add(f"{jurado_formset.prefix}-{i}-{campo}")
+        archivos_conservados = _conv_stash_guardar(request, stash_token, campos_con_error)
     else:
+        stash_token = uuid.uuid4().hex
         form = ConvocatoriaForm()
         config_form = ConfiguracionPostulacionForm()
         jurado_formset = MiembroJuradoFormSet()
@@ -284,6 +411,8 @@ def crear_convocatoria(request):
         "config_form": config_form,
         "jurado_formset": jurado_formset,
         "criterio_formset": criterio_formset,
+        "archivos_conservados": archivos_conservados,
+        "stash_token": stash_token,
     })
 
 
@@ -441,10 +570,14 @@ def rendicion_detalle(request, rendicion_id):
         if "planilla_xlsx" in request.FILES:
             rendicion.planilla_xlsx = request.FILES["planilla_xlsx"]
 
-        # Montos impacto económico
+        # Montos y cantidades impacto económico
         for campo, _ in CAMPOS_IMPACTO:
             try:
                 rendicion.__setattr__(campo, request.POST.get(campo) or 0)
+            except (ValueError, TypeError):
+                pass
+            try:
+                rendicion.__setattr__(f"{campo}_cantidad", int(request.POST.get(f"{campo}_cantidad") or 0))
             except (ValueError, TypeError):
                 pass
 
@@ -786,7 +919,9 @@ def _paso_integrante(request, postulacion, config, ctx, rol):
                 if integrante_prod and integrante_prod.persona_humana == persona:
                     messages.error(request, "En esta convocatoria el/la director/a debe ser una persona distinta al/a la productor/a presentante.")
                     buscado = True
-                    resultados = PersonaHumana.objects.filter(nombre_completo__icontains=persona.nombre_completo)[:10]
+                    resultados = PersonaHumana.objects.filter(
+                        Q(nombre__icontains=persona.nombre) | Q(apellido__icontains=persona.apellido)
+                    )[:10]
                     ctx.update({
                         "rol": rol, "label": label, "integrante": integrante,
                         "form": form, "resultados": resultados, "buscado": buscado,
