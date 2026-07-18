@@ -180,7 +180,11 @@ def evolucion_anual(filtros):
 # Cash Rebate (encuadrado en promoción) es un programa distinto: se separa del
 # resto por `Convocatoria.linea`. El Plan de Fomento agrupa TODO lo demás
 # (fomento, línea libre / Cine en Comunidad, etc.), no solo la línea "fomento".
-LINEA_CASH_REBATE = "cash_rebate"
+#
+# En prod la convocatoria "Salta Cash Rebate" está cargada con linea='beneficio'
+# (el valor 'cash_rebate' de las choices nunca se usó). Se contemplan ambos
+# valores para identificar el programa sin depender de la carga.
+LINEAS_CASH_REBATE = ["cash_rebate", "beneficio"]
 
 LINEAS_DASHBOARD = {
     "fomento": {
@@ -191,7 +195,7 @@ LINEAS_DASHBOARD = {
         "archivo_label":  "postulaciones",
         # Todo salvo Cash Rebate.
         "linea_in":       None,
-        "linea_out":      [LINEA_CASH_REBATE],
+        "linea_out":      LINEAS_CASH_REBATE,
     },
     "cash_rebate": {
         "nav_activo":     "cash_rebate",
@@ -200,7 +204,7 @@ LINEAS_DASHBOARD = {
         "url_exportar":   "estadisticas:exportar_cash_rebate",
         "archivo_label":  "cash_rebate",
         # Solo Cash Rebate.
-        "linea_in":       [LINEA_CASH_REBATE],
+        "linea_in":       LINEAS_CASH_REBATE,
         "linea_out":      None,
     },
 }

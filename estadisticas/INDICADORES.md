@@ -18,7 +18,9 @@ Si se agrega un indicador nuevo, sumarlo acá con su unidad.
 ## Plan de Fomento (`/estadisticas/`) y Cash Rebate (`/estadisticas/cash-rebate/`)
 
 Se separan por `Convocatoria.linea`. **Cash Rebate** (encuadrado en promoción)
-es el programa distinto que se aísla: su dashboard muestra solo `cash_rebate`.
+es el programa distinto que se aísla: su dashboard muestra solo las líneas de
+Cash Rebate (`cash_rebate` y `beneficio` — en prod "Salta Cash Rebate" está
+cargada con `beneficio`; ver `LINEAS_CASH_REBATE` en `views/postulaciones.py`).
 El **Plan de Fomento** agrupa **todo lo demás** (línea `fomento`, línea libre /
 Cine en Comunidad, etc.), es decir *todas las postulaciones salvo* `cash_rebate`
 — no solo la línea `fomento`. Ambos usan la misma lógica y el mismo template
