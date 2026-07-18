@@ -17,15 +17,16 @@ Si se agrega un indicador nuevo, sumarlo acá con su unidad.
 
 ## Plan de Fomento (`/estadisticas/`) y Cash Rebate (`/estadisticas/cash-rebate/`)
 
-Son **dos programas distintos** que comparten el modelo `Postulacion`: se
-separan por `Convocatoria.linea` (`fomento` vs. `cash_rebate`). Cada dashboard
-filtra por su línea, así que las postulaciones de Cash Rebate (encuadrado en
-promoción) no se mezclan con las del Plan de Fomento. Ambos usan la misma
-lógica y el mismo template (`views/postulaciones.py`, parametrizado por línea).
+Se separan por `Convocatoria.linea`. **Cash Rebate** (encuadrado en promoción)
+es el programa distinto que se aísla: su dashboard muestra solo `cash_rebate`.
+El **Plan de Fomento** agrupa **todo lo demás** (línea `fomento`, línea libre /
+Cine en Comunidad, etc.), es decir *todas las postulaciones salvo* `cash_rebate`
+— no solo la línea `fomento`. Ambos usan la misma lógica y el mismo template
+(`views/postulaciones.py`, parametrizado con incluir/excluir línea).
 
 | Indicador | Unidad | Fuente |
 |---|---|---|
-| Postulaciones | postulaciones | `Postulacion` sin `borrador`, filtrada por `convocatoria__linea`; filtros: convocatoria, año de `fecha_envio`, tipo, solo ganadores |
+| Postulaciones | postulaciones | `Postulacion` sin `borrador`; Fomento excluye `cash_rebate`, Cash Rebate incluye solo `cash_rebate`; filtros: convocatoria, año de `fecha_envio`, tipo, solo ganadores |
 | Presentantes únicos | personas únicas | `user_id` distintos del resultado filtrado |
 | Por convocatoria / tipo / género del proyecto / estado | postulaciones | campos de `Postulacion` |
 | Género / rango etario / residencia | personas únicas | `PersonaHumana` del presentante; "Sin dato" si no está en el registro |
