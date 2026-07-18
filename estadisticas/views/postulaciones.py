@@ -37,8 +37,10 @@ def postulaciones_qs(filtros):
     qs = Postulacion.objects.exclude(estado="borrador").select_related(
         "convocatoria", "user"
     )
-    if filtros.get("linea"):
-        qs = qs.filter(convocatoria__linea=filtros["linea"])
+    if filtros.get("linea_in"):
+        qs = qs.filter(convocatoria__linea__in=filtros["linea_in"])
+    if filtros.get("linea_out"):
+        qs = qs.exclude(convocatoria__linea__in=filtros["linea_out"])
     if filtros.get("conv"):
         qs = qs.filter(convocatoria_id=filtros["conv"])
     if filtros.get("anio"):
@@ -175,8 +177,11 @@ def evolucion_anual(filtros):
     }
 
 
-# Parámetros propios de cada programa (comparten el modelo Postulacion,
-# pero son dos líneas distintas: Fomento vs. Cash Rebate — promoción).
+# Cash Rebate (encuadrado en promoción) es un programa distinto: se separa del
+# resto por `Convocatoria.linea`. El Plan de Fomento agrupa TODO lo demás
+# (fomento, línea libre / Cine en Comunidad, etc.), no solo la línea "fomento".
+LINEA_CASH_REBATE = "cash_rebate"
+
 LINEAS_DASHBOARD = {
     "fomento": {
         "nav_activo":     "fomento",
@@ -184,6 +189,9 @@ LINEAS_DASHBOARD = {
         "url_dashboard":  "estadisticas:dashboard",
         "url_exportar":   "estadisticas:exportar",
         "archivo_label":  "postulaciones",
+        # Todo salvo Cash Rebate.
+        "linea_in":       None,
+        "linea_out":      [LINEA_CASH_REBATE],
     },
     "cash_rebate": {
         "nav_activo":     "cash_rebate",
@@ -191,13 +199,27 @@ LINEAS_DASHBOARD = {
         "url_dashboard":  "estadisticas:dashboard_cash_rebate",
         "url_exportar":   "estadisticas:exportar_cash_rebate",
         "archivo_label":  "cash_rebate",
+        # Solo Cash Rebate.
+        "linea_in":       [LINEA_CASH_REBATE],
+        "linea_out":      None,
     },
 }
 
 
+def _aplicar_linea(qs, cfg, campo="convocatoria__linea"):
+    """Filtra un queryset por las líneas del dashboard (incluir/excluir)."""
+    if cfg.get("linea_in"):
+        qs = qs.filter(**{f"{campo}__in": cfg["linea_in"]})
+    if cfg.get("linea_out"):
+        qs = qs.exclude(**{f"{campo}__in": cfg["linea_out"]})
+    return qs
+
+
 def _filtros(request, linea):
+    cfg = LINEAS_DASHBOARD[linea]
     return {
-        "linea":          linea,
+        "linea_in":       cfg["linea_in"],
+        "linea_out":      cfg["linea_out"],
         "conv":           request.GET.get("conv", ""),
         "anio":           request.GET.get("anio", ""),
         "tipo":           request.GET.get("tipo", ""),
@@ -207,10 +229,11 @@ def _filtros(request, linea):
 
 def _dashboard(request, linea):
     cfg = LINEAS_DASHBOARD[linea]
-    convocatorias = Convocatoria.objects.filter(linea=linea).order_by("-fecha_inicio")
+    convocatorias = _aplicar_linea(
+        Convocatoria.objects.all(), cfg, "linea"
+    ).order_by("-fecha_inicio")
     anios = (
-        Postulacion.objects.filter(convocatoria__linea=linea)
-        .exclude(fecha_envio=None)
+        _aplicar_linea(Postulacion.objects.exclude(fecha_envio=None), cfg)
         .values_list("fecha_envio__year", flat=True)
         .distinct()
         .order_by("-fecha_envio__year")
