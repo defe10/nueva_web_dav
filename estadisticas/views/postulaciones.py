@@ -37,6 +37,8 @@ def postulaciones_qs(filtros):
     qs = Postulacion.objects.exclude(estado="borrador").select_related(
         "convocatoria", "user"
     )
+    if filtros.get("linea"):
+        qs = qs.filter(convocatoria__linea=filtros["linea"])
     if filtros.get("conv"):
         qs = qs.filter(convocatoria_id=filtros["conv"])
     if filtros.get("anio"):
@@ -173,32 +175,62 @@ def evolucion_anual(filtros):
     }
 
 
-@staff_member_required
-def dashboard(request):
-    convocatorias = Convocatoria.objects.order_by("-fecha_inicio")
-    anios = (
-        Postulacion.objects.exclude(fecha_envio=None)
-        .values_list("fecha_envio__year", flat=True)
-        .distinct()
-        .order_by("-fecha_envio__year")
-    )
+# Parámetros propios de cada programa (comparten el modelo Postulacion,
+# pero son dos líneas distintas: Fomento vs. Cash Rebate — promoción).
+LINEAS_DASHBOARD = {
+    "fomento": {
+        "nav_activo":     "fomento",
+        "hero_subtitulo": "Postulaciones y ganadores del Plan de Fomento IDEA",
+        "url_dashboard":  "estadisticas:dashboard",
+        "url_exportar":   "estadisticas:exportar",
+        "archivo_label":  "postulaciones",
+    },
+    "cash_rebate": {
+        "nav_activo":     "cash_rebate",
+        "hero_subtitulo": "Postulaciones del programa Cash Rebate (Salta Set)",
+        "url_dashboard":  "estadisticas:dashboard_cash_rebate",
+        "url_exportar":   "estadisticas:exportar_cash_rebate",
+        "archivo_label":  "cash_rebate",
+    },
+}
 
-    filtros = {
+
+def _filtros(request, linea):
+    return {
+        "linea":          linea,
         "conv":           request.GET.get("conv", ""),
         "anio":           request.GET.get("anio", ""),
         "tipo":           request.GET.get("tipo", ""),
         "solo_ganadores": request.GET.get("solo_ganadores", "") == "1",
     }
 
+
+def _dashboard(request, linea):
+    cfg = LINEAS_DASHBOARD[linea]
+    convocatorias = Convocatoria.objects.filter(linea=linea).order_by("-fecha_inicio")
+    anios = (
+        Postulacion.objects.filter(convocatoria__linea=linea)
+        .exclude(fecha_envio=None)
+        .values_list("fecha_envio__year", flat=True)
+        .distinct()
+        .order_by("-fecha_envio__year")
+    )
+
+    filtros = _filtros(request, linea)
+
     qs    = postulaciones_qs(filtros)
     datos = agrupar(qs)
 
     return render(request, "estadisticas/dashboard.html", {
-        "filtros":       filtros,
-        "convocatorias": convocatorias,
-        "anios":         anios,
-        "tipos":         Postulacion.TIPO_PROYECTO,
-        "total":         qs.count(),
+        "filtros":        filtros,
+        "convocatorias":  convocatorias,
+        "anios":          anios,
+        "tipos":          Postulacion.TIPO_PROYECTO,
+        "total":          qs.count(),
+        "nav_activo":     cfg["nav_activo"],
+        "hero_subtitulo": cfg["hero_subtitulo"],
+        "url_dashboard":  cfg["url_dashboard"],
+        "url_exportar":   cfg["url_exportar"],
         **datos,
         **tasas(qs),
         **evolucion_anual(filtros),
@@ -207,13 +239,18 @@ def dashboard(request):
 
 
 @staff_member_required
-def exportar(request):
-    filtros = {
-        "conv":           request.GET.get("conv", ""),
-        "anio":           request.GET.get("anio", ""),
-        "tipo":           request.GET.get("tipo", ""),
-        "solo_ganadores": request.GET.get("solo_ganadores", "") == "1",
-    }
+def dashboard(request):
+    return _dashboard(request, "fomento")
+
+
+@staff_member_required
+def dashboard_cash_rebate(request):
+    return _dashboard(request, "cash_rebate")
+
+
+def _exportar(request, linea):
+    cfg = LINEAS_DASHBOARD[linea]
+    filtros = _filtros(request, linea)
     qs = postulaciones_qs(filtros)
 
     user_ids = qs.values_list("user_id", flat=True).distinct()
@@ -281,7 +318,18 @@ def exportar(request):
     resp = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    label = "ganadores" if filtros["solo_ganadores"] else "postulaciones"
+    base = cfg["archivo_label"]
+    label = f"{base}_ganadores" if filtros["solo_ganadores"] else base
     resp["Content-Disposition"] = f'attachment; filename="estadisticas_{label}.xlsx"'
     wb.save(resp)
     return resp
+
+
+@staff_member_required
+def exportar(request):
+    return _exportar(request, "fomento")
+
+
+@staff_member_required
+def exportar_cash_rebate(request):
+    return _exportar(request, "cash_rebate")

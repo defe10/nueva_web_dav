@@ -4,6 +4,10 @@
        href="{% url 'estadisticas:dashboard' %}">Plan de Fomento</a>
   </li>
   <li class="nav-item">
+    <a class="nav-link {% if activo == 'cash_rebate' %}active{% endif %}"
+       href="{% url 'estadisticas:dashboard_cash_rebate' %}">Cash Rebate</a>
+  </li>
+  <li class="nav-item">
     <a class="nav-link {% if activo == 'registro' %}active{% endif %}"
        href="{% url 'estadisticas:dashboard_registro' %}">Registro Audiovisual</a>
   </li>

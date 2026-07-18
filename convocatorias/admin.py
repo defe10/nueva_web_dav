@@ -310,6 +310,7 @@ class PostulacionAdmin(FiltrosPersistentesMixin, admin.ModelAdmin):
         "crear_rendicion_para_seleccionados",
         "marcar_seleccionado_y_crear_rendicion",
         "marcar_ganador_y_notificar",
+        "marcar_no_seleccionado_y_notificar",
     ]
 
     # -------------------------
@@ -648,6 +649,21 @@ class PostulacionAdmin(FiltrosPersistentesMixin, admin.ModelAdmin):
         self.message_user(request, f"{queryset.count()} proyecto(s) marcado(s) como seleccionado/s y notificado/s.")
 
     marcar_ganador_y_notificar.short_description = "✉️ Marcar como SELECCIONADO y enviar email"
+
+    def marcar_no_seleccionado_y_notificar(self, request, queryset):
+        actualizadas = 0
+        for p in queryset.select_related("user", "convocatoria"):
+            if p.estado != "no_seleccionado":
+                p.estado = "no_seleccionado"
+                p.save(update_fields=["estado"])
+                self._enviar_email_estado(request, p)
+                actualizadas += 1
+        self.message_user(
+            request,
+            f"{actualizadas} postulación/es marcada/s como NO SELECCIONADA/s y notificada/s."
+        )
+
+    marcar_no_seleccionado_y_notificar.short_description = "🚫 Marcar como NO SELECCIONADO y enviar email"
 
     def marcar_admitido(self, request, queryset):
         for p in queryset.select_related("user", "convocatoria"):

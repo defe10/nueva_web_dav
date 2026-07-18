@@ -30,6 +30,8 @@ CAMPOS_IMPACTO = [
 
 def impacto(filtros):
     qs = Rendicion.objects.filter(estado="APROBADO")
+    if filtros.get("linea"):
+        qs = qs.filter(postulacion__convocatoria__linea=filtros["linea"])
     if filtros.get("conv"):
         qs = qs.filter(postulacion__convocatoria_id=filtros["conv"])
     if filtros.get("anio"):
@@ -80,6 +82,10 @@ def montos_comparados(filtros):
     rendidas  = Rendicion.objects.filter(estado__in=ESTADOS_RENDIDO)
     aprobadas = Rendicion.objects.filter(estado="APROBADO")
 
+    if filtros.get("linea"):
+        ganadoras = ganadoras.filter(convocatoria__linea=filtros["linea"])
+        rendidas  = rendidas.filter(postulacion__convocatoria__linea=filtros["linea"])
+        aprobadas = aprobadas.filter(postulacion__convocatoria__linea=filtros["linea"])
     if filtros.get("conv"):
         ganadoras = ganadoras.filter(convocatoria_id=filtros["conv"])
         rendidas  = rendidas.filter(postulacion__convocatoria_id=filtros["conv"])
