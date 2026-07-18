@@ -15,11 +15,17 @@ Si se agrega un indicador nuevo, sumarlo acá con su unidad.
 | **Contratación / ítem** | Cantidad declarada en la planilla de rendición por categoría. **No** son personas únicas: una misma persona puede aparecer en varias categorías o rendiciones. |
 | **Pesos ($)** | Montos de rendiciones, siempre `Decimal`, agregados en base de datos. |
 
-## Plan de Fomento (`/estadisticas/`)
+## Plan de Fomento (`/estadisticas/`) y Cash Rebate (`/estadisticas/cash-rebate/`)
+
+Son **dos programas distintos** que comparten el modelo `Postulacion`: se
+separan por `Convocatoria.linea` (`fomento` vs. `cash_rebate`). Cada dashboard
+filtra por su línea, así que las postulaciones de Cash Rebate (encuadrado en
+promoción) no se mezclan con las del Plan de Fomento. Ambos usan la misma
+lógica y el mismo template (`views/postulaciones.py`, parametrizado por línea).
 
 | Indicador | Unidad | Fuente |
 |---|---|---|
-| Postulaciones | postulaciones | `Postulacion` sin `borrador`, filtros: convocatoria, año de `fecha_envio`, tipo, solo ganadores |
+| Postulaciones | postulaciones | `Postulacion` sin `borrador`, filtrada por `convocatoria__linea`; filtros: convocatoria, año de `fecha_envio`, tipo, solo ganadores |
 | Presentantes únicos | personas únicas | `user_id` distintos del resultado filtrado |
 | Por convocatoria / tipo / género del proyecto / estado | postulaciones | campos de `Postulacion` |
 | Género / rango etario / residencia | personas únicas | `PersonaHumana` del presentante; "Sin dato" si no está en el registro |
@@ -59,7 +65,8 @@ Formación: inscripciones por año.
 
 | Dashboard | Filtros |
 |---|---|
-| Plan de Fomento | convocatoria, año (envío), tipo de proyecto, solo ganadores |
+| Plan de Fomento | convocatoria, año (envío), tipo de proyecto, solo ganadores (solo línea `fomento`) |
+| Cash Rebate | convocatoria, año (envío), tipo de proyecto, solo ganadores (solo línea `cash_rebate`) |
 | Registro | localidad, área de desempeño (principal o secundaria) |
 | Exenciones | año (solicitud), estado, localidad fiscal |
 | Formación | convocatoria, año (inscripción), estado |
@@ -103,7 +110,7 @@ cambiar la carga de rendiciones para identificar personas; hoy la planilla solo 
 ```
 estadisticas/views/
   comun.py          helpers compartidos (conteo, rangos etarios, normalización, Excel)
-  postulaciones.py  dashboard Plan de Fomento + exportación
+  postulaciones.py  dashboards Plan de Fomento y Cash Rebate + exportación
   impacto.py        impacto económico
   registro.py       Registro Audiovisual
   exenciones.py     exenciones

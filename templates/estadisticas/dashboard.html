@@ -4,13 +4,13 @@
 {% block content %}
 <section class="fomento-hero text-center">
   <h1 class="fw-bold mb-2">Estadísticas</h1>
-  <p class="text-white mb-0">Postulaciones y ganadores del Plan de Fomento IDEA</p>
+  <p class="text-white mb-0">{{ hero_subtitulo }}</p>
 </section>
 
 <div class="container py-4">
 
   <!-- ═══ NAVEGACIÓN ENTRE DASHBOARDS ════════════════════════ -->
-  {% include "estadisticas/_nav.html" with activo="fomento" %}
+  {% include "estadisticas/_nav.html" with activo=nav_activo %}
 
   <!-- ═══ FILTROS ═══════════════════════════════════════════ -->
   <div class="dav-card mb-4">
@@ -60,7 +60,7 @@
 
       <div class="col-6 col-md-2 d-flex gap-2">
         <button type="submit" class="btn btn-primary btn-sm w-100">Filtrar</button>
-        <a href="{% url 'estadisticas:dashboard' %}" class="btn btn-outline-secondary btn-sm">✕</a>
+        <a href="{% url url_dashboard %}" class="btn btn-outline-secondary btn-sm">✕</a>
       </div>
 
     </form>
@@ -249,7 +249,7 @@
 
   <!-- ═══ EXPORTAR ════════════════════════════════════════════ -->
   <div class="text-end mt-4">
-    <a href="{% url 'estadisticas:exportar' %}?conv={{ filtros.conv }}&anio={{ filtros.anio }}&tipo={{ filtros.tipo }}&solo_ganadores={% if filtros.solo_ganadores %}1{% endif %}"
+    <a href="{% url url_exportar %}?conv={{ filtros.conv }}&anio={{ filtros.anio }}&tipo={{ filtros.tipo }}&solo_ganadores={% if filtros.solo_ganadores %}1{% endif %}"
        class="btn btn-outline-success">
       Descargar informe (.xlsx)
     </a>
