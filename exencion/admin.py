@@ -81,7 +81,7 @@ class ExencionAdmin(admin.ModelAdmin):
         "presentante",          # ✅ clickable (en vez de nombre_razon_social)
         "cuit",
         "email",
-        "convocatoria",
+        "convocatoria_display",
     )
 
     list_filter = (ArchivadaFilter, "estado", "fecha_creacion")
@@ -192,6 +192,19 @@ class ExencionAdmin(admin.ModelAdmin):
 
     presentante.short_description = "Presentante"
     presentante.admin_order_field = "nombre_razon_social"
+
+    # -------------------------------------------------
+    # CONVOCATORIA (las exenciones independientes no tienen) ✅
+    # -------------------------------------------------
+    def convocatoria_display(self, obj):
+        """
+        Si la exención nació de una convocatoria mostramos su título;
+        si es un trámite independiente mostramos 'Exención' en vez del '-'.
+        """
+        return obj.convocatoria.titulo if obj.convocatoria else "Exención"
+
+    convocatoria_display.short_description = "Convocatoria"
+    convocatoria_display.admin_order_field = "convocatoria__titulo"
 
     # -------------------------------------------------
     # RESUMEN DE DOCUMENTACIÓN (HTML REAL, no texto)
