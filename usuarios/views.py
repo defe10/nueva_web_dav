@@ -8,7 +8,7 @@ from django_ratelimit.exceptions import Ratelimited
 from django.core.paginator import Paginator
 from django.core import signing
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.conf import settings
 import json
@@ -43,6 +43,7 @@ from convocatorias.models import (
     PuntajeCriterio,
 )
 from formacion.models import InscripcionFormacion
+from gps.models import Obra
 
 
 # ============================================================
@@ -255,6 +256,27 @@ def panel_usuario(request):
         .order_by("-fecha")
     )
 
+    # Obras del GPS. `total_hitos` evita una query por fila en el panel.
+    # Con el módulo apagado la sección no se muestra y no se consulta nada.
+    gps_activo = getattr(settings, "GPS_ACTIVO", False)
+    obras = (
+        Obra.objects
+        .filter(owner=user)
+        .annotate(total_hitos=Count("hitos"))
+        if gps_activo else Obra.objects.none()
+    )
+
+    # Proyectos que ganaron y todavía no tienen obra en el GPS: en vez de
+    # crearla sola (duplicados, obras que nadie siente propias), se le ofrece
+    # al titular registrarla con los datos de la postulación ya cargados.
+    postulaciones_sin_obra = (
+        Postulacion.objects
+        .filter(user=user, estado__in=["seleccionado", "finalizado"])
+        .exclude(obras__owner=user)
+        .select_related("convocatoria")
+        if gps_activo else Postulacion.objects.none()
+    )
+
     return render(
         request,
         "usuarios/panel.html",
@@ -266,6 +288,9 @@ def panel_usuario(request):
             "postulaciones": postulaciones_page,
             "rendiciones": rendiciones,
             "inscripciones_formacion": inscripciones_formacion,
+            "obras": obras,
+            "postulaciones_sin_obra": postulaciones_sin_obra,
+            "gps_activo": gps_activo,
         },
     )
 

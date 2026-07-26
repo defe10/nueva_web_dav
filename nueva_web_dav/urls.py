@@ -33,6 +33,9 @@ urlpatterns = [
 
     # Estadísticas (solo staff)
     path('estadisticas/', include('estadisticas.urls')),
+
+    # GPS · Trazabilidad de obras
+    path('gps/', include('gps.urls')),
 ]
 
 if settings.DEBUG:

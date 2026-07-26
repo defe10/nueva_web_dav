@@ -23,5 +23,11 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# =========================
+# MÓDULOS EN DESARROLLO
+# =========================
+# En el servidor va en False (ver config/base.py) hasta que se decida abrirlo.
+GPS_ACTIVO = True
+
 
 

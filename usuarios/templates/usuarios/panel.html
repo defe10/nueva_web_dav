@@ -498,6 +498,100 @@
           {% endif %}
 
           <!-- ========================= -->
+          <!-- REGISTRO DE OBRAS (MISMA GRILLA 4 COL) -->
+          <!-- ========================= -->
+          {% if gps_activo %}
+          {% if persona_humana or persona_juridica %}
+          <div class="panel-section">
+            <div class="panel-section-title">
+              <span class="panel-ico"><i class="bi bi-film"></i></span>
+              <div>
+                <h6 class="mb-0">Registro de obras</h6>
+                <div class="panel-subtitle">Tus obras y su trayectoria</div>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              {% if postulaciones_sin_obra %}
+                <div class="panel-note alert alert-warning mb-3">
+                  <div class="fw-bold mb-2">
+                    Proyecto{{ postulaciones_sin_obra|length|pluralize:"s" }} seleccionado{{ postulaciones_sin_obra|length|pluralize:"s" }} sin obra registrada
+                  </div>
+                  <ul class="mb-0">
+                    {% for p in postulaciones_sin_obra %}
+                      <li class="mb-1">
+                        <strong>{{ p.nombre_proyecto|default:"(Sin título)" }}</strong>
+                        — {{ p.convocatoria.titulo }}
+                        <a href="{% url 'gps:obra_crear' %}?postulacion={{ p.pk }}"
+                           class="btn btn-warning btn-sm btn-pill ms-2">
+                          Registrar obra
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+
+              {% if obras %}
+                <div class="panel-grid-head panel-grid-4">
+                  <div class="panel-head-left">Obra</div>
+                  <div class="panel-head-center panel-head-center-left"><span>Estado de producción</span></div>
+                  <div class="panel-head-right">Trayectoria</div>
+                  <div class="panel-head-right">Acción</div>
+                </div>
+
+                {% for obra in obras %}
+                  <div class="panel-grid-row panel-grid-4">
+                    <div class="panel-cell panel-cell-left">
+                      <div class="panel-primary panel-clamp-2">
+                        {{ obra.titulo|default:"(Sin título)" }}
+                      </div>
+                    </div>
+
+                    <div class="panel-cell panel-cell-center">
+                      <div class="panel-secondary panel-clamp-2 panel-center-text">
+                        {{ obra.get_estado_produccion_display }}
+                        {% if obra.anio_inicio %} · {{ obra.anio_inicio }}{% endif %}
+                      </div>
+                    </div>
+
+                    <div class="panel-cell panel-cell-right">
+                      <span class="badge badge-multiline
+                        {% if obra.total_hitos %} bg-primary
+                        {% else %} bg-secondary
+                        {% endif %}
+                      ">
+                        {{ obra.total_hitos }} hito{{ obra.total_hitos|pluralize }}
+                      </span>
+                    </div>
+
+                    <div class="panel-cell panel-cell-right">
+                      <a href="{% url 'gps:obra_detalle' obra.pk %}"
+                         class="btn btn-outline-primary btn-sm btn-pill">
+                        Abrir
+                      </a>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="panel-note alert alert-info mb-0">
+                  Todavía no registraste obras. Registrá tus proyectos para llevar su
+                  recorrido: apoyos, festivales, premios y estrenos.
+                </div>
+              {% endif %}
+
+              <div class="d-flex justify-content-end mt-3">
+                <a href="{% url 'gps:obra_crear' %}"
+                   class="btn btn-primary btn-sm btn-pill">
+                  Registrar obra
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          {% endif %}
+
+          <!-- ========================= -->
           <!-- ACCIONES -->
           <!-- ========================= -->
           <div class="panel-section">

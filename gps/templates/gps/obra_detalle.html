@@ -1,0 +1,149 @@
+{% extends "sitio_publico/base.html" %}
+
+{% block title %}GPS · {{ obra.titulo }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .gps-timeline { position: relative; padding-left: 1.75rem; }
+  .gps-timeline::before {
+    content: ""; position: absolute; left: 0.5rem; top: 0; bottom: 0;
+    width: 2px; background: #dee2e6;
+  }
+  .gps-hito { position: relative; margin-bottom: 1.25rem; }
+  .gps-hito::before {
+    content: ""; position: absolute; left: -1.4rem; top: 0.35rem;
+    width: 0.75rem; height: 0.75rem; border-radius: 50%;
+    background: #0d6efd; border: 2px solid #fff; box-shadow: 0 0 0 2px #dee2e6;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav class="mb-3">
+  <a href="{% url 'gps:mis_obras' %}" class="text-decoration-none">&larr; Volver a mis obras</a>
+</nav>
+
+<!-- Cabecera de la obra -->
+<div class="d-flex justify-content-between align-items-start mb-2">
+  <div>
+    <h1 class="h3 mb-1">{{ obra.titulo }}</h1>
+    <p class="text-muted small mb-0">
+      {% if obra.formato %}{{ obra.get_formato_display }}{% endif %}
+      {% if obra.genero %}· {{ obra.get_genero_display }}{% endif %}
+      {% if obra.anio_inicio %}· {{ obra.anio_inicio }}{% endif %}
+    </p>
+    {% if titulos_anteriores %}
+      <p class="text-muted small mb-0 mt-1">
+        Antes:
+        {% for t in titulos_anteriores %}
+          <em>{{ t.titulo }}</em>{% if t.anio_hasta %} (hasta {{ t.anio_hasta }}){% endif %}{% if not forloop.last %} · {% endif %}
+        {% endfor %}
+      </p>
+    {% endif %}
+  </div>
+  <a href="{% url 'gps:obra_editar' obra.pk %}" class="btn btn-outline-secondary btn-sm">Editar obra</a>
+</div>
+
+<div class="mb-4">
+  <span class="badge bg-primary">{{ obra.get_estado_produccion_display }}</span>
+  {% if obra.verificado %}<span class="badge bg-success">Verificada</span>{% endif %}
+</div>
+
+{% if obra.direccion or obra.produccion or obra.sinopsis %}
+  <div class="card mb-4">
+    <div class="card-body">
+      {% if obra.direccion %}<p class="mb-1"><strong>Dirección:</strong> {{ obra.direccion }}{% if obra.direccion_registro %} <span class="badge bg-success-subtle text-success border border-success-subtle">Registrado/a</span>{% endif %}</p>{% endif %}
+      {% if obra.produccion %}<p class="mb-1"><strong>Producción:</strong> {{ obra.produccion }}{% if obra.produccion_registro %} <span class="badge bg-success-subtle text-success border border-success-subtle">Registrado/a</span>{% endif %}</p>{% endif %}
+      {% if obra.sinopsis %}<p class="mb-0 mt-2">{{ obra.sinopsis|linebreaksbr }}</p>{% endif %}
+    </div>
+  </div>
+{% endif %}
+
+{% if postulaciones %}
+  <div class="mb-4">
+    <h2 class="h6 text-muted">Apoyo recibido</h2>
+    <ul class="list-group">
+      {% for p in postulaciones %}
+        <li class="list-group-item d-flex justify-content-between">
+          <span>
+            {{ p.convocatoria.titulo }}
+            {# El nombre del proyecto queda congelado al postular: puede no ser el título de hoy. #}
+            {% if p.nombre_proyecto and p.nombre_proyecto != obra.titulo %}
+              <span class="d-block text-muted small">postulada como <em>{{ p.nombre_proyecto }}</em></span>
+            {% endif %}
+          </span>
+          <span class="badge bg-secondary align-self-center">{{ p.get_estado_display }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<!-- Ficha técnica -->
+<div class="card mb-4">
+  <div class="card-body d-flex justify-content-between align-items-center">
+    <div>
+      <h2 class="h6 mb-1">Ficha técnica</h2>
+      <p class="text-muted small mb-0">
+        {% if obra.ficha_tecnica %}
+          Registro técnico de la obra terminada.
+        {% else %}
+          Todavía sin cargar. Completala cuando la obra esté terminada / depositada.
+        {% endif %}
+      </p>
+    </div>
+    <a href="{% url 'gps:ficha_editar' obra.pk %}" class="btn btn-outline-primary btn-sm">
+      {% if obra.ficha_tecnica %}Ver / editar ficha{% else %}Completar ficha técnica{% endif %}
+    </a>
+  </div>
+</div>
+
+<!-- Trayectoria -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0">Trayectoria</h2>
+  <a href="{% url 'gps:hito_crear' obra.pk %}" class="btn btn-primary">+ Hito</a>
+</div>
+
+{% if hitos %}
+  <div class="gps-timeline">
+    {% for h in hitos %}
+      <div class="gps-hito">
+        <div class="card">
+          <div class="card-body py-3">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <span class="badge bg-info text-dark me-1">{{ h.get_tipo_display }}</span>
+                {% if h.estado %}<span class="badge bg-secondary me-1">{{ h.get_estado_display }}</span>{% endif %}
+                <span class="fw-semibold">{{ h.nombre }}</span>
+                <span class="text-muted">· {{ h.anio }}{% if h.fecha %} ({{ h.fecha }}){% endif %}</span>
+              </div>
+              <div class="text-nowrap">
+                <a href="{% url 'gps:hito_editar' h.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
+                <form method="post" action="{% url 'gps:hito_eliminar' h.pk %}" class="d-inline"
+                      onsubmit="return confirm('¿Eliminar este hito?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+                </form>
+              </div>
+            </div>
+            <div class="small text-muted mt-1">
+              {% if h.entidad %}{{ h.entidad }}{% endif %}
+              {% if h.edicion %}· {{ h.edicion }}{% endif %}
+              {% if h.lugar %}· {{ h.lugar }}{% endif %}{% if h.pais %}, {{ h.pais }}{% endif %}
+            </div>
+            {% if h.resultado %}<div class="mt-1"><strong>{{ h.resultado }}</strong></div>{% endif %}
+            {% if h.monto %}<div class="small mt-1">Monto: {{ h.monto }} {{ h.moneda }}</div>{% endif %}
+            {% if h.hito_origen %}<div class="small text-muted mt-1">Surge de: {{ h.hito_origen.nombre }}</div>{% endif %}
+            {% if h.descripcion %}<div class="mt-2">{{ h.descripcion|linebreaksbr }}</div>{% endif %}
+            {% if h.link %}<div class="mt-1"><a href="{{ h.link }}" target="_blank" rel="noopener">Ver más ↗</a></div>{% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">
+    Esta obra todavía no tiene hitos. Agregá el primero con <strong>+ Hito</strong>.
+  </div>
+{% endif %}
+{% endblock %}

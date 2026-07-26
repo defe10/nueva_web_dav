@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'exencion',
     "backoffice",
     'chatbot',
+    'gps',
 ]
 
 
@@ -195,4 +196,13 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" #DESARROLLO
 ALLOWED_HOSTS = ["*"]
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+
+# ============================================
+# GPS · REGISTRO DE OBRAS
+# ============================================
+# Interruptor del módulo. En False el /gps/ devuelve 404 y no se muestra ni en
+# el banner de trámites ni en el panel del usuario; el /admin sigue disponible
+# para el staff. Permite tener el código en el servidor sin abrirlo al público.
+GPS_ACTIVO = False
 

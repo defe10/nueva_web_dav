@@ -1,0 +1,29 @@
+{% extends "sitio_publico/base.html" %}
+
+{% block title %}GPS · {% if hito %}Editar hito{% else %}Nuevo hito{% endif %}{% endblock %}
+
+{% block content %}
+<nav class="mb-3">
+  <a href="{% url 'gps:obra_detalle' obra.pk %}" class="text-decoration-none">&larr; Cancelar</a>
+</nav>
+
+<h1 class="h3 mb-1">{% if hito %}Editar hito{% else %}Nuevo hito{% endif %}</h1>
+<p class="text-muted mb-4">Obra: <strong>{{ obra.titulo }}</strong></p>
+
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  <div class="row g-3">
+    {% for field in form %}
+      <div class="{% if field.name == 'descripcion' or field.name == 'nombre' %}col-12{% else %}col-md-6{% endif %}">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="mt-4">
+    <button type="submit" class="btn btn-primary">Guardar hito</button>
+  </div>
+</form>
+{% endblock %}

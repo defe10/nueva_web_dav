@@ -1,0 +1,136 @@
+{% extends "sitio_publico/base.html" %}
+
+{% block title %}GPS · Ficha técnica{% endblock %}
+
+{% block content %}
+{{ creditos.media }}
+<nav class="mb-3">
+  <a href="{% url 'gps:obra_detalle' obra.pk %}" class="text-decoration-none">&larr; Volver a la obra</a>
+</nav>
+
+<h1 class="h3 mb-1">Ficha técnica</h1>
+<p class="text-muted mb-4">
+  Obra: <strong>{{ obra.titulo }}</strong> · Todos los campos son opcionales, completá lo que tengas.
+</p>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  <!-- ── Créditos ───────────────────────────────────── -->
+  <h2 class="h5 mb-1">Créditos</h2>
+  <p class="text-muted small mb-3">
+    Agregá una fila por persona: elegí el cargo y escribí el nombre. Si la persona
+    está en el Registro Audiovisual, elegila del desplegable para vincularla.
+  </p>
+
+  {{ creditos.management_form }}
+  {% if creditos.non_form_errors %}
+    <div class="text-danger small mb-2">{{ creditos.non_form_errors }}</div>
+  {% endif %}
+
+  <div id="creditos-filas">
+    {% for cf in creditos %}
+      <div class="row g-2 mb-2 credito-fila">
+        {% for hidden in cf.hidden_fields %}{{ hidden }}{% endfor %}
+        <div class="col-md-3">
+          {{ cf.cargo }}
+          {% for error in cf.cargo.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-3 credito-detalle">
+          {{ cf.detalle }}
+          {% for error in cf.detalle.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-5">
+          {{ cf.nombre }}
+          {% for error in cf.nombre.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-1 d-flex align-items-start">
+          {% if cf.instance.pk %}<span class="d-none">{{ cf.DELETE }}</span>{% endif %}
+          <button type="button" class="btn btn-outline-danger btn-sm credito-quitar" title="Quitar">&times;</button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <template id="credito-plantilla">
+    <div class="row g-2 mb-2 credito-fila">
+      {% for hidden in creditos.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+      <div class="col-md-3">{{ creditos.empty_form.cargo }}</div>
+      <div class="col-md-3 credito-detalle">{{ creditos.empty_form.detalle }}</div>
+      <div class="col-md-5">{{ creditos.empty_form.nombre }}</div>
+      <div class="col-md-1 d-flex align-items-start">
+        <button type="button" class="btn btn-outline-danger btn-sm credito-quitar" title="Quitar">&times;</button>
+      </div>
+    </div>
+  </template>
+
+  <button type="button" id="credito-agregar" class="btn btn-outline-primary btn-sm mb-4">
+    + Agregar persona
+  </button>
+
+  <!-- ── Resto de la ficha ──────────────────────────── -->
+  <div class="row g-3">
+    {% for field in form %}
+      <div class="col-12">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-4">
+    <button type="submit" class="btn btn-primary">Guardar ficha técnica</button>
+    <a href="{% url 'gps:obra_detalle' obra.pk %}" class="btn btn-link">Cancelar</a>
+  </div>
+</form>
+
+<script>
+  (function () {
+    var contenedor = document.getElementById("creditos-filas");
+    var plantilla = document.getElementById("credito-plantilla");
+    var totalForms = document.getElementById("id_creditos-TOTAL_FORMS");
+
+    // El campo "Rol" solo aplica al cargo "Otro crédito".
+    function toggleDetalle(fila) {
+      var cargo = fila.querySelector("select[name$='-cargo']");
+      var detalle = fila.querySelector(".credito-detalle");
+      if (!cargo || !detalle) return;
+      detalle.style.visibility = cargo.value === "otro" ? "" : "hidden";
+    }
+
+    function initFila(fila) {
+      toggleDetalle(fila);
+      var cargo = fila.querySelector("select[name$='-cargo']");
+      if (cargo) cargo.addEventListener("change", function () { toggleDetalle(fila); });
+
+      var quitar = fila.querySelector(".credito-quitar");
+      if (quitar) quitar.addEventListener("click", function () {
+        var del = fila.querySelector("input[name$='-DELETE']");
+        if (del) {           // fila ya guardada: marcar para borrar y ocultar
+          del.checked = true;
+          fila.style.display = "none";
+        } else {             // fila nueva: limpiar y ocultar (queda vacía, se ignora)
+          fila.querySelectorAll("input, select").forEach(function (el) { el.value = ""; });
+          fila.style.display = "none";
+        }
+      });
+    }
+
+    contenedor.querySelectorAll(".credito-fila").forEach(initFila);
+
+    document.getElementById("credito-agregar").addEventListener("click", function () {
+      var n = parseInt(totalForms.value, 10);
+      var html = plantilla.innerHTML.replace(/__prefix__/g, n);
+      var div = document.createElement("div");
+      div.innerHTML = html;
+      var fila = div.firstElementChild;
+      contenedor.appendChild(fila);
+      totalForms.value = n + 1;
+      initFila(fila);
+      if (window.registroAutocompleteInit) window.registroAutocompleteInit();
+    });
+  })();
+</script>
+{% endblock %}

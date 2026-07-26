@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "backoffice",
     'chatbot',
     'estadisticas',
+    'gps',
 ]
 
 

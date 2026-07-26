@@ -1,4 +1,5 @@
 # sitio_publico/views.py
+from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -39,7 +40,10 @@ def inicio(request):
 
     todas.sort(key=lambda c: (c.orden, -c.fecha_inicio.toordinal()))
 
-    return render(request, "sitio_publico/inicio.html", {"vigentes": todas})
+    return render(request, "sitio_publico/inicio.html", {
+        "vigentes": todas,
+        "gps_activo": getattr(settings, "GPS_ACTIVO", False),
+    })
 
 
 def institucional(request):

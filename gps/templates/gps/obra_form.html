@@ -1,0 +1,87 @@
+{% extends "sitio_publico/base.html" %}
+
+{% block title %}GPS · {% if obra %}Editar obra{% else %}Nueva obra{% endif %}{% endblock %}
+
+{% block content %}
+{{ form.media }}
+<nav class="mb-3">
+  <a href="{% if obra %}{% url 'gps:obra_detalle' obra.pk %}{% else %}{% url 'gps:mis_obras' %}{% endif %}"
+     class="text-decoration-none">&larr; Cancelar</a>
+</nav>
+
+<h1 class="h3 mb-4">{% if obra %}Editar obra{% else %}Nueva obra{% endif %}</h1>
+
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+  <div class="row g-3">
+    <div class="col-12">{% include "gps/_campo.html" with field=form.titulo %}</div>
+
+    <div class="col-12">
+      {% include "gps/_campo.html" with field=form.titulo_anterior_nuevo %}
+
+      {% if form.titulos_anteriores_eliminar.field.queryset %}
+        <div class="mt-2">
+          <div class="form-text mb-1">
+            Títulos anteriores ya registrados. Marcá los que quieras quitar:
+          </div>
+          {{ form.titulos_anteriores_eliminar }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="col-md-4">{% include "gps/_campo.html" with field=form.formato %}</div>
+    <div class="col-md-4">{% include "gps/_campo.html" with field=form.genero %}</div>
+    <div class="col-md-4">{% include "gps/_campo.html" with field=form.duracion %}</div>
+
+    <div class="col-md-6">{% include "gps/_campo.html" with field=form.anio_inicio %}</div>
+    <div class="col-md-6">{% include "gps/_campo.html" with field=form.estado_produccion %}</div>
+
+    <div class="col-md-6" id="campo-anio-finalizacion">{% include "gps/_campo.html" with field=form.anio_finalizacion %}</div>
+    <div class="col-md-6">{% include "gps/_campo.html" with field=form.enlace %}</div>
+
+    <div class="col-md-6">{% include "gps/_campo.html" with field=form.direccion %}</div>
+    <div class="col-md-6">{% include "gps/_campo.html" with field=form.produccion %}</div>
+
+    <div class="col-12">{% include "gps/_campo.html" with field=form.sinopsis %}</div>
+
+    <div class="col-md-6">{% include "gps/_campo.html" with field=form.portada %}</div>
+
+    {% if form.postulaciones.field.queryset %}
+      <div class="col-12">{% include "gps/_campo.html" with field=form.postulaciones %}</div>
+    {% endif %}
+  </div>
+  <div class="mt-4">
+    <button type="submit" class="btn btn-primary">Guardar</button>
+  </div>
+</form>
+
+<script>
+  // "Año de finalización" solo se muestra si el estado de producción es "Finalizada".
+  (function () {
+    var estado = document.getElementById("id_estado_produccion");
+    var campo = document.getElementById("campo-anio-finalizacion");
+    if (!estado || !campo) return;
+    var input = document.getElementById("id_anio_finalizacion");
+    var label = campo.querySelector("label");
+    function toggle() {
+      var finalizada = estado.value === "finalizada";
+      campo.style.display = finalizada ? "" : "none";
+      if (input) input.required = finalizada;
+      // Marca visual de obligatorio (asterisco) solo cuando corresponde.
+      if (label && !label.querySelector(".req-mark")) {
+        var mark = document.createElement("span");
+        mark.className = "req-mark text-danger";
+        mark.textContent = " *";
+        label.appendChild(mark);
+      }
+      if (label) {
+        var m = label.querySelector(".req-mark");
+        if (m) m.style.display = finalizada ? "" : "none";
+      }
+    }
+    estado.addEventListener("change", toggle);
+    toggle();
+  })();
+</script>
+{% endblock %}

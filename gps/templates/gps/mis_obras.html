@@ -1,0 +1,47 @@
+{% extends "sitio_publico/base.html" %}
+
+{% block title %}GPS · Mis obras{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-1">GPS · Trazabilidad de obras</h1>
+    <p class="text-muted mb-0">Seguí el recorrido de tus obras: apoyos, premios, festivales, mercados y laboratorios.</p>
+  </div>
+  <a href="{% url 'gps:obra_crear' %}" class="btn btn-primary">+ Nueva obra</a>
+</div>
+
+{% if obras %}
+  <div class="row g-3">
+    {% for obra in obras %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start">
+              <h2 class="h5 mb-1">{{ obra.titulo }}</h2>
+              {% if obra.verificado %}<span class="badge bg-success">Verificada</span>{% endif %}
+            </div>
+            <p class="text-muted small mb-2">
+              {% if obra.formato %}{{ obra.get_formato_display }}{% endif %}
+              {% if obra.anio_inicio %}· {{ obra.anio_inicio }}{% endif %}
+            </p>
+            <span class="badge bg-light text-dark align-self-start mb-3">
+              {{ obra.get_estado_produccion_display }}
+            </span>
+            <p class="small mb-3">
+              <strong>{{ obra.hitos.count }}</strong> hito{{ obra.hitos.count|pluralize }} de trayectoria
+            </p>
+            <a href="{% url 'gps:obra_detalle' obra.pk %}" class="btn btn-outline-primary btn-sm mt-auto">
+              Ver recorrido
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">
+    Todavía no tenés obras registradas. Creá la primera con <strong>+ Nueva obra</strong>.
+  </div>
+{% endif %}
+{% endblock %}

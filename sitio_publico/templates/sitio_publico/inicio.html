@@ -180,6 +180,16 @@ Inicio — Dirección de Audiovisuales
           <span class="detalle">Iniciar solicitud</span>
         </a>
 
+        {% if gps_activo %}
+        <a
+          href="{% url 'gps:mis_obras' %}"
+          class="tramite-item"
+        >
+          <span class="titulo">Registro de obras</span>
+          <span class="detalle">Registrar obra</span>
+        </a>
+        {% endif %}
+
         <a
           href="https://docs.google.com/forms/d/1dUELTaF8F3UWd1FT9o-lvkoofWsxZ4aF2kbB8rCAAGo/edit"
           class="tramite-item"
