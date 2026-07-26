@@ -13,6 +13,13 @@ urlpatterns = [
         name="convocatorias_home"
     ),
 
+    # Autocompletado de integrantes (búsqueda en el Registro Audiovisual)
+    path(
+        "buscar-persona-registro/",
+        views.buscar_persona_registro,
+        name="buscar_persona_registro",
+    ),
+
     # --------------------------------
     # SUBSANACIÓN DE DOCUMENTACIÓN (pantalla)
     # --------------------------------

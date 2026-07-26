@@ -1,0 +1,46 @@
+/* Autocompletado de integrantes (búsqueda en el Registro Audiovisual) */
+.integrante-ac-wrap {
+  position: relative;
+}
+
+.integrante-ac-menu {
+  position: absolute;
+  z-index: 1080;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 2px;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.integrante-ac-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.integrante-ac-item:hover {
+  background: #f1f3f5;
+}
+
+.integrante-ac-label {
+  font-weight: 500;
+}
+
+.integrante-ac-meta {
+  font-size: 0.8em;
+  color: #6c757d;
+}
+
+.integrante-ac-empty {
+  padding: 0.6rem 0.75rem;
+  color: #6c757d;
+  font-size: 0.9em;
+}

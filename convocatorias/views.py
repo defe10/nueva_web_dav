@@ -857,6 +857,28 @@ def subir_doc_integrante(request, postulacion_id, rol):
     return redirect(referer.split("#")[0] + "#docs")
 
 
+@login_required
+def buscar_persona_registro(request):
+    """Autocompletado del paso de integrantes: personas del Registro.
+
+    Solo Persona Humana (director/guionista/realizador deben estar inscriptos).
+    Devuelve JSON; la selección real la sigue haciendo el POST 'seleccionar'.
+    """
+    q = (request.GET.get("q") or "").strip()
+    resultados = []
+    if len(q) >= 2:
+        personas = PersonaHumana.objects.filter(
+            Q(nombre__icontains=q)
+            | Q(apellido__icontains=q)
+            | Q(cuil_cuit__icontains=q)
+        )[:10]
+        resultados = [
+            {"id": p.pk, "label": p.nombre_completo, "sublabel": f"CUIT/CUIL {p.cuil_cuit}"}
+            for p in personas
+        ]
+    return JsonResponse({"resultados": resultados})
+
+
 # ── Pasos 2/3/4: Integrante (director, guionista, realizador) ─────────────────
 def _paso_integrante(request, postulacion, config, ctx, rol):
     label = dict(IntegrantePostulacion.ROLES).get(rol, rol)

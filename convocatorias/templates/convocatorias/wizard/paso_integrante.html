@@ -1,6 +1,8 @@
 {% extends "convocatorias/wizard/base_wizard.html" %}
+{% load static %}
 
 {% block wizard_content %}
+<link rel="stylesheet" href="{% static 'convocatorias/integrante_autocomplete.css' %}">
 <div class="dav-card">
   <div class="dav-card-body">
 
@@ -147,42 +149,28 @@
     <p class="small text-muted">¿No es la persona correcta?</p>
     {% endif %}
 
-    <!-- BÚSQUEDA -->
-    <form method="post" class="mb-3">
+    <!-- BÚSQUEDA (autocompletado en vivo) -->
+    <!-- Al elegir una persona, este form dispara la misma acción 'seleccionar'. -->
+    <form method="post" id="form-seleccionar-{{ rol }}" class="d-none">
       {% csrf_token %}
-      <input type="hidden" name="accion" value="buscar">
-      <label class="form-label fw-semibold">Buscar por nombre</label>
-      <div class="input-group">
-        {{ form.nombre_busqueda }}
-        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
-      </div>
-      {% if form.nombre_busqueda.errors %}
-        <div class="text-danger small mt-1">{{ form.nombre_busqueda.errors }}</div>
-      {% endif %}
+      <input type="hidden" name="accion" value="seleccionar">
+      <input type="hidden" name="persona_id" id="persona-id-{{ rol }}">
     </form>
 
-    <!-- RESULTADOS -->
-    {% if buscado %}
-      {% if resultados %}
-        <div class="list-group mb-4">
-          {% for persona in resultados %}
-            <form method="post">
-              {% csrf_token %}
-              <input type="hidden" name="accion" value="seleccionar">
-              <input type="hidden" name="persona_id" value="{{ persona.id }}">
-              <button type="submit" class="list-group-item list-group-item-action text-start">
-                <strong>{{ persona.nombre_completo }}</strong>
-                <span class="text-muted small ms-2">CUIT/CUIL: {{ persona.cuil_cuit }}</span>
-              </button>
-            </form>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="alert alert-warning">
-          No se encontraron personas con ese nombre en el registro. La persona debe estar inscripta en el Registro Audiovisual para poder ser vinculada.
-        </div>
-      {% endif %}
-    {% endif %}
+    <div class="mb-4">
+      <label class="form-label fw-semibold" for="buscar-integrante-{{ rol }}">Buscar por nombre</label>
+      <input type="text" class="form-control"
+             id="buscar-integrante-{{ rol }}"
+             data-integrante-autocomplete="true"
+             data-url="{% url 'convocatorias:buscar_persona_registro' %}"
+             data-target-form="form-seleccionar-{{ rol }}"
+             data-target-input="persona-id-{{ rol }}"
+             placeholder="Escribí el nombre tal como figura en el registro"
+             autocomplete="off">
+      <div class="form-text">
+        Empezá a escribir y elegí a la persona. Debe estar inscripta en el Registro Audiovisual.
+      </div>
+    </div>
 
     <!-- SIGUIENTE -->
     <div class="text-end mt-4">
@@ -195,4 +183,6 @@
 
   </div>
 </div>
+
+<script src="{% static 'convocatorias/integrante_autocomplete.js' %}"></script>
 {% endblock %}
